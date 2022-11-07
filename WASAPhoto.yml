@@ -1,0 +1,52 @@
+openapi: 3.0.3
+
+info:
+  title: WASAPhoto API Specification
+  description: |-
+      This OpenAPI document describes a set of interfaces to allow a WASAPhoto user 
+      to interact with the WASAPhoto backend, WASAPhoto is a new social network that
+      allows you to share your best moments with friends! 
+  version: "1"
+paths:
+  /users:
+  
+  /users/{id}:
+    post:
+      
+
+  /session:
+    post:
+      tags: ["login"]
+      summary: Logs in the user
+      description: |-
+        If the user does not exist, it will be created,
+        and an identifier is returned.
+        If the user exists, the user identifier is returned.
+      operationId: doLogin
+      requestBody:
+        description: User details
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Maria
+                  pattern: 'ˆ\S*?$' #we do not want to accept whitespace
+                  minLength: 3      #it makes parsing harder.
+                  maxLength: 16     
+        required: true
+      responses:
+        '201':
+          description: User log-in action successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  identifier:
+                # change here if you decide to use an integer
+                # or any other type of identifier
+                    type: string
+                    example: "abcdef012345"
