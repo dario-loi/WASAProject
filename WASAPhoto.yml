@@ -21,7 +21,7 @@ components:
         id:
           $ref: '#/components/schemas/SHA256hash'
         user_id:
-          $ref: '#/components/schemas/Usertoken'
+          $ref: '#/components/schemas/UserID'
         photo:
           $ref: '#/components/schemas/Photo'
         description:
@@ -54,7 +54,7 @@ components:
       properties:
         hash:
           type: string
-          description: The token of the user
+          description: The ID of the user
           pattern: /^[A-F0-9]{64}$/i
           example: 985981bedf5cc6956330a1e4c39526a8839e8a3ec3adf0f2e3eedd59c359a58d
       
@@ -63,13 +63,13 @@ components:
       description: Base64 encoded photo
       pattern: ^[A-Za-z0-9+/=]*$
 
-    Usertoken:
-      title: Usertoken #this is basically just a `typedef`
+    UserID:
+      title: UserID #this is basically just a `typedef`
       type: object
       description: |- 
-        The token that identifies the user, SHA 256. 
+        The ID that identifies the user, encoded in SHA 256. 
       properties:
-        token:
+        ID:
           $ref: '#/components/schemas/SHA256hash'
 
     User:
@@ -138,7 +138,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Usertoken'
+                $ref: '#/components/schemas/UserID'
         '400':
           description: |-
             The username is not valid, it must begin with an alphabetical character,
@@ -160,7 +160,7 @@ paths:
           description: The user's id
           required: true
           schema:
-            $ref: '#/components/schemas/Usertoken'
+            $ref: '#/components/schemas/UserID'
       responses:
         '200':
           description: |-
@@ -190,7 +190,7 @@ paths:
           description: The user's id
           required: true
           schema:
-            $ref: '#/components/schemas/Usertoken'
+            $ref: '#/components/schemas/UserID'
       requestBody:
         description: |-
           The photo to post
@@ -233,7 +233,7 @@ paths:
           description: The user's id
           required: true
           schema:
-            $ref: '#/components/schemas/Usertoken'
+            $ref: '#/components/schemas/UserID'
       responses:
         '200':
           description: |-
@@ -256,7 +256,7 @@ paths:
           description: The user's id
           required: true
           schema:
-            $ref: '#/components/schemas/Usertoken'
+            $ref: '#/components/schemas/UserID'
       requestBody:
         description: |-
           The user to follow
@@ -264,7 +264,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Usertoken'
+              $ref: '#/components/schemas/UserID'
       responses:
         '201':
           description: |-
@@ -280,16 +280,18 @@ paths:
             The user is already being followed
     delete:
       operationId: unfollowUser
+      tags: ["Followers"]
       summary: Unfollow a user
       description: |-
-        Unfollow a user
+        Unfollow a user, removing it from the list of users the user is following and 
+        stopping his posts from appearing in the user's feed.
       parameters:
         - name: user_id
           in: path
           description: The user's id
           required: true
           schema:
-            $ref: '#/components/schemas/Usertoken'
+            $ref: '#/components/schemas/UserID'
       requestBody:
         description: |-
           The user to unfollow
@@ -297,7 +299,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Usertoken'
+              $ref: '#/components/schemas/UserID'
       responses:
         '204':
           description: |-
@@ -315,6 +317,7 @@ paths:
   /users/{user_id}/followers:
     get:
       operationId: getFollowers
+      tags: ["Followers"]
       summary: Get the list of users following a user
       description: |-
         Get the list of users following a user
@@ -324,7 +327,7 @@ paths:
           description: The user's id
           required: true
           schema:
-            $ref: '#/components/schemas/Usertoken'
+            $ref: '#/components/schemas/UserID'
       responses:
         '200':
           description: |-
@@ -338,6 +341,7 @@ paths:
             The user does not exist
     delete:
       operationId: removeFollower
+      tags: ["Followers"]
       summary: Remove a follower
       description: |-
         Removes a user from the followers list, useful to  
@@ -349,7 +353,7 @@ paths:
           description: The user's id
           required: true
           schema:
-            $ref: '#/components/schemas/Usertoken'
+            $ref: '#/components/schemas/UserID'
       requestBody:
         description: |-
           The user to unfollow
@@ -357,7 +361,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Usertoken'
+              $ref: '#/components/schemas/UserID'
       responses:
         '204':
           description: |-
@@ -394,4 +398,4 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Usertoken'
+                $ref: '#/components/schemas/UserID'
