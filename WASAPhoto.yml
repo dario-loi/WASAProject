@@ -7,12 +7,104 @@ info:
       to interact with the WASAPhoto backend, WASAPhoto is a new social network that
       allows you to share your best moments with friends! 
   version: "1"
+
+
+
+components:
+  schemas:
+    Photopost:
+      title: Photo
+      type: object
+      description: |- 
+        A post containing a photo to be displayed in various environments,
+        both user profiles and the main feed.
+      properties:
+        id:
+          $ref: '#/components/schemas/SHA256hash'
+        user_id:
+          $ref: '#/components/schemas/Usertoken'
+        photo:
+          $ref: '#/components/schemas/Photo'
+        description:
+          type: string
+          description: Description of the photo
+        created_at:
+          type: string
+          format: date-time
+          description: Date and time when the photo was posted
+        updated_at:
+          type: string
+          format: date-time
+          description: Date and time when the photo was last updated
+
+    Username:
+      title: Username
+      type: object
+      description: |- 
+        The username of the user, it must begin with an alphabetical character 
+        and can be composed of a number of alphanumeric characters and underscores, 
+        with a minimum length of 3 and a maximum length of 32.
+      properties:
+        username:
+          type: string
+
+          pattern: ^[a-zA-Z][a-zA-Z0-9_]{2,32}$ # we don't want to accept any whitespace or weird characters.
+    SHA256hash:
+      title: SHA256hash
+      type: object
+      description: |- 
+        A generic SHA256 hash, used throughout the API to identify users, photos and more.
+      properties:
+        hash:
+          type: string
+          description: The token of the user
+          pattern: /^[A-F0-9]{64}$/i
+      
+    Photo:
+      type: string
+      description: Base64 encoded photo
+      pattern: ^[A-Za-z0-9+/=]*$
+
+    Usertoken:
+      title: Usertoken
+      type: object
+      description: |- 
+        The token that identifies the user, SHA 256.
+      properties:
+        token:
+          $ref: '#/components/schemas/SHA256hash'
+
 paths:
   /users:
-  
-  /users/{id}:
     post:
-      
+      operationId: createUser
+      summary: Create a new user
+      description: |-
+        Create a new user in the WASAPhoto system
+      requestBody:
+        description: |-
+          The user to create
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Username'
+      responses:
+        '201':
+          description: |-
+            The user has been created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usertoken'
+        '400':
+          description: |-
+            The username is not valid, it must begin with an alphabetical character,
+            must only contain alphanumeric characters and underscores and be of a length
+            inbetween 3 and 32.
+        '409':
+          description: |-
+            The username is already taken
 
   /session:
     post:
@@ -43,6 +135,7 @@ paths:
           content:
             application/json:
               schema:
+                title: Usertoken
                 type: object
                 properties:
                   identifier:
