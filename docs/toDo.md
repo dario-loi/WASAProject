@@ -12,12 +12,12 @@ when:
 
 Operations to be implemented:
 - [x] doLogin (see simplified login)
-- [ ] setMyUserName
+- [x] setMyUserName
 - [x] uploadPhoto
 - [x] followUser
 - [x] unfollowUser
-- [ ] banUser
-- [ ] unbanUser
+- [x] banUser
+- [x] unbanUser
 - [x] getUserProfile
 - [ ] getMyStream
 - [ ] likePhoto

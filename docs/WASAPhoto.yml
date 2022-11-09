@@ -109,23 +109,36 @@ components:
         users:
           type: array
           items:
-            $ref: '#/components/schemas/User'
+            $ref: '#/components/schemas/UserID'
 
     FollowList:
       title: FollowList
       type: object
       description: |- 
         A Userlist bound to a single user, it is used to represent the Followers/Following
-        of a user.
+        of a user, structurally identical to a BanList, we give it a different name 
+        to separate them semantically.
       properties:
         owner:
           $ref: '#/components/schemas/User'
           description: The user whose followers/following are being listed
         users:
-          type: array
-          items:
-            $ref: '#/components/schemas/User'
-            description: The list of users that follow/is followed by the owner of the list
+          $ref : '#/components/schemas/UserList'
+          
+    BanList:
+      title: BanList
+      type: object
+      description: |- 
+        A List of users banned by its owner, structurally identical to a FollowList, we give 
+        it a different name to separate them semantically.
+      properties:
+        owner:
+          $ref: '#/components/schemas/User'
+          description: The user that *owns* the bans.
+        banned_users:
+          $ref : '#/components/schemas/UserList'
+
+
 
 paths:
   /users:
@@ -257,7 +270,6 @@ paths:
         '404':
           description: |-
             The user that is requesting the update does not exist.
-
 
   /users/{user_name}/profile/photos:
     post:
@@ -602,6 +614,122 @@ paths:
           description: |-
             The user is not being followed
 
+  /users/{user_name}/bans:
+    get:
+      operationId: getBans
+      summary: Get the list of users banned by a user
+      description: |-
+        Get the list of all users banned by a user.
+      tags:
+        - "bans"
+      parameters:
+        - name: user_name
+          in: path
+          description: The user's name
+          required: true
+          schema:
+            $ref: '#/components/schemas/Username'
+      responses:
+        '200':
+          description: |-
+            The list of users banned by the user.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BanList'
+        '404':
+          description: |-
+            The requested user does not exist.
+    put:
+      operationId: banUser
+      summary: Ban a user
+      description: |-
+        Ban a user
+      tags:
+        - "bans"
+      parameters:
+        - name: user_name
+          in: path
+          description: The user's name
+          required: true
+          schema:
+            $ref: '#/components/schemas/Username'
+        - name: identifier
+          in: header
+          description: The user's identifier, used for authentication purposes.
+          required: true
+          schema:
+            $ref: '#/components/schemas/UserID'
+      requestBody:
+        description: |-
+          The user to ban
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Username'
+      security:
+        - bearerAuth: []
+      responses:
+        '201':
+          description: |-
+            The user has been banned
+        '400':
+          description: |-
+            The ban request is ill-formed.
+        '404':
+          description: |-
+            The user does not exist
+        '401':
+          description: |-
+            The user is not correctly authenticated (the given ID does not match the user's ID)
+        
+    delete:
+      operationId: unbanUser
+      summary: Unban a user
+      description: |-
+        Unban a user
+      tags:
+        - "bans"
+      parameters:
+        - name: user_name
+          in: path
+          description: The user's name
+          required: true
+          schema:
+            $ref: '#/components/schemas/Username'
+        - name: identifier
+          in: header
+          description: The user's identifier, used for authentication purposes.
+          required: true
+          schema:
+            $ref: '#/components/schemas/UserID'
+      requestBody:
+        description: |-
+          The name user to unban
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Username'
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: |-
+            The user has been unbanned.
+        '400':
+          description: |-
+            The unban request is ill-formed.
+        '404':
+          description: |-
+            The user identified by this name does not exist.
+        '409':
+          description: |-
+            The user to unban has never been banned by the request's issuer.
+        '403':
+          description: |-
+            The user is not correctly authenticated (the given ID does not match the user's ID).
   /session:
     put:
       tags: ["login"]
