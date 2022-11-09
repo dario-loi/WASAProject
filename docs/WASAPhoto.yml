@@ -6,7 +6,7 @@ info:
       This OpenAPI document describes a set of interfaces to allow a WASAPhoto user 
       to interact with the WASAPhoto backend, WASAPhoto is a new social network that
       allows you to share your best moments with friends! 
-  version: "1"
+  version: "v0.0.2"
 
 components:
   securitySchemes:
@@ -17,7 +17,7 @@ components:
 
   schemas:
     Photopost:
-      title: Photo
+      title: Photopost
       type: object
       description: |- 
         A post containing a photo to be displayed in various environments,
@@ -25,7 +25,7 @@ components:
       properties:
         id:
           $ref: '#/components/schemas/SHA256hash'
-        user_id:
+        identifier:
           $ref: '#/components/schemas/UserID'
         photo:
           $ref: '#/components/schemas/Photo'
@@ -64,8 +64,12 @@ components:
           example: 985981bedf5cc6956330a1e4c39526a8839e8a3ec3adf0f2e3eedd59c359a58d
       
     Photo:
+      title: Photo
+      format: binary  
       type: string
-      description: Base64 encoded photo
+      description: |- 
+        A Base64 encoded photo, used both in posts, profile pictures and 
+        generally all over the place, this is WASA*Photo* after all.
       pattern: ^[A-Za-z0-9+/=]*$
 
     UserID:
@@ -81,12 +85,14 @@ components:
       title: User
       type: object
       description: |- 
-        A user of the WASAPhoto service, identified by a unique username and a SHA256 hash.
+        A user of the WASAPhoto social network, it contains all *public* information of 
+        that user necessary for a quick representation, omitting information such as photos
+        in order to reduce the size of the structure.
       properties:
-        id:
-          $ref: '#/components/schemas/SHA256hash'
         username:
           $ref: '#/components/schemas/Username'
+        profile_photo:
+          $ref: '#/components/schemas/Photo'
         created_at:
           type: string
           format: date-time
@@ -125,6 +131,8 @@ paths:
   /users:
     post:
       operationId: createUser
+      tags:
+        - "users"
       summary: Create a new user
       description: |-
         Create a new user in the WASAPhoto system
@@ -153,19 +161,21 @@ paths:
           description: |-
             The username is already taken
   
-  /users/{user_id}/profile:
+  /users/{user_name}/profile:
     get:
       operationId: getUserProfile
+      tags:
+        - "users"
       summary: Get a user's profile
       description: |-
         Get a user's profile, including their username and the list of photos they have posted.
       parameters:
-        - name: user_id
+        - name: user_name
           in: path
-          description: The user's id
+          description: The username of the user whose profile is being requested
           required: true
           schema:
-            $ref: '#/components/schemas/UserID'
+            $ref: '#/components/schemas/Username'
       responses:
         '200':
           description: |-
@@ -184,21 +194,95 @@ paths:
         '404':
           description: |-
             The user does not exist
-    
-
-  /users/{user_id}/profile/photos:
-    post:
-      operationId: uploadPhoto
-      summary: Post a photo
+    patch:
+      operationId: setMyUserName
+      tags:
+        - "users"
+        - "login"
+      summary: |-
+        Changes the username of an existing user.
       description: |-
-        Post a photo to the user's profile
+        Allows an user to update its username after having already obtained an 
+        identifier, this prompts an update of the identifier in order to keep the Bearer
+        authentication system in a consistent state, since the identifier depends on 
+        the user's name.
+
+        Returns the new identifier in the response body so that the user can continue 
+        using the application seamlessly.
       parameters:
-        - name: user_id
+        - name: user_name
           in: path
-          description: The user's id
+          description: The username of the user that is requesting the update.
+          required: true
+          schema:
+            $ref: '#/components/schemas/Username'
+        - name: identifier
+          in: header
+          description: |- 
+            The identifier of the user that is requesting the update, used for 
+            authentication purposes.
           required: true
           schema:
             $ref: '#/components/schemas/UserID'
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: |-
+          The new username of the user, **must** be different from the previous one.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Username'
+      responses:
+        '200':
+          description: |-
+            The user's username has been updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserID'
+        '400':
+          description: |-
+            The username is ill-formed, it must begin with an alphabetical character,
+            must only contain alphanumeric characters and underscores and be of a length
+            inbetween 3 and 32.
+        '401':
+          description: |-
+            The identifier is not valid, it is either ill-formed or does not belong to the
+            user that is requesting the update.
+        '409':
+          description: |-
+            The username is already taken/is identical to the previous
+        '404':
+          description: |-
+            The user that is requesting the update does not exist.
+
+
+  /users/{user_name}/profile/photos:
+    post:
+      operationId: uploadPhoto
+      summary: Post a photo
+      tags:
+        - "photos"
+      description: |-
+        Post a photo to the user's profile
+      parameters:
+        - name: user_name
+          in: path
+          description: The username of the user whose profile is being requested
+          required: true
+          schema:
+            $ref: '#/components/schemas/Username'
+        - name: identifier
+          in: header
+          description: The user's identifier
+          required: true
+          schema:
+            $ref: '#/components/schemas/UserID'
+        
+      security:
+        - bearerAuth: []
       requestBody:
         description: |-
           The photo to post
@@ -228,19 +312,24 @@ paths:
         '404':
           description: |-
             The user does not exist
+        '401':
+          description: |-
+            The user is not correctly authenticated (the given ID does not match the user's ID)
     get:
       operationId: getUserPhotos
       summary: Get a user's photos
+      tags:
+        - "photos"
       description: |-
         Get a user's photos, including their description and the date they were posted,
         useful to populate the feed of their profile.
       parameters:
-        - name: user_id
+        - name: user_name
           in: path
-          description: The user's id
+          description: The username of the user whose photos are being requested
           required: true
           schema:
-            $ref: '#/components/schemas/UserID'
+            $ref: '#/components/schemas/Username'
       responses:
         '200':
           description: |-
@@ -255,7 +344,7 @@ paths:
           description: |-
             The user does not exist
   
-  /users/{user_id}/profile/photos/{photo_id}:
+  /users/{user_name}/profile/photos/{photo_id}:
     get:
       operationId: getPhoto
       summary: Get a photo
@@ -263,13 +352,15 @@ paths:
         Get an individual photo from the user's profile, useful to populate the feed of other 
         users by picking photos recently posted by other users, also useful to manage 
         the comment section and like counter of a photo.
+      tags:
+        - "photos"
       parameters:
-        - name: user_id
+        - name: user_name
           in: path
-          description: The user's id
+          description: The user's name
           required: true
           schema:
-            $ref: '#/components/schemas/UserID'
+            $ref: '#/components/schemas/Username'
         - name: photo_id
           in: path
           description: The photo's id
@@ -287,20 +378,61 @@ paths:
         '404':
           description: |-
             Either the requested user of photo id does not exist.
+    delete:
+      operationId: deletePhoto
+      summary: Delete a photo
+      description: |-
+        Lets the user delete a photo from their profile, the user must authenticate in order 
+        to go ahead.
+      tags:
+        - "photos"
+      parameters:
+        - name: user_name
+          in: path
+          description: The user's name
+          required: true
+          schema:
+            $ref: '#/components/schemas/Username'
+        - name: photo_id
+          in: path
+          description: The photo's id
+          required: true
+          schema:
+            $ref: '#/components/schemas/SHA256hash'
+        - name: identifier
+          in: header
+          description: The user's identifier
+          required: true
+          schema:
+            $ref: '#/components/schemas/UserID'
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: |-
+            The photo has been deleted
+        '404':
+          description: |-
+            Either the requested user of photo id does not exist.
+        '401':
+          description: |-
+            The user is not correctly authenticated (the given ID does not match the user's ID)
 
-  /users/{user_id}/following:
+  /users/{user_name}/following:
     get:
       operationId: getFollowing
       summary: Get the list of users a user is following
       description: |-
         Get the list of users a user is following
       parameters:
-        - name: user_id
+        - name: user_name
           in: path
-          description: The user's id
+          description: The user's name
           required: true
           schema:
-            $ref: '#/components/schemas/UserID'
+            $ref: '#/components/schemas/Username'
+      tags:
+        - "followers"
       responses:
         '200':
           description: |-
@@ -312,15 +444,23 @@ paths:
         '404':
           description: |-
             The user does not exist
-    post:
+    put:
       operationId: followUser
       summary: Follow a user
       description: |-
         Follow a user
+      tags:
+        - "followers"
       parameters:
-        - name: user_id
+        - name: user_name
           in: path
-          description: The user's id
+          description: The user's name, used to identify this resource.
+          required: true
+          schema:
+            $ref: '#/components/schemas/Username'
+        - name: identifier
+          in: header
+          description: The user's identifier, used for authentication.
           required: true
           schema:
             $ref: '#/components/schemas/UserID'
@@ -331,71 +471,90 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserID'
+              $ref: '#/components/schemas/Username'
+      security:
+        - bearerAuth: []
       responses:
         '201':
           description: |-
             The user has been followed
         '400':
           description: |-
-            The user to follow is not valid
+            The follow request is ill-formed.
         '404':
           description: |-
             The user does not exist
-        '409':
+        '401':
           description: |-
-            The user is already being followed
+            The user is not correctly authenticated (the given ID does not match the user's ID)
+        
     delete:
       operationId: unfollowUser
       summary: Unfollow a user
       description: |-
         Unfollow a user
+      tags:
+        - "followers"
       parameters:
-        - name: user_id
+        - name: user_name
           in: path
-          description: The user's id
+          description: The user's name
+          required: true
+          schema:
+            $ref: '#/components/schemas/Username'
+        - name: identifier
+          in: header
+          description: The user's identifier, used for authentication purposes.
           required: true
           schema:
             $ref: '#/components/schemas/UserID'
       requestBody:
         description: |-
-          The user to unfollow
+          The name user to unfollow
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserID'
+              $ref: '#/components/schemas/Username'
+      security:
+        - bearerAuth: []
       responses:
         '204':
           description: |-
-            The user has been unfollowed
+            The user has been unfollowed.
         '400':
           description: |-
-            The user to unfollow is not valid
+            The unfollow request is ill-formed.
         '404':
           description: |-
-            The user does not exist
+            The user identified by this name does not exist.
         '409':
           description: |-
-            The user is not being followed
+            The user is not being followed by the user specified in the body of the request.
+        '403':
+          description: |-
+            The user is not correctly authenticated (the given ID does not match the user's ID).
 
-  /users/{user_id}/followers:
+  /users/{user_name}/followers:
     get:
       operationId: getFollowers
       summary: Get the list of users following a user
       description: |-
         Get the list of users following a user
+      tags:
+        - "followers"
       parameters:
-        - name: user_id
+        - name: user_name
           in: path
           description: The user's id
           required: true
           schema:
-            $ref: '#/components/schemas/UserID'
+            $ref: '#/components/schemas/Username'
       responses:
         '200':
           description: |-
-            The list of users following the user
+            The list of users following the user, the user's name is also 
+            aggregated in the list for completeness.
           content:
             application/json:
               schema:
@@ -410,8 +569,10 @@ paths:
         Removes a user from the followers list, useful to  
         enforce the privacy of the user's profile without 
         resorting to a hard ban/block.
+      tags:
+        - "followers"
       parameters:
-        - name: user_id
+        - name: identifier
           in: path
           description: The user's id
           required: true
@@ -425,6 +586,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UserID'
+      security:
+        - bearerAuth: []
       responses:
         '204':
           description: |-
@@ -440,7 +603,7 @@ paths:
             The user is not being followed
 
   /session:
-    post:
+    put:
       tags: ["login"]
       summary: Logs in the user
       description: |-
@@ -462,3 +625,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserID'
+        '400':
+          description: |-
+            Login request is ill-formed.

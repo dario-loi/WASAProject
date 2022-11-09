@@ -24,5 +24,5 @@ Operations to be implemented:
 - [ ] unlikePhoto
 - [ ] commentPhoto
 - [ ] uncommentPhoto
-- [ ] deletePhoto
+- [x] deletePhoto
 
