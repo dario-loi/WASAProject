@@ -1,0 +1,467 @@
+openapi: 3.0.3
+
+info:
+  title: WASAPhoto API Specification
+  description: |-
+      This OpenAPI document describes a set of interfaces to allow a WASAPhoto user 
+      to interact with the WASAPhoto backend, WASAPhoto is a new social network that
+      allows you to share your best moments with friends! 
+  version: "1"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: /^[A-F0-9]{64}$/i
+
+  schemas:
+    Photopost:
+      title: Photo
+      type: object
+      description: |- 
+        A post containing a photo to be displayed in various environments,
+        both user profiles and the main feed.
+      properties:
+        id:
+          $ref: '#/components/schemas/SHA256hash'
+        user_id:
+          $ref: '#/components/schemas/UserID'
+        photo:
+          $ref: '#/components/schemas/Photo'
+        description:
+          type: string
+          description: Description of the photo
+          example: This photo is super cool!
+        created_at:
+          type: string
+          format: date-time
+          description: Date and time when the photo was posted
+          example: 2020-12-31T23:59:59Z
+
+    Username:
+      title: Username
+      type: object
+      description: |- 
+        The username of the user, it must begin with an alphabetical character 
+        and can be composed of a number of alphanumeric characters and underscores, 
+        with a minimum length of 3 and a maximum length of 32.
+      properties:
+        username:
+          type: string
+          pattern: ^[a-zA-Z][a-zA-Z0-9_]{2,32}$ # we don't want to accept any whitespace or weird characters.
+          example: "Dario_Loi_123"
+    SHA256hash:
+      title: SHA256hash
+      type: object
+      description: |- 
+        A generic SHA256 hash, used throughout the API to identify users, photos and more.
+      properties:
+        hash:
+          type: string
+          description: The token of the user
+          pattern: /^[A-F0-9]{64}$/i
+          example: 985981bedf5cc6956330a1e4c39526a8839e8a3ec3adf0f2e3eedd59c359a58d
+      
+    Photo:
+      type: string
+      description: Base64 encoded photo
+      pattern: ^[A-Za-z0-9+/=]*$
+
+    UserID:
+      title: UserID #this is basically just a `typedef`
+      type: object
+      description: |- 
+        The token that identifies the user, SHA 256. 
+      properties:
+        token:
+          $ref: '#/components/schemas/SHA256hash'
+
+    User:
+      title: User
+      type: object
+      description: |- 
+        A user of the WASAPhoto service, identified by a unique username and a SHA256 hash.
+      properties:
+        id:
+          $ref: '#/components/schemas/SHA256hash'
+        username:
+          $ref: '#/components/schemas/Username'
+        created_at:
+          type: string
+          format: date-time
+          description: Date and time when the user was created
+          example: 2020-12-31T23:59:59Z
+        
+
+    UserList:
+      title: UserList
+      type: object
+      description: |- 
+        A list of users, used to return the list of followers and following of a user.
+      properties:
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+
+    FollowList:
+      title: FollowList
+      type: object
+      description: |- 
+        A Userlist bound to a single user, it is used to represent the Followers/Following
+        of a user.
+      properties:
+        owner:
+          $ref: '#/components/schemas/User'
+          description: The user whose followers/following are being listed
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+            description: The list of users that follow/is followed by the owner of the list
+
+paths:
+  /users:
+    post:
+      operationId: createUser
+      summary: Create a new user
+      description: |-
+        Create a new user in the WASAPhoto system
+      requestBody:
+        description: |-
+          The user to create
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Username'
+      responses:
+        '201':
+          description: |-
+            The user has been created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserID'
+        '400':
+          description: |-
+            The username is not valid, it must begin with an alphabetical character,
+            must only contain alphanumeric characters and underscores and be of a length
+            inbetween 3 and 32.
+        '409':
+          description: |-
+            The username is already taken
+  
+  /users/{user_id}/profile:
+    get:
+      operationId: getUserProfile
+      summary: Get a user's profile
+      description: |-
+        Get a user's profile, including their username and the list of photos they have posted.
+      parameters:
+        - name: user_id
+          in: path
+          description: The user's id
+          required: true
+          schema:
+            $ref: '#/components/schemas/UserID'
+      responses:
+        '200':
+          description: |-
+            The user's profile
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  username:
+                    $ref: '#/components/schemas/Username'
+                  photos:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Photopost'
+        '404':
+          description: |-
+            The user does not exist
+    
+
+  /users/{user_id}/profile/photos:
+    post:
+      operationId: uploadPhoto
+      summary: Post a photo
+      description: |-
+        Post a photo to the user's profile
+      parameters:
+        - name: user_id
+          in: path
+          description: The user's id
+          required: true
+          schema:
+            $ref: '#/components/schemas/UserID'
+      requestBody:
+        description: |-
+          The photo to post
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                photo:
+                  $ref: '#/components/schemas/Photo'
+                description:
+                  type: string
+                  description: Description of the photo
+                  example: This photo is super cool!
+      responses:
+        '201':
+          description: |-
+            The photo has been posted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Photopost'
+        '400':
+          description: |-
+            The photo is not valid, it must be a valid base64 encoded image.
+        '404':
+          description: |-
+            The user does not exist
+    get:
+      operationId: getUserPhotos
+      summary: Get a user's photos
+      description: |-
+        Get a user's photos, including their description and the date they were posted,
+        useful to populate the feed of their profile.
+      parameters:
+        - name: user_id
+          in: path
+          description: The user's id
+          required: true
+          schema:
+            $ref: '#/components/schemas/UserID'
+      responses:
+        '200':
+          description: |-
+            The user's photos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Photopost'
+        '404':
+          description: |-
+            The user does not exist
+  
+  /users/{user_id}/profile/photos/{photo_id}:
+    get:
+      operationId: getPhoto
+      summary: Get a photo
+      description: |-
+        Get an individual photo from the user's profile, useful to populate the feed of other 
+        users by picking photos recently posted by other users, also useful to manage 
+        the comment section and like counter of a photo.
+      parameters:
+        - name: user_id
+          in: path
+          description: The user's id
+          required: true
+          schema:
+            $ref: '#/components/schemas/UserID'
+        - name: photo_id
+          in: path
+          description: The photo's id
+          required: true
+          schema:
+            $ref: '#/components/schemas/SHA256hash'
+      responses:
+        '200':
+          description: |-
+            The photo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Photopost'
+        '404':
+          description: |-
+            Either the requested user of photo id does not exist.
+
+  /users/{user_id}/profile/photos/{photo_id}/comments:
+    post:
+
+  /users/{user_id}/following:
+    get:
+      operationId: getFollowing
+      summary: Get the list of users a user is following
+      description: |-
+        Get the list of users a user is following
+      parameters:
+        - name: user_id
+          in: path
+          description: The user's id
+          required: true
+          schema:
+            $ref: '#/components/schemas/UserID'
+      responses:
+        '200':
+          description: |-
+            The list of users the user is following
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FollowList'
+        '404':
+          description: |-
+            The user does not exist
+    post:
+      operationId: followUser
+      summary: Follow a user
+      description: |-
+        Follow a user
+      parameters:
+        - name: user_id
+          in: path
+          description: The user's id
+          required: true
+          schema:
+            $ref: '#/components/schemas/UserID'
+      requestBody:
+        description: |-
+          The user to follow
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserID'
+      responses:
+        '201':
+          description: |-
+            The user has been followed
+        '400':
+          description: |-
+            The user to follow is not valid
+        '404':
+          description: |-
+            The user does not exist
+        '409':
+          description: |-
+            The user is already being followed
+    delete:
+      operationId: unfollowUser
+      summary: Unfollow a user
+      description: |-
+        Unfollow a user
+      parameters:
+        - name: user_id
+          in: path
+          description: The user's id
+          required: true
+          schema:
+            $ref: '#/components/schemas/UserID'
+      requestBody:
+        description: |-
+          The user to unfollow
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserID'
+      responses:
+        '204':
+          description: |-
+            The user has been unfollowed
+        '400':
+          description: |-
+            The user to unfollow is not valid
+        '404':
+          description: |-
+            The user does not exist
+        '409':
+          description: |-
+            The user is not being followed
+
+  /users/{user_id}/followers:
+    get:
+      operationId: getFollowers
+      summary: Get the list of users following a user
+      description: |-
+        Get the list of users following a user
+      parameters:
+        - name: user_id
+          in: path
+          description: The user's id
+          required: true
+          schema:
+            $ref: '#/components/schemas/UserID'
+      responses:
+        '200':
+          description: |-
+            The list of users following the user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FollowList'
+        '404':
+          description: |-
+            The user does not exist
+    delete:
+      operationId: removeFollower
+      summary: Remove a follower
+      description: |-
+        Removes a user from the followers list, useful to  
+        enforce the privacy of the user's profile without 
+        resorting to a hard ban/block.
+      parameters:
+        - name: user_id
+          in: path
+          description: The user's id
+          required: true
+          schema:
+            $ref: '#/components/schemas/UserID'
+      requestBody:
+        description: |-
+          The user to unfollow
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserID'
+      responses:
+        '204':
+          description: |-
+            The user has been unfollowed
+        '400':
+          description: |-
+            The user to unfollow is not valid
+        '404':
+          description: |-
+            The user does not exist
+        '409':
+          description: |-
+            The user is not being followed
+
+  /session:
+    post:
+      tags: ["login"]
+      summary: Logs in the user
+      description: |-
+        If the user does not exist, it will be created,
+        and an identifier is returned.
+        If the user exists, the user identifier is returned.
+      operationId: doLogin
+      requestBody:
+        description: User details
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Username'
+        required: true
+      responses:
+        '201':
+          description: User log-in action successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserID'
