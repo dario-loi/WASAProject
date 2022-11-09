@@ -6,7 +6,7 @@ info:
       This OpenAPI document describes a set of interfaces to allow a WASAPhoto user 
       to interact with the WASAPhoto backend, WASAPhoto is a new social network that
       allows you to share your best moments with friends! 
-  version: "v0.0.2"
+  version: "v0.0.4"
 
 components:
   securitySchemes:
@@ -138,7 +138,19 @@ components:
         banned_users:
           $ref : '#/components/schemas/UserList'
 
-
+    LikesList:
+      title: LikesList
+      type: object
+      description: |- 
+        A list of users that liked a specific post, together with a refernece to the post 
+        itself.
+      properties:
+        owner:
+          $ref: '#/components/schemas/Photopost'
+          description: The user that *owns* the likes.
+        like_users:
+          $ref : '#/components/schemas/UserList'
+        
 
 paths:
   /users:
@@ -429,6 +441,121 @@ paths:
         '401':
           description: |-
             The user is not correctly authenticated (the given ID does not match the user's ID)
+
+  /users/{user_name}/profile/photos/{photo_id}/likes:
+    get:
+      operationId: getPhotoLikes
+      summary: Get a photo's likes
+      description: |-
+        Get the list of users that liked a photo, useful to show a like counter and more 
+        in depth-information about the likers themselves.
+      tags:
+        - "photos"
+      parameters:
+        - name: user_name
+          in: path
+          description: The user's name
+          required: true
+          schema:
+            $ref: '#/components/schemas/Username'
+        - name: photo_id
+          in: path
+          description: The photo's id
+          required: true
+          schema:
+            $ref: '#/components/schemas/SHA256hash'
+      responses:
+        '200':
+          description: |-
+            The list of users that liked the photo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LikesList'
+        '404':
+          description: |-
+            Either the requested user or photo does not exist.
+
+    put:
+      operationId: likePhoto
+      summary: Like a photo
+      description: |-
+        Lets the user like a photo, the user must authenticate in order to go ahead.
+      tags:
+        - "photos"
+      parameters:
+        - name: user_name
+          in: path
+          description: The user's name
+          required: true
+          schema:
+            $ref: '#/components/schemas/Username'
+        - name: photo_id
+          in: path
+          description: The photo's id
+          required: true
+          schema:
+            $ref: '#/components/schemas/SHA256hash'
+        - name: identifier
+          in: header
+          description: The user's identifier
+          required: true
+          schema:
+            $ref: '#/components/schemas/UserID'
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: |-
+            The photo has been liked
+        '404':
+          description: |-
+            Either the requested user or photo does not exist.
+        '401':
+          description: |-
+            The user is not correctly authenticated (the given ID does not match the user's ID)
+
+    delete:
+      operationId: unlikePhoto
+      summary: Unlike a photo
+      description: |-
+        Lets the user unlike a photo, the user must authenticate in order to go ahead.
+      tags:
+        - "photos"
+      parameters:
+        - name: user_name
+          in: path
+          description: The user's name
+          required: true
+          schema:
+            $ref: '#/components/schemas/Username'
+        - name: photo_id
+          in: path
+          description: The photo's id
+          required: true
+          schema:
+            $ref: '#/components/schemas/SHA256hash'
+        - name: identifier
+          in: header
+          description: The user's identifier
+          required: true
+          schema:
+            $ref: '#/components/schemas/UserID'
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: |-
+            The photo has been unliked
+        '404':
+          description: |-
+            Either the requested user or photo does not exist.
+        '401':
+          description: |-
+            The user is not correctly authenticated (the given ID does not match the user's ID)
+        '409':
+          description: |-
+            The user has not liked the photo yet, so it cannot be unliked.
 
   /users/{user_name}/following:
     get:

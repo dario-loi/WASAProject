@@ -20,8 +20,8 @@ Operations to be implemented:
 - [x] unbanUser
 - [x] getUserProfile
 - [ ] getMyStream
-- [ ] likePhoto
-- [ ] unlikePhoto
+- [x] likePhoto
+- [x] unlikePhoto
 - [ ] commentPhoto
 - [ ] uncommentPhoto
 - [x] deletePhoto
