@@ -288,9 +288,6 @@ paths:
           description: |-
             Either the requested user of photo id does not exist.
 
-  /users/{user_id}/profile/photos/{photo_id}/comments:
-    post:
-
   /users/{user_id}/following:
     get:
       operationId: getFollowing
