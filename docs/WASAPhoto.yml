@@ -6,7 +6,7 @@ info:
       This OpenAPI document describes a set of interfaces to allow a WASAPhoto user 
       to interact with the WASAPhoto backend, WASAPhoto is a new social network that
       allows you to share your best moments with friends! 
-  version: "v0.0.4"
+  version: "v0.1.0"
 
 components:
   securitySchemes:
@@ -16,28 +16,6 @@ components:
       bearerFormat: /^[A-F0-9]{64}$/i
 
   schemas:
-    Photopost:
-      title: Photopost
-      type: object
-      description: |- 
-        A post containing a photo to be displayed in various environments,
-        both user profiles and the main feed.
-      properties:
-        id:
-          $ref: '#/components/schemas/SHA256hash'
-        identifier:
-          $ref: '#/components/schemas/UserID'
-        photo:
-          $ref: '#/components/schemas/Photo'
-        description:
-          type: string
-          description: Description of the photo
-          example: This photo is super cool!
-        created_at:
-          type: string
-          format: date-time
-          description: Date and time when the photo was posted
-          example: 2020-12-31T23:59:59Z
 
     Username:
       title: Username
@@ -93,12 +71,6 @@ components:
           $ref: '#/components/schemas/Username'
         profile_photo:
           $ref: '#/components/schemas/Photo'
-        created_at:
-          type: string
-          format: date-time
-          description: Date and time when the user was created
-          example: 2020-12-31T23:59:59Z
-        
 
     UserList:
       title: UserList
@@ -150,7 +122,76 @@ components:
           description: The user that *owns* the likes.
         like_users:
           $ref : '#/components/schemas/UserList'
-        
+
+    Comment:
+      title: Comment
+      type: object
+      description: |- 
+        A comment on a post, it contains the comment's author, body, date and time of 
+        creation.
+      properties:
+        author:
+          $ref: '#/components/schemas/User'
+        body:
+          type: string
+          description: The body of the comment
+          example: |-
+            I really like this photo, the subtle off-white coloring of the background 
+            really makes the color pop!
+          minLength: 0
+          maxLength: 1024
+        creation_time:
+          type: string
+          format: date-time
+          description: Date and time when the comment was created
+          example: 2020-12-31T23:59:59Z
+        parent_post:
+          $ref: '#/components/schemas/SHA256hash'
+    
+    CommentID:
+      title: CommentID
+      type: object
+      description: |- 
+        An ID identifying a comment, we use our SHA256 hash.
+      properties:
+        token:
+          $ref: '#/components/schemas/SHA256hash'
+
+    CommentList:
+      title: CommentList
+      type: object
+      description: |- 
+        A list of comments on a post, packed together to be put in a PhotoPost.
+      properties:
+        comments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Comment'
+    
+    Photopost:
+      title: Photopost
+      type: object
+      description: |- 
+        A post containing a photo to be displayed in various environments,
+        both user profiles and the main feed.
+      properties:
+        id:
+          $ref: '#/components/schemas/SHA256hash'
+        author_identifier:
+          $ref: '#/components/schemas/UserID'
+        photo:
+          $ref: '#/components/schemas/Photo'
+        comments:
+          $ref: '#/components/schemas/CommentList'
+        description:
+          type: string
+          description: Description of the photo
+          example: This photo is super cool!
+        created_at:
+          type: string
+          format: date-time
+          description: Date and time when the photo was posted
+          example: 2020-12-31T23:59:59Z
 
 paths:
   /users:
@@ -556,6 +597,143 @@ paths:
         '409':
           description: |-
             The user has not liked the photo yet, so it cannot be unliked.
+
+  /users/{user_name}/profile/photos/{photo_id}/comments:
+    get:
+      operationId: getPhotoComments
+      summary: Get a photo's comments
+      description: |-
+        Get the list of comments of a photo, useful to show a comment counter and more 
+        in depth-information about the commenters themselves.
+      tags:
+        - "photos"
+      parameters:
+        - name: user_name
+          in: path
+          description: The user's name
+          required: true
+          schema:
+            $ref: '#/components/schemas/Username'
+        - name: photo_id
+          in: path
+          description: The photo's id
+          required: true
+          schema:
+            $ref: '#/components/schemas/SHA256hash'
+      responses:
+        '200':
+          description: |-
+            The list of comments of the photo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentList'
+        '404':
+          description: |-
+            Either the requested user or photo does not exist.
+    
+    post:
+      operationId: commentPhoto
+      summary: Comment a photo.
+      description: |-
+        Lets the user comment one of `user_name`'s photos, authentication is required in order 
+        to perform the comment, the user might post multiple comments, even identical ones
+        (but that would be annoying!).
+      security:
+        - bearerAuth: []
+      
+      tags: 
+        - "photos"
+      parameters:
+        - name: user_name
+          in: path
+          description: The photo owner's username.
+          required: true
+          schema:
+            $ref: '#/components/schemas/Username'
+        - name: photo_id
+          in: path
+          description: The photo's ID.
+          required: true
+          schema:
+            $ref: '#/components/schemas/SHA256hash'
+        - name: identifier
+          in: header
+          description: The commenter's Identifier (for authentication).
+          required: true
+          schema:
+            $ref: '#/components/schemas/UserID'
+      requestBody:
+        description: The comment to be posted on the photo.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Comment'
+      responses:
+        '201':
+          description: |-
+            The comment has been posted.
+        '400':
+          description: |-
+            The request is ill-formed.
+        '404':
+          description: |-
+            Either the requested user or photo does not exist.
+        '401':
+          description: |-
+            The user is not correctly authenticated (the given ID does not match the user's ID)
+    
+    delete:
+      operationId: uncommentPhoto
+      summary: Uncomment a photo.
+      tags:
+        - "photos"
+      description: |-
+        Lets a commenter rectract one of his comments, the comment gets completely erased 
+        from the post and even the owner cannot see it anymore, naturally, it requires 
+        proper authentication from the commenter.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: user_name
+          in: path
+          description: The photo owner's username.
+          required: true
+          schema:
+            $ref: '#/components/schemas/Username'
+        - name: photo_id
+          in: path
+          description: The photo's ID.
+          required: true
+          schema:
+            $ref: '#/components/schemas/SHA256hash'
+        - name: identifier
+          in: header
+          description: The commenter's Identifier (for authentication).
+          required: true
+          schema:
+            $ref: '#/components/schemas/UserID'
+      requestBody:
+        description: The ID of the comment to be deleted from the photoPost.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentID'
+      responses:
+        '200':
+          description: |-
+            The comment has been deleted.
+        '400':
+          description: |-
+            The request is ill-formed.
+        '404':
+          description: |-
+            Either the requested user, photo or comment does not exist.
+        '401':
+          description: |-
+            The user is not correctly authenticated (the given ID does not match the user's ID)
 
   /users/{user_name}/following:
     get:

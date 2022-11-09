@@ -22,7 +22,7 @@ Operations to be implemented:
 - [ ] getMyStream
 - [x] likePhoto
 - [x] unlikePhoto
-- [ ] commentPhoto
-- [ ] uncommentPhoto
+- [x] commentPhoto
+- [x] uncommentPhoto
 - [x] deletePhoto
 
