@@ -16,7 +16,6 @@ components:
       bearerFormat: /^[A-F0-9]{64}$/i
 
   schemas:
-
     Username:
       title: Username
       type: object
@@ -350,39 +349,6 @@ components:
           example: 2020-12-31T23:59:59Z
 
 paths:
-  /users:
-    post:
-      operationId: createUser
-      tags:
-        - "users"
-      summary: Create a new user
-      description: |-
-        Create a new user in the WASAPhoto system
-      requestBody:
-        description: |-
-          The user to create
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Username'
-      responses:
-        '201':
-          description: |-
-            The user has been created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserID'
-        '400':
-          description: |-
-            The username is not valid, it must begin with an alphabetical character,
-            must only contain alphanumeric characters and underscores and be of a length
-            inbetween 3 and 32.
-        '409':
-          description: |-
-            The username is already taken
-  
   /users/{user_name}/profile:
     get:
       operationId: getUserProfile
@@ -1288,6 +1254,9 @@ paths:
         If the user does not exist, it will be created,
         and an identifier is returned.
         If the user exists, the user identifier is returned.
+
+        The usernames *must* be unique, but by tying user login and registration together,
+        we are effectively removing the possibility of a duplicate username.
       operationId: doLogin
       requestBody:
         description: User details
