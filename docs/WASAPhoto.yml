@@ -167,7 +167,163 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Comment'
-    
+
+    Place:
+      title: Place
+      type: object
+      description: |- 
+        A place, it contains a triple of country, state and city, together with 
+        a pair of latitude-longitude coordinates.
+      properties:
+        country:  #we refrain from using regex due to different alphabets around the world.
+          type: string
+          description: Country
+          example: Italy
+          minLength: 1
+          maxLength: 64
+        state:
+          type: string
+          description: State in the Country
+          example: Latium
+          minLength: 1
+          maxLength: 64
+        city:
+          type: string
+          description: City in the state
+          example: Rome
+          minLength: 1
+          maxLength: 64
+        coordinates:
+          type: object
+          description: |-
+            The coordinates of the birthplace, expressed in latitude and longitude.
+          properties:
+            latitude:
+              type: number
+              description: The latitude of the birthplace
+              minimum: -90
+              maximum: 90
+              example: 42.4242
+            longitude:
+              type: number
+              description: The longitude of the birthplace
+              minimum: -180
+              maximum: 180
+              example: -3.1415 
+
+    Biography:
+      title: Biography
+      type: object
+      description: 
+        A Biography of a user, it contains a range of personal info on the user's life 
+        such as Birth date, birthplace, current residence, education history, employment 
+        history, current employment/education status and more.
+      properties:
+        short_description:
+          type: string
+          description: |- 
+            A short description of the user, used in the profile page, it is a 
+            short summary of the user's life.
+          example: |-
+            I'm a 20 year old student at Sapienza University of Rome, I like to take 
+            photos of kittens and sunsets. 
+          minLength: 0
+          maxLength: 65536
+        birthdate:
+          type: string
+          format: date
+          description: The user's birthdate
+          example: 13-06-2001
+        birthplace:
+          $ref: "#components/schemas/Place"
+          description: |-
+            The user's birthplace.
+        residence:
+          $ref: "#components/schemas/Place"
+          description: |-
+            Where the user lives.
+        education:
+          type: array
+          description: |-
+            The user's education history, a list of places where the user studied.
+          items:
+              type: object
+              properties:
+                name:
+                  type: string 
+                  description: The Instituion's name.
+                  example: Sapienza University of Rome.
+                  minLength: 1
+                  maxLength: 256
+                place:
+                  $ref: "#components/schemas/Place"
+                  description: |-
+                    A place where the user studied.
+                start_date:
+                  type: string
+                  format: date
+                  description: The date when the user started studying
+                  example: 13-06-2001
+                end_date:
+                  type: string
+                  format: date
+                  description: The date when the user stopped studying
+                  example: 13-06-2018
+        employment:
+          type: array
+          description: |-
+            The user's employment history, a list of places where the user worked.
+          items:
+              type: object
+              properties:
+                name:
+                  type: string 
+                  description: The company's name.
+                  example: Google
+                  minLength: 1
+                  maxLength: 256
+                place:
+                  $ref: "#components/schemas/Place"
+                  description: |-
+                    A place where the user worked.
+                start_date:
+                  type: string
+                  format: date
+                  description: The date when the user started working
+                  example: 13-06-2018
+                end_date:
+                  type: string
+                  format: date
+                  description: The date when the user stopped working
+                  example: 13-06-2020
+        current_state:
+          type: string
+          enum:
+            - studying
+            - working
+            - unemployed
+          description: |-
+            The user's current state, whether they are studying, working or unemployed.
+          example: working
+        current_place:
+          type: object
+          description: |-
+            The user's current place of employment or education, we do not go through 
+            the trouble of validating if it is an actual place of work or study, or 
+            whether the student is actually working there.
+          properties:
+            name:
+              type: string 
+              description: The Institution/Company's name.
+              example: Google
+              minLength: 1
+              maxLength: 256
+            location:
+              description: |-
+                Where the place is located
+              $ref: "#components/schemas/Place"
+
+        
     Photopost:
       title: Photopost
       type: object
@@ -555,7 +711,6 @@ paths:
         '401':
           description: |-
             The user is not correctly authenticated (the given ID does not match the user's ID)
-
     delete:
       operationId: unlikePhoto
       summary: Unlike a photo
@@ -851,6 +1006,96 @@ paths:
         '403':
           description: |-
             The user is not correctly authenticated (the given ID does not match the user's ID).
+
+  /users/{user_name}/biography:
+    get:
+      operationId: getBiography
+      summary: Gets the biography of a user
+      description: |- 
+        Retrieves the biography of `user_name`, containing a short description written by
+        him, together with some personal information about his life, such as his place 
+        of birth, date of birth, current location, a list of institutions he attended 
+        for his personal education and a list of jobs he attended up until now.
+
+        The biography, being something very personal, is only accessible by the user's
+        followers, therefore, the method *requires* authentication in the form of 
+        an identifier, which should match the identifier of one of his followers.
+      tags:
+        - "biography"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: user_name
+          description: The name of the biography's owner.
+          required: true
+          in: path
+          schema:
+            $ref: "#/components/schemas/Username"
+        - name: requester_ID
+          description: The identifier of the request's issuer.
+          required: true
+          in: header
+          schema:
+            $ref: "#/components/schemas/UserID"
+      responses:
+        '200':
+          description: |-
+            The user's biography has been retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Biography"
+        '404':
+          description: |-
+            The requested user does not exist.
+        '403':  
+          description: |-
+            The user is not correctly authenticated (the given ID does not match the user's ID).
+    put:
+      operationId: updateBiography
+      summary: Updates the biography of a user
+      description: |- 
+        Updates the biography of `user_name`, the user must be authenticated by 
+        providing his ID.
+      tags:
+        - "biography"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: user_name
+          description: The name of the biography's owner.
+          required: true
+          in: path
+          schema:
+            $ref: "#/components/schemas/Username"
+        - name: requester_ID
+          description: The owner's identifier.
+          required: true
+          in: header
+          schema:
+            $ref: "#/components/schemas/UserID"
+      requestBody:
+        description: |-
+          The new biography.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Biography"
+      responses:
+        '200':
+          description: |-
+            The user's biography has been updated.
+        '400':
+          description: |-
+            The request is ill-formed.
+        '403':  
+          description: |-
+            The user is not correctly authenticated (the given ID does not match the user's ID).
+        '404':
+          description: |-
+            The requested user does not exist.
+
 
   /users/{user_name}/followers:
     get:
