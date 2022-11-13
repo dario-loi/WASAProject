@@ -492,7 +492,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Photopost'
+                $ref: '#/components/schemas/SHA256hash'
+                description: |-
+                  The hash of the photo, used for identification.
         '400':
           description: |-
             The photo is not valid, it must be a valid base64 encoded image.
@@ -969,7 +971,7 @@ paths:
         '409':
           description: |-
             The user is not being followed by the user specified in the body of the request.
-        '403':
+        '401':
           description: |-
             The user is not correctly authenticated (the given ID does not match the user's ID).
 
@@ -1014,7 +1016,7 @@ paths:
         '404':
           description: |-
             The requested user does not exist.
-        '403':  
+        '401':  
           description: |-
             The user is not correctly authenticated (the given ID does not match the user's ID).
     put:
@@ -1055,7 +1057,7 @@ paths:
         '400':
           description: |-
             The request is ill-formed.
-        '403':  
+        '401':  
           description: |-
             The user is not correctly authenticated (the given ID does not match the user's ID).
         '404':
@@ -1243,7 +1245,7 @@ paths:
         '409':
           description: |-
             The user to unban has never been banned by the request's issuer.
-        '403':
+        '401':
           description: |-
             The user is not correctly authenticated (the given ID does not match the user's ID).
   /session:
