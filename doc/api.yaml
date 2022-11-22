@@ -716,6 +716,8 @@ paths:
         '401':
           description: |-
             The user is not correctly authenticated (the given ID does not match the user's ID)
+
+  /users/{user_name}/profile/photos/{photo_id}/likes/{liker_id}:
     delete:
       operationId: unlikePhoto
       summary: Unlike a photo
@@ -736,6 +738,12 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/SHA256hash'
+        - name: liker_id
+          in: path
+          description: The user's id
+          required: true
+          schema:
+            $ref: '#/components/schemas/UserID'
         - name: identifier
           in: header
           description: The user's identifier
@@ -843,16 +851,18 @@ paths:
         '401':
           description: |-
             The user is not correctly authenticated (the given ID does not match the user's ID)
-    
+
+  /users/{user_name}/profile/photos/{photo_id}/comments/{comment_id}:
+
     delete:
-      operationId: uncommentPhoto
-      summary: Uncomment a photo.
+      operationId: deleteComment
+      summary: Delete a comment.
       tags:
         - "photos"
       description: |-
-        Lets a commenter rectract one of his comments, the comment gets completely erased 
-        from the post and even the owner cannot see it anymore, naturally, it requires 
-        proper authentication from the commenter.
+        Lets the owner of a photo delete one of the comments on it, the comment gets 
+        completely erased from the post and even the commenter cannot see it anymore, 
+        naturally, it requires proper authentication from the owner.
       security:
         - bearerAuth: []
       parameters:
@@ -868,19 +878,18 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/SHA256hash'
+        - name: comment_id
+          in: path
+          description: The comment's ID.
+          required: true
+          schema:
+            $ref: '#/components/schemas/CommentID'
         - name: identifier
           in: header
           description: The commenter's Identifier (for authentication).
           required: true
           schema:
             $ref: '#/components/schemas/UserID'
-      requestBody:
-        description: The ID of the comment to be deleted from the photoPost.
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CommentID'
       responses:
         '200':
           description: |-
@@ -894,6 +903,7 @@ paths:
         '401':
           description: |-
             The user is not correctly authenticated (the given ID does not match the user's ID)
+
 
   /users/{user_name}/following:
     get:
@@ -964,12 +974,16 @@ paths:
         '401':
           description: |-
             The user is not correctly authenticated (the given ID does not match the user's ID)
-        
+
+
+  /users/{user_name}/following/{followed_name}:
+
     delete:
       operationId: unfollowUser
       summary: Unfollow a user
       description: |-
-        Unfollow a user
+        Unfollow a user that the user has been following, requires 
+        proper authentication from the user.
       tags:
         - "followers"
       parameters:
@@ -979,20 +993,18 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/Username'
+        - name: followed_name
+          in: path
+          description: The name of the user to unfollow
+          required: true
+          schema:
+            $ref: '#/components/schemas/Username'
         - name: identifier
           in: header
           description: The user's identifier, used for authentication purposes.
           required: true
           schema:
             $ref: '#/components/schemas/UserID'
-      requestBody:
-        description: |-
-          The name user to unfollow
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Username'
       security:
         - bearerAuth: []
       responses:
@@ -1011,6 +1023,7 @@ paths:
         '401':
           description: |-
             The user is not correctly authenticated (the given ID does not match the user's ID).
+
 
   /users/{user_name}/biography:
     get:
