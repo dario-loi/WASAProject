@@ -79,6 +79,8 @@ components:
       properties:
         users:
           type: array
+          minItems: 0
+          maxItems: 4294967295
           items:
             $ref: '#/components/schemas/UserID'
 
@@ -142,6 +144,7 @@ components:
         creation_time:
           type: string
           format: date-time
+          pattern: ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$
           description: Date and time when the comment was created
           example: 2020-12-31T23:59:59Z
         parent_post:
@@ -164,6 +167,8 @@ components:
       properties:
         comments:
           type: array
+          minItems: 0
+          maxItems: 4294967295
           items:
             $ref: '#/components/schemas/Comment'
 
@@ -226,12 +231,14 @@ components:
           example: |-
             I'm a 20 year old student at Sapienza University of Rome, I like to take 
             photos of kittens and sunsets. 
+          pattern: ^.{0,65536}$
           minLength: 0
           maxLength: 65536
         birthdate:
           type: string
           format: date
           description: The user's birthdate
+          pattern: ^\d{4}-\d{2}-\d{2}$
           example: 13-06-2001
         birthplace:
           $ref: "#components/schemas/Place"
@@ -243,6 +250,8 @@ components:
             Where the user lives.
         education:
           type: array
+          minItems: 0
+          maxItems: 256
           description: |-
             The user's education history, a list of places where the user studied.
           items:
@@ -251,6 +260,7 @@ components:
                 name:
                   type: string 
                   description: The Instituion's name.
+                  pattern: ^.{0,256}$
                   example: Sapienza University of Rome.
                   minLength: 1
                   maxLength: 256
@@ -261,15 +271,19 @@ components:
                 start_date:
                   type: string
                   format: date
+                  pattern: ^\d{4}-\d{2}-\d{2}$
                   description: The date when the user started studying
                   example: 13-06-2001
                 end_date:
                   type: string
                   format: date
+                  pattern: ^\d{4}-\d{2}-\d{2}$
                   description: The date when the user stopped studying
                   example: 13-06-2018
         employment:
           type: array
+          minItems: 0
+          maxItems: 256
           description: |-
             The user's employment history, a list of places where the user worked.
           items:
@@ -277,6 +291,7 @@ components:
               properties:
                 name:
                   type: string 
+                  pattern: ^.{0,256}$
                   description: The company's name.
                   example: Google
                   minLength: 1
@@ -288,11 +303,13 @@ components:
                 start_date:
                   type: string
                   format: date
+                  pattern: ^\d{4}-\d{2}-\d{2}$
                   description: The date when the user started working
                   example: 13-06-2018
                 end_date:
                   type: string
                   format: date
+                  pattern: ^\d{4}-\d{2}-\d{2}$
                   description: The date when the user stopped working
                   example: 13-06-2020
         current_state:
@@ -315,6 +332,7 @@ components:
               type: string 
               description: The Institution/Company's name.
               example: Google
+              pattern: ^.{0,256}$
               minLength: 1
               maxLength: 256
             location:
@@ -347,6 +365,21 @@ components:
           format: date-time
           description: Date and time when the photo was posted
           example: 2020-12-31T23:59:59Z
+          pattern: ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$
+
+    Stream:
+      title: Stream
+      type: object
+      description: |- 
+        A stream of posts, it contains a list of Photoposts.
+      properties:
+        posts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Photopost'
+          minItems: 1
+          maxItems: 256
+
 
 paths:
   /users/{user_name}/profile:
@@ -377,6 +410,8 @@ paths:
                     $ref: '#/components/schemas/Username'
                   photos:
                     type: array
+                    minItems: 0
+                    maxItems: 65536
                     items:
                       $ref: '#/components/schemas/Photopost'
         '404':
@@ -527,6 +562,8 @@ paths:
             application/json:
               schema:
                 type: array
+                minItems: 0
+                maxItems: 65536
                 items:
                   $ref: '#/components/schemas/Photopost'
         '404':
@@ -1063,6 +1100,61 @@ paths:
         '404':
           description: |-
             The requested user does not exist.
+
+  /users/{user_name}/stream:
+    get:
+      OperationId: getMyStream
+      summary: Gets the stream of a user
+      description: |-
+        Retrieves the stream of `user_name`, containing a list of the most recent
+        posts of the user and his followers.
+
+        The stream is the *heart* of WasaPhoto, it allows a user to see the experiences 
+        that his friends are having.
+
+        The stream is therefore something personal that is only accessible through 
+        authentication.
+      tags:
+        - "stream"
+        - "users"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: user_name
+          description: The name of the stream's owner.
+          required: true
+          in: path
+          schema:
+            $ref: "#/components/schemas/Username"
+        - name: requester_ID
+          description: The identifier of the request's issuer.
+          required: true
+          in: header
+          schema:
+            $ref: "#/components/schemas/UserID"
+        - name: upto
+          description: The maximum number of posts to retrieve.
+          required: false
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+      responses:
+        '200':
+          description: |-
+            The user's stream has been retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Stream"
+        '404':
+          description: |-
+            The requested user does not exist.
+        '401':  
+          description: |-
+            The user is not correctly authenticated (the given ID does not match the user's ID).
 
 
   /users/{user_name}/followers:
