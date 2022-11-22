@@ -1,0 +1,1 @@
+cmd /c "explorer http://localhost:3030/pkg/%1 && exit"
