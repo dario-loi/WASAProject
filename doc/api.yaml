@@ -93,8 +93,9 @@ components:
         to separate them semantically.
       properties:
         owner:
-          $ref: '#/components/schemas/User'
-          description: The user whose followers/following are being listed
+          allOf:
+            - $ref: '#/components/schemas/User'
+            - description: The user whose followers/following are being listed
         users:
           $ref : '#/components/schemas/UserList'
           
@@ -106,8 +107,9 @@ components:
         it a different name to separate them semantically.
       properties:
         owner:
-          $ref: '#/components/schemas/User'
-          description: The user that *owns* the bans.
+          allOf:  
+            - $ref: '#/components/schemas/User'
+            - description: The user that *owns* the bans.
         banned_users:
           $ref : '#/components/schemas/UserList'
 
@@ -119,8 +121,9 @@ components:
         itself.
       properties:
         owner:
-          $ref: '#/components/schemas/Photopost'
-          description: The user that *owns* the likes.
+          allOf:
+            - $ref: '#/components/schemas/Photopost'
+            - description: The user that *owns* the likes.
         like_users:
           $ref : '#/components/schemas/UserList'
 
@@ -241,13 +244,15 @@ components:
           pattern: ^\d{4}-\d{2}-\d{2}$
           example: 13-06-2001
         birthplace:
-          $ref: "#components/schemas/Place"
-          description: |-
-            The user's birthplace.
+          allOf:
+            - $ref: "#/components/schemas/Place"
+            - description: |-
+                The user's birthplace.
         residence:
-          $ref: "#components/schemas/Place"
-          description: |-
-            Where the user lives.
+          allOf:
+            - $ref: "#/components/schemas/Place"
+            - description: |-
+                Where the user lives.
         education:
           type: array
           minItems: 0
@@ -265,9 +270,10 @@ components:
                   minLength: 1
                   maxLength: 256
                 place:
-                  $ref: "#components/schemas/Place"
-                  description: |-
-                    A place where the user studied.
+                  allOf:
+                    - $ref: "#/components/schemas/Place"
+                    - description: |-
+                        A place where the user studied.
                 start_date:
                   type: string
                   format: date
@@ -297,9 +303,10 @@ components:
                   minLength: 1
                   maxLength: 256
                 place:
-                  $ref: "#components/schemas/Place"
-                  description: |-
-                    A place where the user worked.
+                  allOf:
+                    - $ref: "#/components/schemas/Place"
+                    - description: |-
+                        A place where the user worked.
                 start_date:
                   type: string
                   format: date
@@ -336,9 +343,10 @@ components:
               minLength: 1
               maxLength: 256
             location:
-              description: |-
-                Where the place is located
-              $ref: "#components/schemas/Place"
+              allOf:
+                - description: |-
+                    Where the place is located
+                - $ref: "#/components/schemas/Place"
 
         
     Photopost:
@@ -527,9 +535,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SHA256hash'
-                description: |-
-                  The hash of the photo, used for identification.
+                allOf:
+                  - $ref: '#/components/schemas/SHA256hash'
+                  - description: |-
+                      The hash of the photo, used for identification.
         '400':
           description: |-
             The photo is not valid, it must be a valid base64 encoded image.
@@ -1210,19 +1219,23 @@ paths:
             - "followers"
           parameters:
             - name: identifier
-              in: path
+              in: header
               description: The user's id
               required: true
               schema:
                 $ref: '#/components/schemas/UserID'
-          requestBody:
-            description: |-
-              The user to unfollow
-            required: true
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/UserID'
+            - name: user_name
+              in: path
+              description: The user's username
+              required: true
+              schema:
+                $ref: '#/components/schemas/Username'
+            - name: follower_name
+              in: path
+              description: The follower's username
+              required: true
+              schema:
+                $ref: '#/components/schemas/Username'
           security:
             - bearerAuth: []
           responses:
@@ -1309,6 +1322,7 @@ paths:
           description: |-
             The user is not correctly authenticated (the given ID does not match the user's ID)
         
+  /users/{user_name}/bans/{banned_name}:
     delete:
       operationId: unbanUser
       summary: Unban a user
@@ -1323,38 +1337,34 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/Username'
+        - name: banned_name
+          in: path
+          description: The banned user's name
+          required: true
+          schema:
+            $ref: '#/components/schemas/Username'
         - name: identifier
           in: header
           description: The user's identifier, used for authentication purposes.
           required: true
           schema:
             $ref: '#/components/schemas/UserID'
-      requestBody:
-        description: |-
-          The name user to unban
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Username'
       security:
         - bearerAuth: []
       responses:
-        '200':
+        '204':
           description: |-
-            The user has been unbanned.
+            The user has been unbanned
         '400':
           description: |-
             The unban request is ill-formed.
         '404':
           description: |-
-            The user identified by this name does not exist.
-        '409':
-          description: |-
-            The user to unban has never been banned by the request's issuer.
+            The user does not exist
         '401':
           description: |-
-            The user is not correctly authenticated (the given ID does not match the user's ID).
+            The user is not correctly authenticated (the given ID does not match the user's ID)
+
   /session:
     put:
       tags: ["login"]
