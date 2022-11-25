@@ -1,0 +1,709 @@
+2022/11/13 22:32:06 Working Directory:  D:\Documents\WASAProject\exercises\TrainsHTTP
+2022/11/13 22:32:06 Starting server on port 8080
+2022/11/13 22:32:20 Handling http request from  [::1]:63537
+2022/11/13 22:32:20 Schedule read successfully.
+2022/11/13 22:32:20 Performing calculations...
+2022/11/13 22:32:20 Printing Results...
+2022/11/13 22:32:20 Composing .json response
+2022/11/13 22:32:20 Sending response to client
+2022/11/13 22:32:20 Response sent successfully.  105  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63538
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63539
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63540
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63541
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  103  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63542
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63543
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63544
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63545
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63546
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63547
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  102  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63548
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  105  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63549
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  105  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63550
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  102  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63551
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  103  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63552
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63553
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  105  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63554
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63555
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63556
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  103  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63557
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  105  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63558
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  102  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63559
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  105  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63560
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  105  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63561
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63562
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63563
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63564
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63565
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63566
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  102  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63567
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63568
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  103  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63569
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  105  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63570
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63571
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  102  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63572
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63573
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63574
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63575
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63576
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63577
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63578
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63579
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  105  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63580
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  105  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63582
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63583
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  105  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63584
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  103  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63585
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63586
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  103  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63587
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63588
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63589
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  105  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63590
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63591
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63592
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  105  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63593
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  105  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63594
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  105  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63595
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63596
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63597
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  103  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63598
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  105  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63599
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  105  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63600
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63601
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63602
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63603
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63604
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  102  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63605
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  103  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63606
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  105  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63607
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  105  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63608
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63609
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63610
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63611
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63612
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63613
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63614
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63615
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  103  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63616
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63617
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63618
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63619
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63620
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63621
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  105  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63622
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  102  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63623
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63624
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  103  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63625
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  102  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63626
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63627
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63628
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63629
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63630
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  105  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63631
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63632
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  103  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63633
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63634
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  103  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63635
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  105  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63636
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63637
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  104  bytes written.
+2022/11/13 22:32:21 Handling http request from  [::1]:63638
+2022/11/13 22:32:21 Schedule read successfully.
+2022/11/13 22:32:21 Performing calculations...
+2022/11/13 22:32:21 Printing Results...
+2022/11/13 22:32:21 Composing .json response
+2022/11/13 22:32:21 Sending response to client
+2022/11/13 22:32:21 Response sent successfully.  103  bytes written.
