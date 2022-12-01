@@ -153,6 +153,7 @@ components:
           example: |-
             I really like this photo, the subtle off-white coloring of the background 
             really makes the color pop!
+          pattern: ^[^\n]{1,1024}$
           minLength: 0
           maxLength: 1024
         creation_time:
@@ -207,6 +208,7 @@ components:
           type: string
           description: State in the Country
           example: Latium
+          pattern: ^[^\\]{1,64}$
           minLength: 1
           maxLength: 64
         city:
@@ -295,7 +297,7 @@ components:
                 start_date:
                   type: string
                   format: date
-                  pattern: ^\d{2}-\d{2}-\d{4}$
+                  pattern: ^\d{4}-\d{2}-\d{2}$
                   description: The date when the user started studying
                   example: 2001-06-13
                   minLength: 10
@@ -303,7 +305,7 @@ components:
                 end_date:
                   type: string
                   format: date
-                  pattern: ^\d{2}-\d{2}-\d{4}$
+                  pattern: ^\d{4}-\d{2}-\d{2}$
                   description: The date when the user stopped studying
                   example: 2018-06-13
                   minLength: 10
@@ -332,7 +334,7 @@ components:
                 start_date:
                   type: string
                   format: date
-                  pattern: ^\d{2}-\d{2}-\d{4}$
+                  pattern: ^\d{4}-\d{2}-\d{2}$
                   description: The date when the user started working
                   example: 2018-06-13
                   minLength: 10
@@ -340,7 +342,7 @@ components:
                 end_date:
                   type: string
                   format: date
-                  pattern: ^\d{2}-\d{2}-\d{4}$
+                  pattern: ^\d{4}-\d{2}-\d{2}$
                   minLength: 10
                   maxLength: 10
                   description: The date when the user stopped working
