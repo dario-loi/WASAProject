@@ -8,10 +8,15 @@ info:
       allows you to share your best moments with friends! 
   version: "v0.1.0"
 
+security:
+  - bearerAuth: []
+
 components:
   securitySchemes:
     bearerAuth:
       type: http
+      description: |
+        Bearer token for the WASAPhoto API.
       scheme: bearer
       bearerFormat: /^[A-F0-9]{64}$/i
 
@@ -28,6 +33,8 @@ components:
           type: string
           pattern: ^[a-zA-Z][a-zA-Z0-9_]{2,32}$ # we don't want to accept any whitespace or weird characters.
           example: "Dario_Loi_123"
+          minLength: 2
+          maxLength: 32
     SHA256hash:
       title: SHA256hash
       type: object
@@ -37,13 +44,17 @@ components:
         hash:
           type: string
           description: The token of the user
-          pattern: /^[A-F0-9]{64}$/i
+          pattern: ^[a-fA-F0-9]{64}$
           example: 985981bedf5cc6956330a1e4c39526a8839e8a3ec3adf0f2e3eedd59c359a58d
+          minLength: 64
+          maxLength: 64
       
     Photo:
       title: Photo
       format: binary  
       type: string
+      minLength: 0
+      maxLength: 32000000 # 32MB
       description: |- 
         A Base64 encoded photo, used both in posts, profile pictures and 
         generally all over the place, this is WASA*Photo* after all.
@@ -148,6 +159,8 @@ components:
           type: string
           format: date-time
           pattern: ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$
+          minLength: 20
+          maxLength: 20
           description: Date and time when the comment was created
           example: 2020-12-31T23:59:59Z
         parent_post:
@@ -170,6 +183,7 @@ components:
       properties:
         comments:
           type: array
+          description: The list of comments
           minItems: 0
           maxItems: 4294967295
           items:
@@ -182,12 +196,13 @@ components:
         A place, it contains a triple of country, state and city, together with 
         a pair of latitude-longitude coordinates.
       properties:
-        country:  #we refrain from using regex due to different alphabets around the world.
+        country:  #We use regex to validate the country, state and city names.
           type: string
           description: Country
           example: Italy
           minLength: 1
           maxLength: 64
+          pattern: ^[^\\]{1,64}$
         state:
           type: string
           description: State in the Country
@@ -199,6 +214,7 @@ components:
           description: City in the state
           example: Rome
           minLength: 1
+          pattern: ^[^\\]{1,64}$
           maxLength: 64
         coordinates:
           type: object
@@ -234,7 +250,7 @@ components:
           example: |-
             I'm a 20 year old student at Sapienza University of Rome, I like to take 
             photos of kittens and sunsets. 
-          pattern: ^.{0,65536}$
+          pattern: ^[^\\]*?$
           minLength: 0
           maxLength: 65536
         birthdate:
@@ -243,6 +259,8 @@ components:
           description: The user's birthdate
           pattern: ^\d{4}-\d{2}-\d{2}$
           example: 2001-06-13
+          minLength: 10
+          maxLength: 10
         birthplace:
           allOf:
             - $ref: "#/components/schemas/Place"
@@ -277,15 +295,19 @@ components:
                 start_date:
                   type: string
                   format: date
-                  pattern: ^\d{4}-\d{2}-\d{2}$
+                  pattern: ^\d{2}-\d{2}-\d{4}$
                   description: The date when the user started studying
                   example: 2001-06-13
+                  minLength: 10
+                  maxLength: 10
                 end_date:
                   type: string
                   format: date
-                  pattern: ^\d{4}-\d{2}-\d{2}$
+                  pattern: ^\d{2}-\d{2}-\d{4}$
                   description: The date when the user stopped studying
                   example: 2018-06-13
+                  minLength: 10
+                  maxLength: 10
         employment:
           type: array
           minItems: 0
@@ -297,7 +319,7 @@ components:
               properties:
                 name:
                   type: string 
-                  pattern: ^.{0,256}$
+                  pattern: ^[^\\]{0,256}$
                   description: The company's name.
                   example: Google
                   minLength: 1
@@ -310,13 +332,17 @@ components:
                 start_date:
                   type: string
                   format: date
-                  pattern: ^\d{4}-\d{2}-\d{2}$
+                  pattern: ^\d{2}-\d{2}-\d{4}$
                   description: The date when the user started working
                   example: 2018-06-13
+                  minLength: 10
+                  maxLength: 10
                 end_date:
                   type: string
                   format: date
-                  pattern: ^\d{4}-\d{2}-\d{2}$
+                  pattern: ^\d{2}-\d{2}-\d{4}$
+                  minLength: 10
+                  maxLength: 10
                   description: The date when the user stopped working
                   example: 2020-06-13
         current_state:
@@ -339,7 +365,7 @@ components:
               type: string 
               description: The Institution/Company's name.
               example: Google
-              pattern: ^.{0,256}$
+              pattern: ^.{1,256}$
               minLength: 1
               maxLength: 256
             location:
@@ -366,7 +392,10 @@ components:
           $ref: '#/components/schemas/CommentList'
         description:
           type: string
+          minLength: 0
+          maxLength: 1024
           description: Description of the photo
+          pattern: ^[^\\]*?$
           example: This photo is super cool!
         created_at:
           type: string
@@ -374,6 +403,8 @@ components:
           description: Date and time when the photo was posted
           example: 2020-12-31T23:59:59Z
           pattern: ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$
+          minLength: 20
+          maxLength: 20
 
     Stream:
       title: Stream
@@ -388,8 +419,24 @@ components:
           minItems: 1
           maxItems: 256
 
+tags:
+  - name: users
+    description: Operations on users of WASAphoto.
+  - name: login 
+    description: Operations required for bearer token authentication and session management.
+  - name: photos
+    description: Operations on photos, the main content of WASA*photo*.
+  - name: followers
+    description: Operations about followers, interactions between users.
+  - name: biography
+    description: Operations about biographies, additional info on user's profiles.
+  - name: stream
+    description: Operations about the stream, the main feed of WASAphoto.
+  - name: bans
+    description: Operations about bans, for user privacy.
 
 paths:
+    
   /users/{user_name}/profile:
     parameters:
       - name: user_name
@@ -610,6 +657,9 @@ paths:
                   type: string
                   description: Description of the photo
                   example: This photo is super cool!
+                  pattern: ^[^\\]{0,256}$
+                  minLength: 0
+                  maxLength: 1024
       responses:
         '201':
           description: |-
