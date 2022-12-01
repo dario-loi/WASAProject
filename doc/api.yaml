@@ -880,7 +880,7 @@ paths:
           description: |-
             The user is not correctly authenticated (the given ID does not match the user's ID)
     delete:
-      operationId: deleteComment
+      operationId: uncommentPhoto
       summary: Delete a comment.
       tags:
         - "photos"
