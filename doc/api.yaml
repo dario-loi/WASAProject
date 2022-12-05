@@ -6,7 +6,7 @@ info:
       This OpenAPI document describes a set of interfaces to allow a WASAPhoto user 
       to interact with the WASAPhoto backend, WASAPhoto is a new social network that
       allows you to share your best moments with friends! 
-  version: "v0.1.0"
+  version: "v0.9.0"
 
 security:
   - bearerAuth: []
@@ -79,8 +79,10 @@ components:
       properties:
         username:
           $ref: '#/components/schemas/Username'
+          description: The username of the user
         profile_photo:
           $ref: '#/components/schemas/Photo'
+          description: The profile picture of the user
 
     UserList:
       title: UserList
@@ -94,6 +96,7 @@ components:
           maxItems: 4294967295
           items:
             $ref: '#/components/schemas/UserID'
+            description: The ID of a user in the list
 
     FollowList:
       title: FollowList
@@ -207,6 +210,7 @@ components:
           type: string
           description: State in the Country
           example: Latium
+          pattern: ^[^\\]{1,64}$
           minLength: 1
           maxLength: 64
         city:
@@ -419,6 +423,24 @@ components:
           minItems: 1
           maxItems: 256
 
+    Error: 
+      title: Error
+      type: object
+      description: |- 
+        An error message, it contains a code and a message.
+      properties:
+        code:
+          type: integer
+          description: The error code
+          example: 400
+        message:
+          type: string
+          description: The error message
+          example: Bad request
+          pattern: ^[^\\]*?$
+          minLength: 1
+          maxLength: 256
+
 tags:
   - name: users
     description: Operations on users of WASAphoto.
@@ -438,6 +460,13 @@ tags:
 paths:
     
   /users/{user_name}/profile:
+    parameters:
+    - name: user_name
+      in: path
+      description: The username of the user whose profile is being requested
+      required: true
+      schema:
+        $ref: '#/components/schemas/Username'
     get:
       operationId: getUserProfile
       tags:
@@ -445,13 +474,7 @@ paths:
       summary: Get a user's profile
       description: |-
         Get a user's profile, including their username and the list of photos they have posted.
-      parameters:
-        - name: user_name
-          in: path
-          description: The username of the user whose profile is being requested
-          required: true
-          schema:
-            $ref: '#/components/schemas/Username'
+
       responses:
         '200':
           description: |-
@@ -472,6 +495,11 @@ paths:
         '404':
           description: |-
             The user does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        
     patch:
       operationId: setMyUserName
       tags:
@@ -488,12 +516,6 @@ paths:
         Returns the new identifier in the response body so that the user can continue 
         using the application seamlessly.
       parameters:
-        - name: user_name
-          in: path
-          description: The username of the user that is requesting the update.
-          required: true
-          schema:
-            $ref: '#/components/schemas/Username'
         - name: identifier
           in: header
           description: |- 
@@ -525,16 +547,32 @@ paths:
             The username is ill-formed, it must begin with an alphabetical character,
             must only contain alphanumeric characters and underscores and be of a length
             inbetween 3 and 32.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '401':
           description: |-
             The identifier is not valid, it is either ill-formed or does not belong to the
             user that is requesting the update.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '409':
           description: |-
             The username is already taken/is identical to the previous
+          content:  
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '404':
           description: |-
             The user that is requesting the update does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   /users/{user_name}/profile/photos:
     post:
@@ -551,6 +589,7 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/Username'
+
         - name: identifier
           in: header
           description: The user's identifier
@@ -592,12 +631,24 @@ paths:
         '400':
           description: |-
             The photo is not valid, it must be a valid base64 encoded image.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '404':
           description: |-
             The user does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '401':
           description: |-
             The user is not correctly authenticated (the given ID does not match the user's ID)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
     get:
       operationId: getUserPhotos
       summary: Get a user's photos
@@ -627,7 +678,11 @@ paths:
                   $ref: '#/components/schemas/Photopost'
         '404':
           description: |-
-            The user does not exist
+            The user does not 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   
   /users/{user_name}/profile/photos/{photo_id}:
     get:
@@ -663,6 +718,10 @@ paths:
         '404':
           description: |-
             Either the requested user of photo id does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
     delete:
       operationId: deletePhoto
       summary: Delete a photo
@@ -699,9 +758,17 @@ paths:
         '404':
           description: |-
             Either the requested user of photo id does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '401':
           description: |-
             The user is not correctly authenticated (the given ID does not match the user's ID)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   /users/{user_name}/profile/photos/{photo_id}/likes:
     get:
@@ -736,6 +803,10 @@ paths:
         '404':
           description: |-
             Either the requested user or photo does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
     put:
       operationId: likePhoto
@@ -772,9 +843,17 @@ paths:
         '404':
           description: |-
             Either the requested user or photo does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '401':
           description: |-
             The user is not correctly authenticated (the given ID does not match the user's ID)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   /users/{user_name}/profile/photos/{photo_id}/likes/{liker_id}:
     delete:
@@ -818,12 +897,24 @@ paths:
         '404':
           description: |-
             Either the requested user or photo does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '401':
           description: |-
             The user is not correctly authenticated (the given ID does not match the user's ID)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '409':
           description: |-
             The user has not liked the photo yet, so it cannot be unliked.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   /users/{user_name}/profile/photos/{photo_id}/comments:
     get:
@@ -904,12 +995,24 @@ paths:
         '400':
           description: |-
             The request is ill-formed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '404':
           description: |-
             Either the requested user or photo does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '401':
           description: |-
             The user is not correctly authenticated (the given ID does not match the user's ID)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   /users/{user_name}/profile/photos/{photo_id}/comments/{comment_id}:
 
@@ -956,12 +1059,24 @@ paths:
         '400':
           description: |-
             The request is ill-formed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '404':
           description: |-
             Either the requested user, photo or comment does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '401':
           description: |-
             The user is not correctly authenticated (the given ID does not match the user's ID)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
 
   /users/{user_name}/following:
@@ -990,6 +1105,10 @@ paths:
         '404':
           description: |-
             The user does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
     put:
       operationId: followUser
       summary: Follow a user
@@ -1027,12 +1146,24 @@ paths:
         '400':
           description: |-
             The follow request is ill-formed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '404':
           description: |-
             The user does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '401':
           description: |-
             The user is not correctly authenticated (the given ID does not match the user's ID)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
 
   /users/{user_name}/following/{followed_name}:
@@ -1073,15 +1204,31 @@ paths:
         '400':
           description: |-
             The unfollow request is ill-formed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '404':
           description: |-
             The user identified by this name does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '409':
           description: |-
             The user is not being followed by the user specified in the body of the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '401':
           description: |-
             The user is not correctly authenticated (the given ID does not match the user's ID).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
 
   /users/{user_name}/biography:
@@ -1166,12 +1313,24 @@ paths:
         '400':
           description: |-
             The request is ill-formed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '401':  
           description: |-
             The user is not correctly authenticated (the given ID does not match the user's ID).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '404':
           description: |-
             The requested user does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   /users/{user_name}/stream:
     get:
@@ -1224,9 +1383,17 @@ paths:
         '404':
           description: |-
             The requested user does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '401':  
           description: |-
             The user is not correctly authenticated (the given ID does not match the user's ID).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
 
   /users/{user_name}/followers:
@@ -1256,6 +1423,10 @@ paths:
         '404':
           description: |-
             The user does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   /users/{user_name}/followers/{follower_name}: 
         delete:
@@ -1295,12 +1466,24 @@ paths:
             '400':
               description: |-
                 The user to unfollow is not valid
+              content:
+                application/json:
+                  schema:
+                    $ref: '#/components/schemas/Error'
             '404':
               description: |-
                 The user does not exist
+              content:
+                application/json:
+                  schema:
+                    $ref: '#/components/schemas/Error'
             '409':
               description: |-
                 The user is not being followed
+              content:
+                application/json:
+                  schema:
+                    $ref: '#/components/schemas/Error'
 
   /users/{user_name}/bans:
     get:
@@ -1365,12 +1548,24 @@ paths:
         '400':
           description: |-
             The ban request is ill-formed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '404':
           description: |-
             The user does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '401':
           description: |-
             The user is not correctly authenticated (the given ID does not match the user's ID)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         
   /users/{user_name}/bans/{banned_name}:
     delete:
@@ -1408,12 +1603,24 @@ paths:
         '400':
           description: |-
             The unban request is ill-formed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '404':
           description: |-
             The user does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '401':
           description: |-
             The user is not correctly authenticated (the given ID does not match the user's ID)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   /session:
     put:
@@ -1444,3 +1651,7 @@ paths:
         '400':
           description: |-
             Login request is ill-formed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
