@@ -156,7 +156,7 @@ components:
           example: |-
             I really like this photo, the subtle off-white coloring of the background 
             really makes the color pop!
-          pattern: ^[^\n]{1,1024}$
+          pattern: ^[^\\]{1,1024}$
           minLength: 0
           maxLength: 1024
         creation_time:
