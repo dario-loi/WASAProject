@@ -660,7 +660,7 @@ paths:
       parameters:
         - name: identifier
           in: header
-          description: The user's identifier
+          description: The user's identifier, for authentication purposes.
           required: true
           schema:
             $ref: '#/components/schemas/UserID'
@@ -669,7 +669,7 @@ paths:
       responses:
         '204':
           description: |-
-            The photo has been deleted
+            The photo has been correctly deleted.
         '404':
           description: |-
             Either the requested user of photo id does not exist.
@@ -695,7 +695,7 @@ paths:
       parameters:
         - name: identifier
           in: header
-          description: The user's identifier
+          description: The user's identifier, for authentication purposes.
           required: true
           schema:
             $ref: '#/components/schemas/UserID'
@@ -1474,13 +1474,6 @@ paths:
         Get the list of all users banned by a user.
       tags:
         - "bans"
-      parameters:
-        - name: user_name
-          in: path
-          description: The user's name
-          required: true
-          schema:
-            $ref: '#/components/schemas/Username'
       responses:
         '200':
           description: |-
