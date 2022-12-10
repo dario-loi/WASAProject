@@ -81,8 +81,7 @@ components:
           $ref: '#/components/schemas/Username'
           description: The username of the user
         profile_photo:
-          $ref: '#/components/schemas/Photo'
-          description: The profile picture of the user
+          $ref: '#/components/schemas/Photopost'
 
     UserList:
       title: UserList
@@ -96,7 +95,6 @@ components:
           maxItems: 4294967295
           items:
             $ref: '#/components/schemas/UserID'
-            description: The ID of a user in the list
 
     FollowList:
       title: FollowList
@@ -606,6 +604,10 @@ paths:
         '404':
           description: |-
             The user does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   
   /users/{user_name}/profile/photos/{photo_id}:
     parameters:
@@ -641,6 +643,12 @@ paths:
         '404':
           description: |-
             Either the requested user of photo id does not exist.
+          
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          
     delete:
       operationId: deletePhoto
       summary: Delete a photo
@@ -665,9 +673,17 @@ paths:
         '404':
           description: |-
             Either the requested user of photo id does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '401':
           description: |-
             The user is not correctly authenticated (the given ID does not match the user's ID)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
       
     put:
       operationId: uploadPhoto
