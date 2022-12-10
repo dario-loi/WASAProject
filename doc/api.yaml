@@ -1438,12 +1438,26 @@ paths:
         '400':
           description: |-
             The unban request is ill-formed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '404':
           description: |-
             The user does not exist
+          
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '401':
           description: |-
             The user is not correctly authenticated (the given ID does not match the user's ID)
+          
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
     put:
       operationId: banUser
       summary: Ban a user
@@ -1460,12 +1474,27 @@ paths:
         '400':
           description: |-
             The ban request is ill-formed.
+          
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '404':
           description: |-
             The user does not exist
+          
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '401':
           description: |-
             The user is not correctly authenticated (the given ID does not match the user's ID)
+          
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
     
     get:
       operationId: getBans
@@ -1485,6 +1514,11 @@ paths:
         '404':
           description: |-
             The requested user does not exist.
+          
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   /session:
     put:
