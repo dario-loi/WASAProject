@@ -483,6 +483,8 @@ paths:
           content:
             application/json:
               schema:
+                description: |-
+                  The user's profile.
                 type: object
                 properties:
                   username:
@@ -710,6 +712,8 @@ paths:
           application/json:
             schema:
               type: object
+              description: |-
+                The photo to post, it must be a valid base64 encoded image.
               properties:
                 photo:
                   $ref: "#/components/schemas/Photo"
