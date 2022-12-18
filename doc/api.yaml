@@ -3,9 +3,9 @@ openapi: 3.0.3
 info:
   title: WASAPhoto API Specification
   description: |-
-      This OpenAPI document describes a set of interfaces to allow a WASAPhoto user 
-      to interact with the WASAPhoto backend, WASAPhoto is a new social network that
-      allows you to share your best moments with friends! 
+    This OpenAPI document describes a set of interfaces to allow a WASAPhoto user 
+    to interact with the WASAPhoto backend, WASAPhoto is a new social network that
+    allows you to share your best moments with friends!
   version: "v0.9.0"
 
 security:
@@ -24,21 +24,23 @@ components:
     Username:
       title: Username
       type: object
-      description: |- 
+      description: |-
         The username of the user, it must begin with an alphabetical character 
         and can be composed of a number of alphanumeric characters and underscores, 
         with a minimum length of 3 and a maximum length of 32.
       properties:
-        username:
+        username-string:
           type: string
+          description: The username of the user
           pattern: ^[a-zA-Z][a-zA-Z0-9_]{2,32}$ # we don't want to accept any whitespace or weird characters.
           example: "Dario_Loi_123"
           minLength: 2
           maxLength: 32
+
     SHA256hash:
       title: SHA256hash
       type: object
-      description: |- 
+      description: |-
         A generic SHA256 hash, used throughout the API to identify users, photos and more.
       properties:
         hash:
@@ -48,14 +50,14 @@ components:
           example: 985981bedf5cc6956330a1e4c39526a8839e8a3ec3adf0f2e3eedd59c359a58d
           minLength: 64
           maxLength: 64
-      
+
     Photo:
       title: Photo
-      format: binary  
+      format: binary
       type: string
       minLength: 0
       maxLength: 32000000 # 32MB
-      description: |- 
+      description: |-
         A Base64 encoded photo, used both in posts, profile pictures and 
         generally all over the place, this is WASA*Photo* after all.
       pattern: ^[A-Za-z0-9+/=]*$
@@ -63,91 +65,93 @@ components:
     UserID:
       title: UserID #this is basically just a `typedef`
       type: object
-      description: |- 
-        The token that identifies the user, SHA 256. 
+      description: |-
+        The token that identifies the user, SHA 256.
       properties:
         token:
-          $ref: '#/components/schemas/SHA256hash'
+          $ref: "#/components/schemas/SHA256hash"
 
     User:
       title: User
       type: object
-      description: |- 
+      description: |-
         A user of the WASAPhoto social network, it contains all *public* information of 
         that user necessary for a quick representation, omitting information such as photos
         in order to reduce the size of the structure.
       properties:
         username:
-          $ref: '#/components/schemas/Username'
-          description: The username of the user
+          $ref: "#/components/schemas/Username"
         profile_photo:
-          $ref: '#/components/schemas/Photopost'
+          allOf:
+            - $ref: "#/components/schemas/SHA256hash"
+            - description: The SHA256 hash of the user's profile picture.
 
     UserList:
       title: UserList
       type: object
-      description: |- 
+      description: |-
         A list of users, used to return the list of followers and following of a user.
       properties:
         users:
           type: array
+          description: The list of users
           minItems: 0
           maxItems: 4294967295
           items:
-            $ref: '#/components/schemas/UserID'
+            $ref: "#/components/schemas/UserID"
 
     FollowList:
       title: FollowList
       type: object
-      description: |- 
+      description: |-
         A Userlist bound to a single user, it is used to represent the Followers/Following
         of a user, structurally identical to a BanList, we give it a different name 
         to separate them semantically.
       properties:
         owner:
           allOf:
-            - $ref: '#/components/schemas/User'
+            - $ref: "#/components/schemas/User"
             - description: The user whose followers/following are being listed
-        users:
-          $ref : '#/components/schemas/UserList'
-          
+        follow-list:
+          $ref: "#/components/schemas/UserList"
+
     BanList:
       title: BanList
       type: object
-      description: |- 
+      description: |-
         A List of users banned by its owner, structurally identical to a FollowList, we give 
         it a different name to separate them semantically.
       properties:
         owner:
-          allOf:  
-            - $ref: '#/components/schemas/User'
+          allOf:
+            - $ref: "#/components/schemas/User"
             - description: The user that *owns* the bans.
         banned_users:
-          $ref : '#/components/schemas/UserList'
+          $ref: "#/components/schemas/UserList"
 
     LikesList:
       title: LikesList
       type: object
-      description: |- 
+      description: |-
         A list of users that liked a specific post, together with a refernece to the post 
         itself.
       properties:
         owner:
           allOf:
-            - $ref: '#/components/schemas/Photopost'
+            - $ref: "#/components/schemas/Photopost"
             - description: The user that *owns* the likes.
-        like_users:
-          $ref : '#/components/schemas/UserList'
+        likes:
+          $ref: "#/components/schemas/UserList"
 
     Comment:
       title: Comment
       type: object
-      description: |- 
+      description: |-
         A comment on a post, it contains the comment's author, body, date and time of 
         creation.
       properties:
         author:
-          $ref: '#/components/schemas/User'
+          $ref: "#/components/schemas/User"
         body:
           type: string
           description: The body of the comment
@@ -166,21 +170,21 @@ components:
           description: Date and time when the comment was created
           example: 2020-12-31T23:59:59Z
         parent_post:
-          $ref: '#/components/schemas/SHA256hash'
-    
+          $ref: "#/components/schemas/SHA256hash"
+
     CommentID:
       title: CommentID
       type: object
-      description: |- 
+      description: |-
         An ID identifying a comment, we use our SHA256 hash.
       properties:
         token:
-          $ref: '#/components/schemas/SHA256hash'
+          $ref: "#/components/schemas/SHA256hash"
 
     CommentList:
       title: CommentList
       type: object
-      description: |- 
+      description: |-
         A list of comments on a post, packed together to be put in a PhotoPost.
       properties:
         comments:
@@ -189,16 +193,16 @@ components:
           minItems: 0
           maxItems: 4294967295
           items:
-            $ref: '#/components/schemas/Comment'
+            $ref: "#/components/schemas/Comment"
 
     Place:
       title: Place
       type: object
-      description: |- 
+      description: |-
         A place, it contains a triple of country, state and city, together with 
         a pair of latitude-longitude coordinates.
       properties:
-        country:  #We use regex to validate the country, state and city names.
+        country: #We use regex to validate the country, state and city names.
           type: string
           description: Country
           example: Italy
@@ -235,24 +239,24 @@ components:
               description: The longitude of the birthplace
               minimum: -180
               maximum: 180
-              example: -3.1415 
+              example: -3.1415
 
     Biography:
       title: Biography
       type: object
-      description: 
-        A Biography of a user, it contains a range of personal info on the user's life 
-        such as Birth date, birthplace, current residence, education history, employment 
+      description:
+        A Biography of a user, it contains a range of personal info on the user's life
+        such as Birth date, birthplace, current residence, education history, employment
         history, current employment/education status and more.
       properties:
         short_description:
           type: string
-          description: |- 
+          description: |-
             A short description of the user, used in the profile page, it is a 
             short summary of the user's life.
           example: |-
             I'm a 20 year old student at Sapienza University of Rome, I like to take 
-            photos of kittens and sunsets. 
+            photos of kittens and sunsets.
           pattern: ^[^\\]*?$
           minLength: 0
           maxLength: 65536
@@ -281,36 +285,36 @@ components:
           description: |-
             The user's education history, a list of places where the user studied.
           items:
-              type: object
-              properties:
-                name:
-                  type: string 
-                  description: The Instituion's name.
-                  pattern: ^.{0,256}$
-                  example: Sapienza University of Rome.
-                  minLength: 1
-                  maxLength: 256
-                place:
-                  allOf:
-                    - $ref: "#/components/schemas/Place"
-                    - description: |-
-                        A place where the user studied.
-                start_date:
-                  type: string
-                  format: date
-                  pattern: ^\d{4}-\d{2}-\d{2}$
-                  description: The date when the user started studying
-                  example: 2001-06-13
-                  minLength: 10
-                  maxLength: 10
-                end_date:
-                  type: string
-                  format: date
-                  pattern: ^\d{4}-\d{2}-\d{2}$
-                  description: The date when the user stopped studying
-                  example: 2018-06-13
-                  minLength: 10
-                  maxLength: 10
+            type: object
+            properties:
+              name:
+                type: string
+                description: The Instituion's name.
+                pattern: ^.{0,256}$
+                example: Sapienza University of Rome.
+                minLength: 1
+                maxLength: 256
+              place:
+                allOf:
+                  - $ref: "#/components/schemas/Place"
+                  - description: |-
+                      A place where the user studied.
+              start_date:
+                type: string
+                format: date
+                pattern: ^\d{4}-\d{2}-\d{2}$
+                description: The date when the user started studying
+                example: 2001-06-13
+                minLength: 10
+                maxLength: 10
+              end_date:
+                type: string
+                format: date
+                pattern: ^\d{4}-\d{2}-\d{2}$
+                description: The date when the user stopped studying
+                example: 2018-06-13
+                minLength: 10
+                maxLength: 10
         employment:
           type: array
           minItems: 0
@@ -318,36 +322,36 @@ components:
           description: |-
             The user's employment history, a list of places where the user worked.
           items:
-              type: object
-              properties:
-                name:
-                  type: string 
-                  pattern: ^[^\\]{0,256}$
-                  description: The company's name.
-                  example: Google
-                  minLength: 1
-                  maxLength: 256
-                place:
-                  allOf:
-                    - $ref: "#/components/schemas/Place"
-                    - description: |-
-                        A place where the user worked.
-                start_date:
-                  type: string
-                  format: date
-                  pattern: ^\d{4}-\d{2}-\d{2}$
-                  description: The date when the user started working
-                  example: 2018-06-13
-                  minLength: 10
-                  maxLength: 10
-                end_date:
-                  type: string
-                  format: date
-                  pattern: ^\d{4}-\d{2}-\d{2}$
-                  minLength: 10
-                  maxLength: 10
-                  description: The date when the user stopped working
-                  example: 2020-06-13
+            type: object
+            properties:
+              name:
+                type: string
+                pattern: ^[^\\]{0,256}$
+                description: The company's name.
+                example: Google
+                minLength: 1
+                maxLength: 256
+              place:
+                allOf:
+                  - $ref: "#/components/schemas/Place"
+                  - description: |-
+                      A place where the user worked.
+              start_date:
+                type: string
+                format: date
+                pattern: ^\d{4}-\d{2}-\d{2}$
+                description: The date when the user started working
+                example: 2018-06-13
+                minLength: 10
+                maxLength: 10
+              end_date:
+                type: string
+                format: date
+                pattern: ^\d{4}-\d{2}-\d{2}$
+                minLength: 10
+                maxLength: 10
+                description: The date when the user stopped working
+                example: 2020-06-13
         current_state:
           type: string
           enum:
@@ -365,7 +369,7 @@ components:
             whether the student is actually working there.
           properties:
             name:
-              type: string 
+              type: string
               description: The Institution/Company's name.
               example: Google
               pattern: ^.{1,256}$
@@ -377,22 +381,21 @@ components:
                     Where the place is located
                 - $ref: "#/components/schemas/Place"
 
-        
     Photopost:
       title: Photopost
       type: object
-      description: |- 
+      description: |-
         A post containing a photo to be displayed in various environments,
         both user profiles and the main feed.
       properties:
         id:
-          $ref: '#/components/schemas/SHA256hash'
+          $ref: "#/components/schemas/SHA256hash"
         author_identifier:
-          $ref: '#/components/schemas/UserID'
+          $ref: "#/components/schemas/UserID"
         photo:
-          $ref: '#/components/schemas/Photo'
-        comments:
-          $ref: '#/components/schemas/CommentList'
+          $ref: "#/components/schemas/Photo"
+        comments-list:
+          $ref: "#/components/schemas/CommentList"
         description:
           type: string
           minLength: 0
@@ -412,20 +415,21 @@ components:
     Stream:
       title: Stream
       type: object
-      description: |- 
+      description: |-
         A stream of posts, it contains a list of Photoposts.
       properties:
         posts:
           type: array
+          description: A list of Photoposts
           items:
-            $ref: '#/components/schemas/Photopost'
+            $ref: "#/components/schemas/Photopost"
           minItems: 1
           maxItems: 256
 
-    Error: 
+    Error:
       title: Error
       type: object
-      description: |- 
+      description: |-
         An error message, it contains a code and a message.
       properties:
         code:
@@ -443,7 +447,7 @@ components:
 tags:
   - name: users
     description: Operations on users of WASAphoto.
-  - name: login 
+  - name: login
     description: Operations required for bearer token authentication and session management.
   - name: photos
     description: Operations on photos, the main content of WASA*photo*.
@@ -457,7 +461,6 @@ tags:
     description: Operations about bans, for user privacy.
 
 paths:
-    
   /users/{user_name}/profile:
     parameters:
       - name: user_name
@@ -465,7 +468,7 @@ paths:
         description: The username of the user that is requesting the update.
         required: true
         schema:
-          $ref: '#/components/schemas/Username'
+          $ref: "#/components/schemas/Username"
     get:
       operationId: getUserProfile
       tags:
@@ -474,7 +477,7 @@ paths:
       description: |-
         Get a user's profile, including their username and the list of photos they have posted.
       responses:
-        '200':
+        "200":
           description: |-
             The user's profile
           content:
@@ -483,21 +486,22 @@ paths:
                 type: object
                 properties:
                   username:
-                    $ref: '#/components/schemas/Username'
+                    $ref: "#/components/schemas/Username"
                   photos:
                     type: array
+                    description: A list of the user's photos
                     minItems: 0
                     maxItems: 65536
                     items:
-                      $ref: '#/components/schemas/Photopost'
-        '404':
+                      $ref: "#/components/schemas/Photopost"
+        "404":
           description: |-
             The user does not exist
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        
+                $ref: "#/components/schemas/Error"
+
     patch:
       operationId: setMyUserName
       tags:
@@ -516,12 +520,12 @@ paths:
       parameters:
         - name: identifier
           in: header
-          description: |- 
+          description: |-
             The identifier of the user that is requesting the update, used for 
             authentication purposes.
           required: true
           schema:
-            $ref: '#/components/schemas/UserID'
+            $ref: "#/components/schemas/UserID"
       security:
         - bearerAuth: []
       requestBody:
@@ -531,16 +535,16 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Username'
+              $ref: "#/components/schemas/Username"
       responses:
-        '200':
+        "200":
           description: |-
             The user's username has been updated
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserID'
-        '400':
+                $ref: "#/components/schemas/UserID"
+        "400":
           description: |-
             The username is ill-formed, it must begin with an alphabetical character,
             must only contain alphanumeric characters and underscores and be of a length
@@ -548,38 +552,38 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '401':
+                $ref: "#/components/schemas/Error"
+        "401":
           description: |-
             The identifier is not valid, it is either ill-formed or does not belong to the
             user that is requesting the update.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '409':
+                $ref: "#/components/schemas/Error"
+        "409":
           description: |-
             The username is already taken/is identical to the previous
-          content:  
+          content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '404':
+                $ref: "#/components/schemas/Error"
+        "404":
           description: |-
             The user that is requesting the update does not exist.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
 
   /users/{user_name}/profile/photos:
     parameters:
-        - name: user_name
-          in: path
-          description: The username of the user whose photos are being requested
-          required: true
-          schema:
-            $ref: '#/components/schemas/Username'
+      - name: user_name
+        in: path
+        description: The username of the user whose photos are being requested
+        required: true
+        schema:
+          $ref: "#/components/schemas/Username"
     get:
       operationId: getUserPhotos
       summary: Get a user's photos
@@ -588,27 +592,23 @@ paths:
       description: |-
         Get a user's photos, including their description and the date they were posted,
         useful to populate the feed of their profile.
-      
+
       responses:
-        '200':
+        "200":
           description: |-
             The user's photos
           content:
             application/json:
               schema:
-                type: array
-                minItems: 0
-                maxItems: 65536
-                items:
-                  $ref: '#/components/schemas/Photopost'
-        '404':
+                $ref: "#/components/schemas/Stream"
+        "404":
           description: |-
             The user does not exist
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-  
+                $ref: "#/components/schemas/Error"
+
   /users/{user_name}/profile/photos/{photo_id}:
     parameters:
       - name: user_name
@@ -616,13 +616,13 @@ paths:
         description: The user's name
         required: true
         schema:
-          $ref: '#/components/schemas/Username'
+          $ref: "#/components/schemas/Username"
       - name: photo_id
         in: path
         description: The photo's id
         required: true
         schema:
-          $ref: '#/components/schemas/SHA256hash'
+          $ref: "#/components/schemas/SHA256hash"
     get:
       operationId: getPhoto
       summary: Get a photo
@@ -633,22 +633,22 @@ paths:
       tags:
         - "photos"
       responses:
-        '200':
+        "200":
           description: |-
             The photo
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Photopost'
-        '404':
+                $ref: "#/components/schemas/Photopost"
+        "404":
           description: |-
             Either the requested user of photo id does not exist.
-          
+
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-          
+                $ref: "#/components/schemas/Error"
+
     delete:
       operationId: deletePhoto
       summary: Delete a photo
@@ -663,28 +663,28 @@ paths:
           description: The user's identifier, for authentication purposes.
           required: true
           schema:
-            $ref: '#/components/schemas/UserID'
+            $ref: "#/components/schemas/UserID"
       security:
         - bearerAuth: []
       responses:
-        '204':
+        "204":
           description: |-
             The photo has been correctly deleted.
-        '404':
+        "404":
           description: |-
             Either the requested user of photo id does not exist.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '401':
+                $ref: "#/components/schemas/Error"
+        "401":
           description: |-
             The user is not correctly authenticated (the given ID does not match the user's ID)
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-      
+                $ref: "#/components/schemas/Error"
+
     put:
       operationId: uploadPhoto
       summary: Post a photo
@@ -698,8 +698,8 @@ paths:
           description: The user's identifier, for authentication purposes.
           required: true
           schema:
-            $ref: '#/components/schemas/UserID'
-        
+            $ref: "#/components/schemas/UserID"
+
       security:
         - bearerAuth: []
       requestBody:
@@ -712,7 +712,7 @@ paths:
               type: object
               properties:
                 photo:
-                  $ref: '#/components/schemas/Photo'
+                  $ref: "#/components/schemas/Photo"
                 description:
                   type: string
                   description: Description of the photo
@@ -721,37 +721,37 @@ paths:
                   minLength: 0
                   maxLength: 1024
       responses:
-        '201':
+        "201":
           description: |-
             The photo has been posted
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/SHA256hash'
+                  - $ref: "#/components/schemas/SHA256hash"
                   - description: |-
                       The hash of the photo, used for identification.
-        '400':
+        "400":
           description: |-
             The photo is not valid, it must be a valid base64 encoded image.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '404':
+                $ref: "#/components/schemas/Error"
+        "404":
           description: |-
             The user does not exist
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '401':
+                $ref: "#/components/schemas/Error"
+        "401":
           description: |-
             The user is not correctly authenticated (the given ID does not match the user's ID)
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
   /users/{user_name}/profile/photos/{photo_id}/likes:
     parameters:
       - name: user_name
@@ -759,13 +759,13 @@ paths:
         description: The user's name
         required: true
         schema:
-          $ref: '#/components/schemas/Username'
+          $ref: "#/components/schemas/Username"
       - name: photo_id
         in: path
         description: The photo's id
         required: true
         schema:
-          $ref: '#/components/schemas/SHA256hash'
+          $ref: "#/components/schemas/SHA256hash"
     get:
       operationId: getPhotoLikes
       summary: Get a photo's likes
@@ -775,48 +775,47 @@ paths:
       tags:
         - "photos"
       responses:
-        '200':
+        "200":
           description: |-
             The list of users that liked the photo
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LikesList'
-        '404':
+                $ref: "#/components/schemas/LikesList"
+        "404":
           description: |-
             Either the requested user or photo does not exist.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-
+                $ref: "#/components/schemas/Error"
 
   /users/{user_name}/profile/photos/{photo_id}/likes/{liker_id}:
     parameters:
-        - name: user_name
-          in: path
-          description: The user's name
-          required: true
-          schema:
-            $ref: '#/components/schemas/Username'
-        - name: photo_id
-          in: path
-          description: The photo's id
-          required: true
-          schema:
-            $ref: '#/components/schemas/SHA256hash'
-        - name: liker_id
-          in: path
-          description: The user's id
-          required: true
-          schema:
-            $ref: '#/components/schemas/UserID'
-        - name: identifier
-          in: header
-          description: The user's identifier
-          required: true
-          schema:
-            $ref: '#/components/schemas/UserID'
+      - name: user_name
+        in: path
+        description: The user's name
+        required: true
+        schema:
+          $ref: "#/components/schemas/Username"
+      - name: photo_id
+        in: path
+        description: The photo's id
+        required: true
+        schema:
+          $ref: "#/components/schemas/SHA256hash"
+      - name: liker_id
+        in: path
+        description: The user's id
+        required: true
+        schema:
+          $ref: "#/components/schemas/UserID"
+      - name: identifier
+        in: header
+        description: The user's identifier
+        required: true
+        schema:
+          $ref: "#/components/schemas/UserID"
     delete:
       operationId: unlikePhoto
       summary: Unlike a photo
@@ -827,30 +826,30 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '204':
+        "204":
           description: |-
             The photo has been unliked
-        '404':
+        "404":
           description: |-
             Either the requested user or photo does not exist.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '401':
+                $ref: "#/components/schemas/Error"
+        "401":
           description: |-
             The user is not correctly authenticated (the given ID does not match the user's ID)
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '409':
+                $ref: "#/components/schemas/Error"
+        "409":
           description: |-
             The user has not liked the photo yet, so it cannot be unliked.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
     put:
       operationId: likePhoto
       summary: Like a photo
@@ -861,15 +860,24 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '204':
+        "204":
           description: |-
             The photo has been liked
-        '404':
+
+        "404":
           description: |-
             Either the requested user or photo does not exist.
-        '401':
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
           description: |-
             The user is not correctly authenticated (the given ID does not match the user's ID)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 
   /users/{user_name}/profile/photos/{photo_id}/comments:
     parameters:
@@ -878,13 +886,13 @@ paths:
         description: The user's name
         required: true
         schema:
-          $ref: '#/components/schemas/Username'
+          $ref: "#/components/schemas/Username"
       - name: photo_id
         in: path
         description: The photo's id
         required: true
         schema:
-          $ref: '#/components/schemas/SHA256hash'
+          $ref: "#/components/schemas/SHA256hash"
     get:
       operationId: getPhotoComments
       summary: Get a photo's comments
@@ -894,18 +902,20 @@ paths:
       tags:
         - "photos"
       responses:
-        '200':
+        "200":
           description: |-
             The list of comments of the photo
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CommentList'
-        '404':
+                $ref: "#/components/schemas/CommentList"
+        "404":
           description: |-
             Either the requested user or photo does not exist.
-    
-    
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 
   /users/{user_name}/profile/photos/{photo_id}/comments/{comment_id}:
     parameters:
@@ -914,25 +924,25 @@ paths:
         description: The photo owner's username.
         required: true
         schema:
-          $ref: '#/components/schemas/Username'
+          $ref: "#/components/schemas/Username"
       - name: photo_id
         in: path
         description: The photo's ID.
         required: true
         schema:
-          $ref: '#/components/schemas/SHA256hash'
+          $ref: "#/components/schemas/SHA256hash"
       - name: comment_id
         in: path
         description: The comment's ID.
         required: true
         schema:
-          $ref: '#/components/schemas/CommentID'
+          $ref: "#/components/schemas/CommentID"
       - name: identifier
         in: header
         description: The commenter's Identifier (for authentication).
         required: true
         schema:
-          $ref: '#/components/schemas/UserID'
+          $ref: "#/components/schemas/UserID"
     put:
       operationId: commentPhoto
       summary: Comment a photo.
@@ -942,7 +952,7 @@ paths:
         (but that would be annoying!).
       security:
         - bearerAuth: []
-      tags: 
+      tags:
         - "photos"
       requestBody:
         description: The comment to be posted on the photo.
@@ -950,32 +960,32 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Comment'
+              $ref: "#/components/schemas/Comment"
       responses:
-        '201':
+        "204":
           description: |-
             The comment has been posted.
-        '400':
+        "400":
           description: |-
             The request is ill-formed.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '404':
+                $ref: "#/components/schemas/Error"
+        "404":
           description: |-
             Either the requested user or photo does not exist.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '401':
+                $ref: "#/components/schemas/Error"
+        "401":
           description: |-
             The user is not correctly authenticated (the given ID does not match the user's ID)
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
     delete:
       operationId: uncommentPhoto
       summary: Delete a comment.
@@ -988,31 +998,30 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
+        "204":
           description: |-
             The comment has been deleted.
-        '400':
+        "400":
           description: |-
             The request is ill-formed.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '404':
+                $ref: "#/components/schemas/Error"
+        "404":
           description: |-
             Either the requested user, photo or comment does not exist.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '401':
+                $ref: "#/components/schemas/Error"
+        "401":
           description: |-
             The user is not correctly authenticated (the given ID does not match the user's ID)
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-
+                $ref: "#/components/schemas/Error"
 
   /users/{user_name}/following:
     parameters:
@@ -1021,7 +1030,7 @@ paths:
         description: The user's name
         required: true
         schema:
-          $ref: '#/components/schemas/Username'
+          $ref: "#/components/schemas/Username"
     get:
       operationId: getFollowing
       summary: Get the list of users a user is following
@@ -1030,21 +1039,20 @@ paths:
       tags:
         - "followers"
       responses:
-        '200':
+        "200":
           description: |-
             The list of users the user is following
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/FollowList'
-        '404':
+                $ref: "#/components/schemas/FollowList"
+        "404":
           description: |-
             The user does not exist
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-    
+                $ref: "#/components/schemas/Error"
 
   /users/{user_name}/following/{followed_name}:
     parameters:
@@ -1053,19 +1061,19 @@ paths:
         description: The user's name
         required: true
         schema:
-          $ref: '#/components/schemas/Username'
+          $ref: "#/components/schemas/Username"
       - name: followed_name
         in: path
         description: The target's username
         required: true
         schema:
-          $ref: '#/components/schemas/Username'
+          $ref: "#/components/schemas/Username"
       - name: identifier
         in: header
         description: The user's identifier, used for authentication purposes.
         required: true
         schema:
-          $ref: '#/components/schemas/UserID'
+          $ref: "#/components/schemas/UserID"
     put:
       operationId: followUser
       summary: Follow a user
@@ -1080,41 +1088,41 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Username'
+              $ref: "#/components/schemas/Username"
       security:
         - bearerAuth: []
       responses:
-        '201':
+        "204":
           description: |-
             The user has been followed
-        '400':
+        "400":
           description: |-
             The follow request is ill-formed.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '404':
+                $ref: "#/components/schemas/Error"
+        "404":
           description: |-
             The user does not exist
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '401':
+                $ref: "#/components/schemas/Error"
+        "401":
           description: |-
             The user is not correctly authenticated (the given ID does not match the user's ID)
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '409':
+                $ref: "#/components/schemas/Error"
+        "409":
           description: |-
             The user is already following the target
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
     delete:
       operationId: unfollowUser
       summary: Unfollow a user
@@ -1126,57 +1134,56 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '204':
+        "204":
           description: |-
             The user has been unfollowed.
-        '400':
+        "400":
           description: |-
             The unfollow request is ill-formed.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '404':
+                $ref: "#/components/schemas/Error"
+        "404":
           description: |-
             The user identified by this name does not exist.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '409':
+                $ref: "#/components/schemas/Error"
+        "409":
           description: |-
             The user is not being followed by the user specified in the body of the request.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '401':
+                $ref: "#/components/schemas/Error"
+        "401":
           description: |-
             The user is not correctly authenticated (the given ID does not match the user's ID).
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-
+                $ref: "#/components/schemas/Error"
 
   /users/{user_name}/biography:
     parameters:
-            - name: user_name
-              description: The name of the biography's owner.
-              required: true
-              in: path
-              schema:
-                $ref: "#/components/schemas/Username"
-            - name: requester_ID
-              description: The identifier of the request's issuer.
-              required: true
-              in: header
-              schema:
-                $ref: "#/components/schemas/UserID"
+      - name: user_name
+        description: The name of the biography's owner.
+        required: true
+        in: path
+        schema:
+          $ref: "#/components/schemas/Username"
+      - name: requester_ID
+        description: The identifier of the request's issuer.
+        required: true
+        in: header
+        schema:
+          $ref: "#/components/schemas/UserID"
     get:
       operationId: getBiography
       summary: Gets the biography of a user
-      description: |- 
+      description: |-
         Retrieves the biography of `user_name`, containing a short description written by
         him, together with some personal information about his life, such as his place 
         of birth, date of birth, current location, a list of institutions he attended 
@@ -1189,25 +1196,33 @@ paths:
         - "biography"
       security:
         - bearerAuth: []
-      
+
       responses:
-        '200':
+        "200":
           description: |-
             The user's biography has been retrieved.
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Biography"
-        '404':
+        "404":
           description: |-
             The requested user does not exist.
-        '401':  
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
           description: |-
             The user is not correctly authenticated (the given ID does not match the user's ID).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
     put:
       operationId: updateBiography
       summary: Updates the biography of a user
-      description: |- 
+      description: |-
         Updates the biography of `user_name`, the user must be authenticated by 
         providing his ID.
       tags:
@@ -1223,54 +1238,54 @@ paths:
             schema:
               $ref: "#/components/schemas/Biography"
       responses:
-        '200':
+        "204":
           description: |-
             The user's biography has been updated.
-        '400':
+        "400":
           description: |-
             The request is ill-formed.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '401':  
+                $ref: "#/components/schemas/Error"
+        "401":
           description: |-
             The user is not correctly authenticated (the given ID does not match the user's ID).
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '404':
+                $ref: "#/components/schemas/Error"
+        "404":
           description: |-
             The requested user does not exist.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
 
   /users/{user_name}/stream:
     parameters:
-        - name: user_name
-          description: The name of the stream's owner.
-          required: true
-          in: path
-          schema:
-            $ref: "#/components/schemas/Username"
-        - name: requester_ID
-          description: The identifier of the request's issuer.
-          required: true
-          in: header
-          schema:
-            $ref: "#/components/schemas/UserID"
-        - name: upto
-          description: The maximum number of posts to retrieve.
-          required: false
-          in: query
-          schema:
-            type: integer
-            minimum: 1
-            maximum: 100
-            default: 10
+      - name: user_name
+        description: The name of the stream's owner.
+        required: true
+        in: path
+        schema:
+          $ref: "#/components/schemas/Username"
+      - name: requester_ID
+        description: The identifier of the request's issuer.
+        required: true
+        in: header
+        schema:
+          $ref: "#/components/schemas/UserID"
+      - name: upto
+        description: The maximum number of posts to retrieve.
+        required: false
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 10
     get:
       operationId: getMyStream
       summary: Gets the stream of a user
@@ -1289,36 +1304,36 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
+        "200":
           description: |-
             The user's stream has been retrieved.
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Stream"
-        '404':
+        "404":
           description: |-
             The requested user does not exist.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '401':  
+                $ref: "#/components/schemas/Error"
+        "401":
           description: |-
             The user is not correctly authenticated (the given ID does not match the user's ID).
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
 
   /users/{user_name}/followers:
     parameters:
-    - name: user_name
-      in: path
-      description: The user's id
-      required: true
-      schema:
-        $ref: '#/components/schemas/Username'
+      - name: user_name
+        in: path
+        description: The user's id
+        required: true
+        schema:
+          $ref: "#/components/schemas/Username"
     get:
       operationId: getFollowers
       summary: Get the list of users following a user
@@ -1328,42 +1343,42 @@ paths:
         - "followers"
 
       responses:
-        '200':
+        "200":
           description: |-
             The list of users following the user, the user's name is also 
             aggregated in the list for completeness.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/FollowList'
-        '404':
+                $ref: "#/components/schemas/FollowList"
+        "404":
           description: |-
             The user does not exist
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
 
-  /users/{user_name}/followers/{follower_name}: 
+  /users/{user_name}/followers/{follower_name}:
     parameters:
-    - name: identifier
-      in: header
-      description: The user's id
-      required: true
-      schema:
-        $ref: '#/components/schemas/UserID'
-    - name: user_name
-      in: path
-      description: The user's username
-      required: true
-      schema:
-        $ref: '#/components/schemas/Username'
-    - name: follower_name
-      in: path
-      description: The follower's username
-      required: true
-      schema:
-        $ref: '#/components/schemas/Username'
+      - name: identifier
+        in: header
+        description: The user's id
+        required: true
+        schema:
+          $ref: "#/components/schemas/UserID"
+      - name: user_name
+        in: path
+        description: The user's username
+        required: true
+        schema:
+          $ref: "#/components/schemas/Username"
+      - name: follower_name
+        in: path
+        description: The follower's username
+        required: true
+        schema:
+          $ref: "#/components/schemas/Username"
     delete:
       operationId: removeFollower
       summary: Remove a follower
@@ -1376,31 +1391,30 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '204':
+        "204":
           description: |-
             The user has been unfollowed
-        '400':
+        "400":
           description: |-
             The user to unfollow is not valid
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '404':
+                $ref: "#/components/schemas/Error"
+        "404":
           description: |-
             The user does not exist
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '409':
+                $ref: "#/components/schemas/Error"
+        "409":
           description: |-
             The user is not being followed
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-
+                $ref: "#/components/schemas/Error"
 
   /users/{user_name}/bans/{banned_name}:
     parameters:
@@ -1409,19 +1423,19 @@ paths:
         description: The user's name
         required: true
         schema:
-          $ref: '#/components/schemas/Username'
+          $ref: "#/components/schemas/Username"
       - name: banned_name
         in: path
         description: The banned user's name
         required: true
         schema:
-          $ref: '#/components/schemas/Username'
+          $ref: "#/components/schemas/Username"
       - name: user_id
         in: header
         description: The user's identifier, used for authentication purposes.
         required: true
         schema:
-          $ref: '#/components/schemas/UserID'
+          $ref: "#/components/schemas/UserID"
     delete:
       operationId: unbanUser
       summary: Unban a user
@@ -1432,32 +1446,32 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '204':
+        "204":
           description: |-
             The user has been unbanned
-        '400':
+        "400":
           description: |-
             The unban request is ill-formed.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '404':
+                $ref: "#/components/schemas/Error"
+        "404":
           description: |-
             The user does not exist
-          
+
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '401':
+                $ref: "#/components/schemas/Error"
+        "401":
           description: |-
             The user is not correctly authenticated (the given ID does not match the user's ID)
-          
+
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
     put:
       operationId: banUser
       summary: Ban a user
@@ -1468,34 +1482,31 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '201':
+        "204":
           description: |-
             The user has been banned
-        '400':
+        "400":
           description: |-
             The ban request is ill-formed.
-          
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '404':
+                $ref: "#/components/schemas/Error"
+        "404":
           description: |-
             The user does not exist
-          
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '401':
+                $ref: "#/components/schemas/Error"
+        "401":
           description: |-
             The user is not correctly authenticated (the given ID does not match the user's ID)
-          
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-    
+                $ref: "#/components/schemas/Error"
+
     get:
       operationId: getBans
       summary: Get the list of users banned by a user
@@ -1504,21 +1515,21 @@ paths:
       tags:
         - "bans"
       responses:
-        '200':
+        "200":
           description: |-
             The list of users banned by the user.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BanList'
-        '404':
+                $ref: "#/components/schemas/BanList"
+        "404":
           description: |-
             The requested user does not exist.
-          
+
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
 
   /session:
     put:
@@ -1537,19 +1548,19 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Username'
+              $ref: "#/components/schemas/Username"
         required: true
       responses:
-        '201':
+        "201":
           description: User log-in action successful
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserID'
-        '400':
+                $ref: "#/components/schemas/UserID"
+        "400":
           description: |-
             Login request is ill-formed.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
