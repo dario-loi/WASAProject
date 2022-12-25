@@ -31,31 +31,29 @@ Then you can initialize the AppDatabase and pass it to the api package.
 package database
 
 import (
+	"crypto"
 	"database/sql"
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"os"
-	"reflect"
+
+	"git.sapienzaapps.it/fantasticcoffee/fantastic-coffee-decaffeinated/service/components"
 )
 
 // AppDatabase is the high level interface for the DB
 type AppDatabase interface {
 	GetName() (string, error)
 	SetName(name string) error
-	// QueryAndPack executes the query and pakcs the result into the provided interface.
-	// This allows for a *very* generic way of querying the DB and getting back the result.
-	//
-	// This proper use of polymorphism will probably be branded as "bad practice" by the review
-	// and be promptly converted to a hundred different (but equal) methods, with complimentary
-	// `switch` statements, just like the good old days!
-	QueryAndPack(data_struct interface{}, query string, args ...interface{}) ([]interface{}, error)
-
-	// ExecQuery executes the query and returns an error if the query failed or no rows were affected.
-	// Another generic method to allow for execution of queries that do *not* have a return value.
-	ExecQuery(query string, args ...interface{}) error
-
-	QueryAndPackRow(data_struct interface{}, query string, args ...interface{}) error
 	Ping() error
+
+	// Boilerplate code for APIs
+	// each method encapsulates the logic for a specific API
+	// it goes from data estracting from the DB to data serialization
+
+	// GetUserID returns the ID of the user with the given name
+	// Create the user if it doesn't exist
+	PostUserID(userName string) (ID string, err error)
 }
 
 type appdbimpl struct {
@@ -121,177 +119,90 @@ func (db *appdbimpl) Ping() error {
 	return db.c.Ping()
 }
 
-func (db *appdbimpl) ExecQuery(query string, args ...interface{}) error {
-	res, err := db.c.Exec(query, args...)
+// PostUserID returns the ID of the user with the given name
+// Create the user if it doesn't exist
+
+func (db *appdbimpl) PostUserID(userName string) (json string, err error) {
+
+	// check if the user already exists
+
+	var count int
+
+	// Selects ALWAYS one row
+	err = db.c.QueryRow(`SELECT COUNT(id) FROM users WHERE name = ?`, userName).Scan(&count)
 
 	if err != nil {
-		return err
-	}
+		data, e := components.Error{Code: 500, Message: "Internal Server Error"}.ToJSON()
 
-	affected, err := res.RowsAffected()
-
-	if err != nil {
-		return err
-	} else if affected == 0 {
-		return errors.New("no rows affected") // convert to custom error to be properly handled into http response
-	}
-
-	return nil
-}
-
-func (db *appdbimpl) QueryAndPack(data_struct interface{}, query string, args ...interface{}) ([]interface{}, error) {
-
-	// Get the type of the data_struct
-	data_struct_type := reflect.TypeOf(data_struct).Elem()
-
-	// Get the number of fields in the data_struct
-	data_struct_num_fields := data_struct_type.NumField()
-
-	// Get the number of arguments
-	num_args := len(args)
-
-	// Create a slice of interfaces to hold the arguments
-	// This is needed because the `Query` method expects a slice of interfaces
-	// as arguments.
-	// The arguments are passed as a variadic parameters, so we need to convert
-	// them to a slice of interfaces.
-	args_slice := make([]interface{}, num_args)
-	for i := 0; i < num_args; i++ {
-		args_slice[i] = args[i]
-	}
-
-	// Execute the query
-	rows, err := db.c.Query(query, args_slice...)
-
-	if err != nil {
-		return nil, err
-	}
-
-	// Create a slice of interfaces to hold the result
-	var result []interface{}
-
-	// Iterate over the rows
-	for rows.Next() {
-
-		// Create a slice of interfaces to hold the fields
-		fields := make([]interface{}, data_struct_num_fields)
-
-		// Iterate over the fields
-		for i := 0; i < data_struct_num_fields; i++ {
-			// Get the field type
-			field_type := data_struct_type.Field(i).Type
-
-			// Create a new pointer to the field type
-			field := reflect.New(field_type)
-
-			// Set the field in the slice of interfaces
-			fields[i] = field.Interface()
+		if e != nil {
+			return components.InternalServerError, fmt.Errorf("error converting error to JSON: %w", e)
 		}
 
-		// Scan the row into the fields
-		err = rows.Scan(fields...)
+		return string(data), fmt.Errorf("error getting user ID: %w", err)
+	}
+
+	// get the count
+	var userID string
+
+	if count == 0 {
+		// create the user
+
+		// Hash the user name with SHA256
+		hash := crypto.SHA256.New()
+		hash.Write([]byte(userName))
+		hashedUserName := hash.Sum(nil)
+		userID = fmt.Sprintf("%x", hashedUserName)
+
+		// Insert the user in the DB
+		_, err = db.c.Exec(`INSERT INTO users (id, name) VALUES (?, ?)`, hashedUserName, userName)
 
 		if err != nil {
-			return nil, err
+			data, e := components.Error{Code: 500, Message: "Internal Server Error"}.ToJSON()
+
+			if e != nil {
+				return components.InternalServerError, fmt.Errorf("error converting error to JSON: %w", e)
+			}
+
+			return string(data), fmt.Errorf("error creating user: %w", err)
 		}
 
-		// Create a new instance of the data_struct
-		new_data_struct := reflect.New(data_struct_type)
+	} else {
 
-		// Iterate over the fields
-		for i := 0; i < data_struct_num_fields; i++ {
-			// Get the field type
-			field_type := data_struct_type.Field(i).Type
+		// get the user ID
 
-			// Get the field value
-			field_value := reflect.ValueOf(fields[i]).Elem()
-
-			// Set the field in the new instance of the data_struct
-			new_data_struct.Elem().Field(i).Set(field_value.Convert(field_type))
-		}
-
-		// Append the new instance of the data_struct to the result
-		result = append(result, new_data_struct.Interface())
-	}
-
-	return result, nil
-}
-
-func (db *appdbimpl) QueryAndPackRow(data_struct interface{}, query string, args ...interface{}) error {
-
-	// Get the type of the data_struct
-	data_struct_type := reflect.TypeOf(data_struct).Elem()
-
-	// Get the number of fields in the data_struct
-	data_struct_num_fields := data_struct_type.NumField()
-
-	// Get the number of arguments
-	num_args := len(args)
-
-	// Create a slice of interfaces to hold the arguments
-	// This is needed because the `Query` method expects a slice of interfaces
-	// as arguments.
-	// The arguments are passed as a variadic parameters, so we need to convert
-	// them to a slice of interfaces.
-	args_slice := make([]interface{}, num_args)
-	for i := 0; i < num_args; i++ {
-		args_slice[i] = args[i]
-	}
-
-	// Execute the query
-	rows, err := db.c.Query(query, args_slice...)
-
-	if err != nil {
-
-		return err
-	}
-
-	// Iterate over the rows
-	for rows.Next() {
-
-		// Create a slice of interfaces to hold the fields
-		fields := make([]interface{}, data_struct_num_fields)
-
-		// Iterate over the fields
-		for i := 0; i < data_struct_num_fields; i++ {
-			// Get the field type
-			field_type := data_struct_type.Field(i).Type
-
-			// Create a new pointer to the field type
-			field := reflect.New(field_type)
-
-			// Set the field in the slice of interfaces
-			fields[i] = field.Interface()
-		}
-
-		// Scan the row into the fields
-		err = rows.Scan(fields...)
+		err = db.c.QueryRow(`SELECT id FROM users WHERE name = ?`, userName).Scan(&userID)
 
 		if err != nil {
-			return err
+			data, e := components.Error{Code: 500, Message: "Internal Server Error"}.ToJSON()
+
+			if e != nil {
+				return components.InternalServerError, fmt.Errorf("error converting error to JSON: %w", e)
+			}
+
+			return string(data), fmt.Errorf("error getting user ID: %w", err)
 		}
 
-		// Create a new instance of the data_struct
-		new_data_struct := reflect.New(data_struct_type)
-
-		// Iterate over the fields
-		for i := 0; i < data_struct_num_fields; i++ {
-			// Get the field type
-			field_type := data_struct_type.Field(i).Type
-
-			// Get the field value
-			field_value := reflect.ValueOf(fields[i]).Elem()
-
-			// Set the field in the new instance of the data_struct
-			new_data_struct.Elem().Field(i).Set(field_value.Convert(field_type))
-		}
-
-		// Set the new instance of the data_struct to the data_struct
-		data_struct = new_data_struct.Interface()
-
-		return nil
 	}
 
-	return errors.New("no rows found")
+	// return the user ID
+	userID = base64.URLEncoding.EncodeToString([]byte(userID))
+	fmt.Println(userID)
+	userID_json := components.SHA256hash{Hash: userID}
+
+	data, err := userID_json.ToJSON()
+
+	if err != nil {
+		data, e := components.Error{Code: 500, Message: "Internal Server Error"}.ToJSON()
+
+		if e != nil {
+			return components.InternalServerError, fmt.Errorf("error converting error to JSON: %w", e)
+		}
+
+		return string(data), fmt.Errorf("error converting user to JSON: %w", err)
+	}
+
+	fmt.Println(string(data))
+
+	return string(data), nil
 
 }

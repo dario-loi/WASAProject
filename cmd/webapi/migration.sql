@@ -4,22 +4,21 @@ CREATE TABLE IF NOT EXISTS users (
   propic_id TEXT,
   bio_id TEXT,
   FOREIGN KEY(propic_id) REFERENCES photos(id),
-  FOREIGN KEY(bio_id) REFERENCES bios(id),
-  FOREIGN KEY(id) REFERENCES followers(followed),
-  FOREIGN KEY(id) REFERENCES followers(following),
-  FOREIGN KEY(id) REFERENCES bans(banisher),
-  FOREIGN KEY(id) REFERENCES bans(banished),
-  FOREIGN KEY(id) REFERENCES likes(liker_id)
+  FOREIGN KEY(bio_id) REFERENCES bios(id)
 );
 CREATE TABLE IF NOT EXISTS followers (
   followed TEXT,
   following TEXT,
-  PRIMARY KEY (followed, following)
+  PRIMARY KEY (followed, following),
+  FOREIGN KEY(followed) REFERENCES users(id),
+  FOREIGN KEY(following) REFERENCES users(id)
 );
 CREATE TABLE IF NOT EXISTS bans (
   banisher TEXT,
   banished TEXT,
-  PRIMARY KEY (banisher, banished)
+  PRIMARY KEY (banisher, banished),
+  FOREIGN KEY(banisher) REFERENCES users(id),
+  FOREIGN KEY(banished) REFERENCES users(id)
 );
 CREATE TABLE IF NOT EXISTS bios (
   id TEXT PRIMARY KEY,
@@ -64,7 +63,8 @@ CREATE TABLE IF NOT EXISTS occupations (
 CREATE TABLE IF NOT EXISTS likes (
   liker_id TEXT,
   post_id TEXT, 
-  PRIMARY KEY (liker_id, post_id) 
+  PRIMARY KEY (liker_id, post_id),
+  FOREIGN KEY(liker_id) REFERENCES users(id)
 );
 CREATE TABLE IF NOT EXISTS photos (
   id TEXT PRIMARY KEY

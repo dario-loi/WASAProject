@@ -1,4 +1,4 @@
-package api
+package components
 
 // BiographyCurrentState The user's current state, whether they are studying, working or unemployed.
 type BiographyCurrentState string
