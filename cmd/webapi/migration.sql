@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS users (
   propic_id TEXT,
   bio_id TEXT,
   FOREIGN KEY(propic_id) REFERENCES photos(id),
-  FOREIGN KEY(bio_id) REFERENCES bio(id),
+  FOREIGN KEY(bio_id) REFERENCES bios(id),
   FOREIGN KEY(id) REFERENCES followers(followed),
   FOREIGN KEY(id) REFERENCES followers(following),
   FOREIGN KEY(id) REFERENCES bans(banisher),
@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS bans (
   banished TEXT,
   PRIMARY KEY (banisher, banished)
 );
-CREATE TABLE IF NOT EXISTS bio (
+CREATE TABLE IF NOT EXISTS bios (
   id TEXT PRIMARY KEY,
   bio_str TEXT,
   birth_date TEXT,
@@ -30,25 +30,25 @@ CREATE TABLE IF NOT EXISTS bio (
   FOREIGN KEY(residence) REFERENCES places(id),
   FOREIGN KEY(current_place_id) REFERENCES places(id)
 );
-CREATE TABLE IF NOT EXISTS post (
+CREATE TABLE IF NOT EXISTS posts (
   id TEXT PRIMARY KEY,
   photo_id TEXT,
-  description TEXT,
+  description TEXT NOT NULL DEFAULT '',
   FOREIGN KEY(photo_id) REFERENCES photos(id),
   FOREIGN KEY(id) REFERENCES likes(post_id)
 );
 CREATE TABLE IF NOT EXISTS comment (
   id TEXT PRIMARY KEY,
-  content TEXT,
+  content TEXT NOT NULL DEFAULT '',
   author_id TEXT,
-  creation_date TEXT,
+  creation_date TEXT NOT NULL,
   FOREIGN KEY(author_id) REFERENCES users(id)
 );
 CREATE TABLE IF NOT EXISTS comment_list (
   comment_id TEXT,
   post_id TEXT,
   FOREIGN KEY(comment_id) REFERENCES comment(id),
-  FOREIGN KEY(post_id) REFERENCES post(id)
+  FOREIGN KEY(post_id) REFERENCES posts(id),
   PRIMARY KEY (comment_id, post_id)
 );
 CREATE TABLE IF NOT EXISTS occupations (
@@ -58,15 +58,13 @@ CREATE TABLE IF NOT EXISTS occupations (
   end_date TEXT,
   place_id TEXT,
   kind TEXT CHECK( kind IN ( 'education', 'employment' ) ) NOT NULL,
-  FOREIGN KEY(person_id) REFERENCES users(id)
-  PRIMARY KEY (person_id, place_id)
+  FOREIGN KEY(person_id) REFERENCES users(id),
+  PRIMARY KEY (person_id, place_id) 
 );
 CREATE TABLE IF NOT EXISTS likes (
   liker_id TEXT,
-  post_id TEXT,
-  FOREIGN KEY(liker_id) REFERENCES users(id),
-  FOREIGN KEY(post_id) REFERENCES post(id),
-  PRIMARY KEY (liker_id, post_id)
+  post_id TEXT, 
+  PRIMARY KEY (liker_id, post_id) 
 );
 CREATE TABLE IF NOT EXISTS photos (
   id TEXT PRIMARY KEY
@@ -76,7 +74,7 @@ CREATE TABLE IF NOT EXISTS places (
   country TEXT,
   state TEXT,
   city TEXT,
-  lat REAL NOT NULL,
-  long REAL NOT NULL,
+  lat REAL NOT NULL DEFAULT 0.0,
+  long REAL NOT NULL DEFAULT 0.0,
   FOREIGN KEY(id) REFERENCES occupations(place_id)
 );
