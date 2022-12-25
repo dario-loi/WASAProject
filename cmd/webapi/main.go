@@ -73,6 +73,7 @@ func run() error {
 	// Init logging
 	logger := logrus.New()
 	logger.SetOutput(os.Stdout)
+	logger.SetReportCaller(true) //add file and line number to log
 	if cfg.Debug {
 		logger.SetLevel(logrus.DebugLevel)
 	} else {
@@ -83,7 +84,8 @@ func run() error {
 
 	// Start Database
 	logger.Println("initializing database support")
-	dbconn, err := sql.Open("sqlite3", cfg.DB.Filename)
+	dbconn, err := sql.Open("sqlite3",
+		"./fantastic-coffee-decaffeinated.db")
 	if err != nil {
 		logger.WithError(err).Error("error opening SQLite DB")
 		return fmt.Errorf("opening SQLite: %w", err)

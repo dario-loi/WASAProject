@@ -146,9 +146,8 @@ type CommentList struct {
 
 // Error is a generic error response.
 type Error struct {
-	Code *int `json:"code,omitempty"`
-
-	Message *string `json:"message,omitempty"`
+	Code    int    `json:"code,omitempty"`
+	Message string `json:"message,omitempty"`
 }
 
 // A WASAPhoto follow list.

@@ -6,7 +6,7 @@ info:
     This OpenAPI document describes a set of interfaces to allow a WASAPhoto user 
     to interact with the WASAPhoto backend, WASAPhoto is a new social network that
     allows you to share your best moments with friends!
-  version: "v0.9.0"
+  version: "v1.0.0"
 
 security:
   - bearerAuth: []
@@ -45,7 +45,7 @@ components:
       properties:
         hash:
           type: string
-          description: The token of the user
+          description: A unique identifier, in this case a SHA256 hash.
           pattern: ^[a-fA-F0-9]{64}$
           example: 985981bedf5cc6956330a1e4c39526a8839e8a3ec3adf0f2e3eedd59c359a58d
           minLength: 64
@@ -76,15 +76,14 @@ components:
       type: object
       description: |-
         A user of the WASAPhoto social network, it contains all *public* information of 
-        that user necessary for a quick representation, omitting information such as photos
-        in order to reduce the size of the structure.
+        that user necessary for a quick representation, photos are passed as SHA256 hashes.
       properties:
         username:
           $ref: "#/components/schemas/Username"
         profile_photo:
           allOf:
             - $ref: "#/components/schemas/SHA256hash"
-            - description: The SHA256 hash of the user's profile picture.
+            - description: The UUID of the user's profile picture.
 
     UserList:
       title: UserList
@@ -98,7 +97,7 @@ components:
           minItems: 0
           maxItems: 4294967295
           items:
-            $ref: "#/components/schemas/UserID"
+            $ref: "#/components/schemas/User"
 
     FollowList:
       title: FollowList
@@ -133,15 +132,28 @@ components:
       title: LikesList
       type: object
       description: |-
-        A list of users that liked a specific post, together with a refernece to the post 
-        itself.
+        A list of users that liked a specific post.
       properties:
-        owner:
+        parent_post:
           allOf:
-            - $ref: "#/components/schemas/Photopost"
-            - description: The user that *owns* the likes.
+            - $ref: "#/components/schemas/SHA256hash"
+            - description: The post whose likes are being listed.
         likes:
           $ref: "#/components/schemas/UserList"
+
+    IDList:
+      title: IDList
+      type: object
+      description: |-
+        A list of SHA256 hashes, used to represent a list of photos, posts or users.
+      properties:
+        ids:
+          type: array
+          description: The list of SHA256 hashes
+          minItems: 0
+          maxItems: 4294967295
+          items:
+            $ref: "#/components/schemas/SHA256hash"
 
     Comment:
       title: Comment
@@ -391,9 +403,9 @@ components:
         id:
           $ref: "#/components/schemas/SHA256hash"
         author_identifier:
-          $ref: "#/components/schemas/UserID"
+          $ref: "#/components/schemas/User"
         photo:
-          $ref: "#/components/schemas/Photo"
+          $ref: "#/components/schemas/SHA256hash"
         comments-list:
           $ref: "#/components/schemas/CommentList"
         description:
@@ -489,13 +501,18 @@ paths:
                 properties:
                   username:
                     $ref: "#/components/schemas/Username"
+                  profile_photo:
+                    allOf:
+                      - $ref: "#/components/schemas/SHA256hash"
+                      - description: |-
+                          The user's profile photo, identified by its SHA256 hash.
                   photos:
                     type: array
-                    description: A list of the user's photos
+                    description: A list of the user's photos, identified by their SHA256 hash.
                     minItems: 0
                     maxItems: 65536
                     items:
-                      $ref: "#/components/schemas/Photopost"
+                      $ref: "#/components/schemas/IDList"
         "404":
           description: |-
             The user does not exist
@@ -602,7 +619,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Stream"
+                $ref: "#/components/schemas/IDList"
         "404":
           description: |-
             The user does not exist
@@ -1529,6 +1546,38 @@ paths:
         "404":
           description: |-
             The requested user does not exist.
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /resources/photos/{UUID}:
+    parameters:
+      - name: UUID
+        in: path
+        description: The photo's UUID
+        required: true
+        schema:
+          $ref: "#/components/schemas/SHA256hash"
+    get:
+      operationId: getPhoto
+      summary: Get a photo
+      description: |-
+        Get a photo
+      tags:
+        - "photos"
+      responses:
+        "200":
+          description: |-
+            The photo
+          content:
+            image/jpeg:
+              schema:
+                $ref: "#/components/schemas/Photo"
+        "404":
+          description: |-
+            The photo does not exist
 
           content:
             application/json:
