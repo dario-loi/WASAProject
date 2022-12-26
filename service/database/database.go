@@ -56,10 +56,23 @@ type AppDatabase interface {
 	// Create the user if it doesn't exist
 	PostUserID(userName string) (ID string, err error)
 
+	// GetUserID returns the ID of the user with the given name
+	// it returns an error if the user doesn't exist
+	// therefore the user is NOT created.
+	GetUserID(name string) (ID string, err error)
+
 	SearchUserByName(name string) (matches string, err error)
 
 	// CheckUserExists returns true if the user with the given ID exists
 	CheckUserExists(ID string) (exists bool, err error)
+
+	// CheckPhotoExists returns true if the photo with the given ID exists
+	CheckPhotoExists(ID string) (exists bool, err error)
+
+	// CheckUsernameExists returns true if the user with the given username exists
+	CheckUsernameExists(username string) (exists bool, err error)
+
+	GetUserPhotos(ID string) (photos string, err error)
 }
 
 type appdbimpl struct {
@@ -290,5 +303,93 @@ func (db *appdbimpl) CheckUserExists(userID string) (exists bool, err error) {
 	}
 
 	return true, nil
+
+}
+
+func (db *appdbimpl) CheckPhotoExists(photoID string) (exists bool, err error) {
+
+	var count int
+
+	// Selects ALWAYS one row
+	err = db.c.QueryRow(`SELECT COUNT(id) FROM photos WHERE id = ?`, photoID).Scan(&count)
+
+	if err != nil {
+		return false, fmt.Errorf("error getting photo ID: %w", err)
+	}
+
+	if count == 0 {
+		return false, fmt.Errorf("photo %s does not exist", photoID)
+	}
+
+	return true, nil
+
+}
+
+func (db *appdbimpl) CheckUsernameExists(username string) (exists bool, err error) {
+
+	var count int
+
+	// Selects ALWAYS one row
+	err = db.c.QueryRow(`SELECT COUNT(id) FROM users WHERE name = ?`, username).Scan(&count)
+
+	if err != nil {
+		return false, fmt.Errorf("error getting user ID: %w", err)
+	}
+
+	if count == 0 {
+		return false, fmt.Errorf("user %s does not exist", username)
+	}
+
+	return true, nil
+
+}
+
+func (db *appdbimpl) GetUserPhotos(userID string) (photo string, err error) {
+
+	photoIDlist := components.IDList{}
+
+	res, err := db.c.Query(`SELECT pt.id FROM photos AS pt, 
+		posts AS p WHERE p.author = ? AND p.photo_id = pt.id`, userID)
+
+	if err != nil {
+		return components.InternalServerError,
+			fmt.Errorf("error getting user's photos: %w", err)
+	}
+
+	for res.Next() {
+		var photoID components.SHA256hash
+
+		err = res.Scan(&photoID.Hash)
+
+		if err != nil {
+			return components.InternalServerError,
+				fmt.Errorf("error scanning photo: %w", err)
+		}
+
+		photoIDlist.IDs = append(photoIDlist.IDs, photoID)
+	}
+
+	data, err := photoIDlist.ToJSON()
+
+	if err != nil {
+		return components.InternalServerError,
+			fmt.Errorf("error converting photo to JSON: %w", err)
+	}
+
+	return string(data), nil
+
+}
+
+func (db *appdbimpl) GetUserID(name string) (ID string, err error) {
+
+	var userID string
+
+	err = db.c.QueryRow(`SELECT id FROM users WHERE name = ?`, name).Scan(&userID)
+
+	if err != nil {
+		return components.InternalServerError, fmt.Errorf("error getting user ID: %w", err)
+	}
+
+	return userID, nil
 
 }

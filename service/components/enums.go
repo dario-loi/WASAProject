@@ -13,7 +13,9 @@ const (
 const InternalServerError string = "{\"code\": 500, \"message\": \"Internal Server Error\"}"
 const BadRequestError string = "{\"code\": 400, \"message\": \"Bad Request\"}"
 const UnauthorizedError string = "{\"code\": 401, \"message\": \"Unauthorized\"}"
+const NotFoundError string = "{\"code\": 404, \"message\": \"Not Found\"}"
 
 const InternalServerErrorF string = "{\"code\": 500, \"message\": \"Internal Server Error: %s\"}"
 const BadRequestErrorF string = "{\"code\": 400, \"message\": \"Bad Request: %s\"}"
 const UnauthorizedErrorF string = "{\"code\": 401, \"message\": \"Unauthorized: %s\"}"
+const NotFoundErrorF string = "{\"code\": 404, \"message\": \"Not Found: %s\"}"

@@ -33,9 +33,12 @@ CREATE TABLE IF NOT EXISTS bios (
 CREATE TABLE IF NOT EXISTS posts (
   id TEXT PRIMARY KEY,
   photo_id TEXT,
+  author TEXT,
   description TEXT NOT NULL DEFAULT '',
+  creation_date TEXT NOT NULL,
   FOREIGN KEY(photo_id) REFERENCES photos(id),
-  FOREIGN KEY(id) REFERENCES likes(post_id)
+  FOREIGN KEY(id) REFERENCES likes(post_id),
+  FOREIGN KEY(author) REFERENCES users(id)
 );
 CREATE TABLE IF NOT EXISTS comment (
   id TEXT PRIMARY KEY,

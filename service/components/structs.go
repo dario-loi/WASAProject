@@ -34,3 +34,15 @@ type SHA256hash struct {
 func (h SHA256hash) ToJSON() ([]byte, error) {
 	return json.MarshalIndent(h, "", "  ")
 }
+
+type IDList struct {
+	IDs []SHA256hash `json:"ids"`
+}
+
+func (i IDList) ToJSON() ([]byte, error) {
+	if len(i.IDs) == 0 {
+		return []byte("[]"), nil
+	}
+
+	return json.MarshalIndent(i, "", "  ")
+}

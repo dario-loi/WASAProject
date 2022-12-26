@@ -671,6 +671,13 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+        "500":
+          description: |-
+            Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 
   /users/{user_name}/profile/photos/{photo_id}:
     parameters:
@@ -686,31 +693,6 @@ paths:
         required: true
         schema:
           $ref: "#/components/schemas/SHA256hash"
-    get:
-      operationId: getPhotoMetadata
-      summary: Get a photo's metadata
-      description: |-
-        Get an individual photo from the user's profile, useful to populate the feed of other 
-        users by picking photos recently posted by other users, also useful to manage 
-        the comment section and like counter of a photo.
-      tags:
-        - "photos"
-      responses:
-        "200":
-          description: |-
-            The photo
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Photopost"
-        "404":
-          description: |-
-            Either the requested user of photo id does not exist.
-
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
 
     delete:
       operationId: deletePhoto

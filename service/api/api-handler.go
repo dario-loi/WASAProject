@@ -19,5 +19,9 @@ func (rt *_router) Handler() http.Handler {
 
 	// Session routes
 	rt.router.PUT("/session", rt.wrap(rt.doLogin))
+
+	// Photo routes
+	rt.router.GET("/resources/photos/:UUID", rt.wrap(rt.getPhoto))
+	rt.router.GET("/users/:user_name/profile/photos", rt.wrap(rt.getUserPhotos))
 	return rt.router
 }
