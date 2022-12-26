@@ -1,6 +1,9 @@
 package components
 
-import "encoding/json"
+import (
+	"database/sql"
+	"encoding/json"
+)
 
 type User struct {
 	Uname   Username   `json:"username-string"`
@@ -20,15 +23,12 @@ type Error struct {
 	Message string `json:"message"`
 }
 
-const InternalServerError string = "{\"code\": 500, \"message\": \"Internal Server Error\"}"
-const BadRequestError string = "{\"code\": 400, \"message\": \"Bad Request\"}"
-
 func (e Error) ToJSON() ([]byte, error) {
 	return json.MarshalIndent(e, "", "  ")
 }
 
 type SHA256hash struct {
-	Hash string `json:"hash"`
+	Hash sql.NullString `json:"hash"`
 }
 
 func (h SHA256hash) ToJSON() ([]byte, error) {

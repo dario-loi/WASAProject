@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS followers (
   FOREIGN KEY(followed) REFERENCES users(id),
   FOREIGN KEY(following) REFERENCES users(id)
 );
+
 CREATE TABLE IF NOT EXISTS bans (
   banisher TEXT,
   banished TEXT,

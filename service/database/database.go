@@ -31,9 +31,10 @@ Then you can initialize the AppDatabase and pass it to the api package.
 package database
 
 import (
-	"crypto"
+	"crypto/sha256"
 	"database/sql"
-	"encoding/base64"
+	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
@@ -54,6 +55,11 @@ type AppDatabase interface {
 	// GetUserID returns the ID of the user with the given name
 	// Create the user if it doesn't exist
 	PostUserID(userName string) (ID string, err error)
+
+	SearchUserByName(name string) (matches string, err error)
+
+	// CheckUserExists returns true if the user with the given ID exists
+	CheckUserExists(ID string) (exists bool, err error)
 }
 
 type appdbimpl struct {
@@ -148,13 +154,13 @@ func (db *appdbimpl) PostUserID(userName string) (json string, err error) {
 		// create the user
 
 		// Hash the user name with SHA256
-		hash := crypto.SHA256.New()
-		hash.Write([]byte(userName))
-		hashedUserName := hash.Sum(nil)
-		userID = fmt.Sprintf("%x", hashedUserName)
+
+		h := sha256.New()
+		h.Write([]byte(userName))
+		userID = hex.EncodeToString(h.Sum(nil))
 
 		// Insert the user in the DB
-		_, err = db.c.Exec(`INSERT INTO users (id, name) VALUES (?, ?)`, hashedUserName, userName)
+		_, err = db.c.Exec(`INSERT INTO users (id, name) VALUES (?, ?)`, userID, userName)
 
 		if err != nil {
 			data, e := components.Error{Code: 500, Message: "Internal Server Error"}.ToJSON()
@@ -185,9 +191,7 @@ func (db *appdbimpl) PostUserID(userName string) (json string, err error) {
 	}
 
 	// return the user ID
-	userID = base64.URLEncoding.EncodeToString([]byte(userID))
-	fmt.Println(userID)
-	userID_json := components.SHA256hash{Hash: userID}
+	userID_json := components.SHA256hash{Hash: sql.NullString{String: userID, Valid: true}}
 
 	data, err := userID_json.ToJSON()
 
@@ -204,5 +208,87 @@ func (db *appdbimpl) PostUserID(userName string) (json string, err error) {
 	fmt.Println(string(data))
 
 	return string(data), nil
+
+}
+
+func (db *appdbimpl) SearchUserByName(name string) (matches string, err error) {
+
+	// Print all users (for testing)
+
+	res, err := db.c.Query(`SELECT users.name, users.propic_id FROM users`)
+
+	if err != nil {
+		return components.InternalServerError, fmt.Errorf("error getting users: %w", err)
+	}
+
+	for res.Next() {
+		user := components.User{}
+
+		err = res.Scan(&user.Uname.Username_string, &user.PhotoID.Hash)
+
+		if err != nil {
+			return components.InternalServerError, fmt.Errorf("error scanning user: %w", err)
+		}
+
+		fmt.Println(user)
+
+	}
+
+	res, err = db.c.Query(`SELECT u.name, u.propic_id FROM users as u WHERE u.name LIKE '%'||?||'%'`, name)
+
+	defer func() {
+		if res != nil {
+			err := res.Close()
+			if err != nil {
+				fmt.Println("error closing result set: ", err)
+			}
+		}
+	}()
+
+	if err != nil {
+		return components.InternalServerError, fmt.Errorf("error searching user: %w", err)
+	}
+
+	var users []components.User
+
+	for res.Next() {
+
+		user := components.User{}
+
+		err = res.Scan(&user.Uname.Username_string, &user.PhotoID.Hash)
+
+		if err != nil {
+			return components.InternalServerError, fmt.Errorf("error scanning user: %w", err)
+		}
+
+		users = append(users, user)
+	}
+
+	data, err := json.Marshal(users)
+
+	if err != nil {
+		return components.InternalServerError, fmt.Errorf("error converting users to JSON: %w", err)
+	}
+
+	return string(data), nil
+
+}
+
+func (db *appdbimpl) CheckUserExists(userID string) (exists bool, err error) {
+
+	var count int
+
+	// Selects ALWAYS one row
+	err = db.c.QueryRow(`SELECT COUNT(id) FROM users WHERE id = ?`, userID).Scan(&count)
+
+	if err != nil {
+		return false, fmt.Errorf("error getting user ID: %w", err)
+	}
+
+	if count == 0 {
+		return false, fmt.Errorf("user %s does not exist", userID)
+	}
+
+	return true, nil
 
 }
