@@ -58,8 +58,7 @@ components:
       minLength: 0
       maxLength: 32000000 # 32MB
       description: |-
-        A Base64 encoded photo, used both in posts, profile pictures and 
-        generally all over the place, this is WASA*Photo* after all.
+        A Base64 encoded photo, used generally all over the place, this is WASA*Photo* after all.
       pattern: ^[A-Za-z0-9+/=]*$
 
     UserID:
@@ -70,20 +69,6 @@ components:
       properties:
         token:
           $ref: "#/components/schemas/SHA256hash"
-
-    User:
-      title: User
-      type: object
-      description: |-
-        A user of the WASAPhoto social network, it contains all *public* information of 
-        that user necessary for a quick representation, photos are passed as SHA256 hashes.
-      properties:
-        username:
-          $ref: "#/components/schemas/Username"
-        profile_photo:
-          allOf:
-            - $ref: "#/components/schemas/SHA256hash"
-            - description: The UUID of the user's profile picture.
 
     UserList:
       title: UserList
@@ -97,7 +82,7 @@ components:
           minItems: 0
           maxItems: 4294967295
           items:
-            $ref: "#/components/schemas/User"
+            $ref: "#/components/schemas/Username"
 
     FollowList:
       title: FollowList
@@ -109,7 +94,7 @@ components:
       properties:
         owner:
           allOf:
-            - $ref: "#/components/schemas/User"
+            - $ref: "#/components/schemas/Username"
             - description: The user whose followers/following are being listed
         follow-list:
           $ref: "#/components/schemas/UserList"
@@ -123,10 +108,17 @@ components:
       properties:
         owner:
           allOf:
-            - $ref: "#/components/schemas/User"
+            - $ref: "#/components/schemas/Username"
             - description: The user that *owns* the bans.
         banned_users:
           $ref: "#/components/schemas/UserList"
+      example:
+        owner:
+          username-string: Dario_Loi_123
+        banned_users:
+          users:
+            - username-string: Dario_Loi_123
+            - username-string: Dario_Loi_123
 
     LikesList:
       title: LikesList
@@ -163,7 +155,7 @@ components:
         creation.
       properties:
         author:
-          $ref: "#/components/schemas/User"
+          $ref: "#/components/schemas/Username"
         body:
           type: string
           description: The body of the comment
@@ -253,146 +245,6 @@ components:
               maximum: 180
               example: -3.1415
 
-    Biography:
-      title: Biography
-      type: object
-      description:
-        A Biography of a user, it contains a range of personal info on the user's life
-        such as Birth date, birthplace, current residence, education history, employment
-        history, current employment/education status and more.
-      properties:
-        short_description:
-          type: string
-          description: |-
-            A short description of the user, used in the profile page, it is a 
-            short summary of the user's life.
-          example: |-
-            I'm a 20 year old student at Sapienza University of Rome, I like to take 
-            photos of kittens and sunsets.
-          pattern: ^[^\\]*?$
-          minLength: 0
-          maxLength: 65536
-        birthdate:
-          type: string
-          format: date
-          description: The user's birthdate
-          pattern: ^\d{4}-\d{2}-\d{2}$
-          example: 2001-06-13
-          minLength: 10
-          maxLength: 10
-        birthplace:
-          allOf:
-            - $ref: "#/components/schemas/Place"
-            - description: |-
-                The user's birthplace.
-        residence:
-          allOf:
-            - $ref: "#/components/schemas/Place"
-            - description: |-
-                Where the user lives.
-        education:
-          type: array
-          minItems: 0
-          maxItems: 256
-          description: |-
-            The user's education history, a list of places where the user studied.
-          items:
-            type: object
-            properties:
-              name:
-                type: string
-                description: The Instituion's name.
-                pattern: ^.{0,256}$
-                example: Sapienza University of Rome.
-                minLength: 1
-                maxLength: 256
-              place:
-                allOf:
-                  - $ref: "#/components/schemas/Place"
-                  - description: |-
-                      A place where the user studied.
-              start_date:
-                type: string
-                format: date
-                pattern: ^\d{4}-\d{2}-\d{2}$
-                description: The date when the user started studying
-                example: 2001-06-13
-                minLength: 10
-                maxLength: 10
-              end_date:
-                type: string
-                format: date
-                pattern: ^\d{4}-\d{2}-\d{2}$
-                description: The date when the user stopped studying
-                example: 2018-06-13
-                minLength: 10
-                maxLength: 10
-        employment:
-          type: array
-          minItems: 0
-          maxItems: 256
-          description: |-
-            The user's employment history, a list of places where the user worked.
-          items:
-            type: object
-            properties:
-              name:
-                type: string
-                pattern: ^[^\\]{0,256}$
-                description: The company's name.
-                example: Google
-                minLength: 1
-                maxLength: 256
-              place:
-                allOf:
-                  - $ref: "#/components/schemas/Place"
-                  - description: |-
-                      A place where the user worked.
-              start_date:
-                type: string
-                format: date
-                pattern: ^\d{4}-\d{2}-\d{2}$
-                description: The date when the user started working
-                example: 2018-06-13
-                minLength: 10
-                maxLength: 10
-              end_date:
-                type: string
-                format: date
-                pattern: ^\d{4}-\d{2}-\d{2}$
-                minLength: 10
-                maxLength: 10
-                description: The date when the user stopped working
-                example: 2020-06-13
-        current_state:
-          type: string
-          enum:
-            - studying
-            - working
-            - unemployed
-          description: |-
-            The user's current state, whether they are studying, working or unemployed.
-          example: working
-        current_place:
-          type: object
-          description: |-
-            The user's current place of employment or education, we do not go through 
-            the trouble of validating if it is an actual place of work or study, or 
-            whether the student is actually working there.
-          properties:
-            name:
-              type: string
-              description: The Institution/Company's name.
-              example: Google
-              pattern: ^.{1,256}$
-              minLength: 1
-              maxLength: 256
-            location:
-              allOf:
-                - description: |-
-                    Where the place is located
-                - $ref: "#/components/schemas/Place"
-
     Photopost:
       title: Photopost
       type: object
@@ -403,7 +255,7 @@ components:
         id:
           $ref: "#/components/schemas/SHA256hash"
         author_identifier:
-          $ref: "#/components/schemas/User"
+          $ref: "#/components/schemas/Username"
         photo:
           $ref: "#/components/schemas/SHA256hash"
         comments-list:
@@ -437,6 +289,13 @@ components:
             $ref: "#/components/schemas/Photopost"
           minItems: 1
           maxItems: 256
+      example:
+        posts:
+          - id: 0000000000000000000000000000000000000000000000000000000000000000
+            author_identifier: user1
+            photo: 0000000000000000000000000000000000000000000000000000000000000000
+            comments-list:
+              comments:
 
     Error:
       title: Error
@@ -465,8 +324,6 @@ tags:
     description: Operations on photos, the main content of WASA*photo*.
   - name: followers
     description: Operations about followers, interactions between users.
-  - name: biography
-    description: Operations about biographies, additional info on user's profiles.
   - name: stream
     description: Operations about the stream, the main feed of WASAphoto.
   - name: bans
@@ -1208,103 +1065,6 @@ paths:
         "401":
           description: |-
             The user is not correctly authenticated (the given ID does not match the user's ID).
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-
-  /users/{user_name}/biography:
-    parameters:
-      - name: user_name
-        description: The name of the biography's owner.
-        required: true
-        in: path
-        schema:
-          $ref: "#/components/schemas/Username"
-      - name: requester_ID
-        description: The identifier of the request's issuer.
-        required: true
-        in: header
-        schema:
-          $ref: "#/components/schemas/UserID"
-    get:
-      operationId: getBiography
-      summary: Gets the biography of a user
-      description: |-
-        Retrieves the biography of `user_name`, containing a short description written by
-        him, together with some personal information about his life, such as his place 
-        of birth, date of birth, current location, a list of institutions he attended 
-        for his personal education and a list of jobs he attended up until now.
-
-        The biography, being something very personal, is only accessible by the user's
-        followers, therefore, the method *requires* authentication in the form of 
-        an identifier, which should match the identifier of one of his followers.
-      tags:
-        - "biography"
-      security:
-        - bearerAuth: []
-
-      responses:
-        "200":
-          description: |-
-            The user's biography has been retrieved.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Biography"
-        "404":
-          description: |-
-            The requested user does not exist.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-        "401":
-          description: |-
-            The user is not correctly authenticated (the given ID does not match the user's ID).
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-    put:
-      operationId: updateBiography
-      summary: Updates the biography of a user
-      description: |-
-        Updates the biography of `user_name`, the user must be authenticated by 
-        providing his ID.
-      tags:
-        - "biography"
-      security:
-        - bearerAuth: []
-      requestBody:
-        description: |-
-          The new biography.
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Biography"
-      responses:
-        "204":
-          description: |-
-            The user's biography has been updated.
-        "400":
-          description: |-
-            The request is ill-formed.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-        "401":
-          description: |-
-            The user is not correctly authenticated (the given ID does not match the user's ID).
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-        "404":
-          description: |-
-            The requested user does not exist.
           content:
             application/json:
               schema:

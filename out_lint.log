@@ -1,0 +1,410 @@
+
+errors
+
+  Message :   Property names must be snake case: username-string
+  Rule    :   property-case-convention
+  Path    :   components.schemas.Username.properties
+  Line    :   31
+
+  Message :   Property names must be snake case: follow-list
+  Rule    :   property-case-convention
+  Path    :   components.schemas.FollowList.properties
+  Line    :   94
+
+  Message :   Property names must be snake case: comments-list
+  Rule    :   property-case-convention
+  Path    :   components.schemas.Photopost.properties
+  Line    :   254
+
+  Message :   Header parameter names must be pascal case
+  Rule    :   parameter-case-convention
+  Path    :   paths./users/{user_name}/profile.patch.parameters.0
+  Line    :   436
+
+  Message :   Header parameter names must be pascal case
+  Rule    :   parameter-case-convention
+  Path    :   paths./users/{user_name}/profile/photos/{photo_id}.delete.parameters.0
+  Line    :   558
+
+  Message :   Header parameter names must be pascal case
+  Rule    :   parameter-case-convention
+  Path    :   paths./users/{user_name}/profile/photos/{photo_id}.put.parameters.0
+  Line    :   593
+
+  Message :   Header parameter names must be pascal case
+  Rule    :   parameter-case-convention
+  Path    :   paths./users/{user_name}/profile/photos/{photo_id}/likes/{liker_id}.parameters.3
+  Line    :   712
+
+  Message :   Header parameter names must be pascal case
+  Rule    :   parameter-case-convention
+  Path    :   paths./users/{user_name}/profile/photos/{photo_id}/comments/{comment_id}.parameters.3
+  Line    :   839
+
+  Message :   Header parameter names must be pascal case
+  Rule    :   parameter-case-convention
+  Path    :   paths./users/{user_name}/following/{followed_name}.parameters.2
+  Line    :   970
+
+  Message :   Header parameter names must be pascal case
+  Rule    :   parameter-case-convention
+  Path    :   paths./users/{user_name}/stream.parameters.1
+  Line    :   1076
+
+  Message :   Header parameter names must be pascal case
+  Rule    :   parameter-case-convention
+  Path    :   paths./users/{user_name}/followers/{follower_name}.parameters.0
+  Line    :   1166
+
+  Message :   Header parameter names must be pascal case
+  Rule    :   parameter-case-convention
+  Path    :   paths./users/{user_name}/bans/{banned_name}.parameters.2
+  Line    :   1235
+
+  Message :   Path parameter names must be snake case
+  Rule    :   parameter-case-convention
+  Path    :   paths./resources/photos/{UUID}.parameters.0
+  Line    :   1338
+
+warnings
+
+  Message :   Major version segment not present in either server URLs or paths
+  Rule    :   major-version-in-path
+  Path    :   
+  Line    :   0
+
+  Message :   OpenAPI "servers" must be present and non-empty array.
+  Rule    :   oas3-api-servers
+  Path    :   
+  Line    :   0
+
+  Message :   Collection list operation response schema should define array property with name "following"
+  Rule    :   collection-array-property
+  Path    :   components.schemas.FollowList
+  Line    :   87
+
+  Message :   Collection list operation response schema should define array property with name "followers"
+  Rule    :   collection-array-property
+  Path    :   components.schemas.FollowList
+  Line    :   87
+
+  Message :   Collection list operation response schema should define array property with name "likes"
+  Rule    :   collection-array-property
+  Path    :   components.schemas.LikesList
+  Line    :   123
+
+  Message :   Collection list operation response schema should define array property with name "photos"
+  Rule    :   collection-array-property
+  Path    :   components.schemas.IDList
+  Line    :   136
+
+  Message :   Potentially unused component has been detected.
+  Rule    :   oas3-unused-component
+  Path    :   components.schemas.Place
+  Line    :   202
+
+  Message :   Nested objects should be defined as a $ref to a named schema.
+  Rule    :   inline-property-schema
+  Path    :   components.schemas.Place.properties.coordinates
+  Line    :   230
+
+  Message :   Error container model should contain property `trace` of type string
+  Rule    :   response-error-response-schema
+  Path    :   components.schemas.Error.properties
+  Line    :   298
+
+  Message :   Error container model must contain property `errors` which must be an array of error models
+  Rule    :   response-error-response-schema
+  Path    :   components.schemas.Error.properties
+  Line    :   298
+
+  Message :   A tag is defined but never used: biography
+  Rule    :   unused-tag
+  Path    :   tags.4
+  Line    :   320
+
+  Message :   Operation ids must be snake case
+  Rule    :   operation-id-case-convention
+  Path    :   paths./users.get.operationId
+  Line    :   343
+
+  Message :   operationIds should follow naming convention: operationId verb should be list
+  Rule    :   operation-id-naming-convention
+  Path    :   paths./users.get.operationId
+  Line    :   343
+
+  Message :   Response bodies should include an example response
+  Rule    :   response-example-provided
+  Path    :   paths./users.get.responses.200.content.application/json
+  Line    :   354
+
+  Message :   Operation ids must be snake case
+  Rule    :   operation-id-case-convention
+  Path    :   paths./users/{user_name}/profile.get.operationId
+  Line    :   381
+
+  Message :   Response bodies should include an example response
+  Rule    :   response-example-provided
+  Path    :   paths./users/{user_name}/profile.get.responses.200.content.application/json
+  Line    :   392
+
+  Message :   Response schemas should be defined as a $ref to a named schema.
+  Rule    :   inline-response-schema
+  Path    :   paths./users/{user_name}/profile.get.responses.200.content.application/json.schema
+  Line    :   393
+
+  Message :   Operation ids must be snake case
+  Rule    :   operation-id-case-convention
+  Path    :   paths./users/{user_name}/profile.patch.operationId
+  Line    :   421
+
+  Message :   operationIds should follow naming convention: operationId verb should be update
+  Rule    :   operation-id-naming-convention
+  Path    :   paths./users/{user_name}/profile.patch.operationId
+  Line    :   421
+
+  Message :   Summary should not have a trailing period
+  Rule    :   prohibit-summary-sentence-style
+  Path    :   paths./users/{user_name}/profile.patch.summary
+  Line    :   425
+
+  Message :   PATCH requests should support content types "application/json-patch+json" or "application/merge-patch+json"
+  Rule    :   patch-request-content-type
+  Path    :   paths./users/{user_name}/profile.patch.requestBody.content.application/json
+  Line    :   451
+
+  Message :   Response bodies should include an example response
+  Rule    :   response-example-provided
+  Path    :   paths./users/{user_name}/profile.patch.responses.200.content.application/json
+  Line    :   459
+
+  Message :   Operation ids must be snake case
+  Rule    :   operation-id-case-convention
+  Path    :   paths./users/{user_name}/profile/photos.get.operationId
+  Line    :   503
+
+  Message :   operationIds should follow naming convention: operationId verb should be list
+  Rule    :   operation-id-naming-convention
+  Path    :   paths./users/{user_name}/profile/photos.get.operationId
+  Line    :   503
+
+  Message :   Response bodies should include an example response
+  Rule    :   response-example-provided
+  Path    :   paths./users/{user_name}/profile/photos.get.responses.200.content.application/json
+  Line    :   516
+
+  Message :   Operation ids must be snake case
+  Rule    :   operation-id-case-convention
+  Path    :   paths./users/{user_name}/profile/photos/{photo_id}.delete.operationId
+  Line    :   550
+
+  Message :   Operation ids must be snake case
+  Rule    :   operation-id-case-convention
+  Path    :   paths./users/{user_name}/profile/photos/{photo_id}.put.operationId
+  Line    :   586
+
+  Message :   operationIds should follow naming convention: operationId verb should be replace or add
+  Rule    :   operation-id-naming-convention
+  Path    :   paths./users/{user_name}/profile/photos/{photo_id}.put.operationId
+  Line    :   586
+
+  Message :   Request body schemas should be defined as a $ref to a named schema.
+  Rule    :   inline-request-schema
+  Path    :   paths./users/{user_name}/profile/photos/{photo_id}.put.requestBody.content.application/json.schema
+  Line    :   608
+
+  Message :   Response bodies should include an example response
+  Rule    :   response-example-provided
+  Path    :   paths./users/{user_name}/profile/photos/{photo_id}.put.responses.201.content.application/json
+  Line    :   627
+
+  Message :   Operation ids must be snake case
+  Rule    :   operation-id-case-convention
+  Path    :   paths./users/{user_name}/profile/photos/{photo_id}/likes.get.operationId
+  Line    :   669
+
+  Message :   operationIds should follow naming convention: operationId verb should be list or check
+  Rule    :   operation-id-naming-convention
+  Path    :   paths./users/{user_name}/profile/photos/{photo_id}/likes.get.operationId
+  Line    :   669
+
+  Message :   Response bodies should include an example response
+  Rule    :   response-example-provided
+  Path    :   paths./users/{user_name}/profile/photos/{photo_id}/likes.get.responses.200.content.application/json
+  Line    :   681
+
+  Message :   Operation ids must be snake case
+  Rule    :   operation-id-case-convention
+  Path    :   paths./users/{user_name}/profile/photos/{photo_id}/likes/{liker_id}.delete.operationId
+  Line    :   719
+
+  Message :   operationIds should follow naming convention: operationId verb should be delete or remove
+  Rule    :   operation-id-naming-convention
+  Path    :   paths./users/{user_name}/profile/photos/{photo_id}/likes/{liker_id}.delete.operationId
+  Line    :   719
+
+  Message :   Operation ids must be snake case
+  Rule    :   operation-id-case-convention
+  Path    :   paths./users/{user_name}/profile/photos/{photo_id}/likes/{liker_id}.put.operationId
+  Line    :   753
+
+  Message :   operationIds should follow naming convention: operationId verb should be replace or add
+  Rule    :   operation-id-naming-convention
+  Path    :   paths./users/{user_name}/profile/photos/{photo_id}/likes/{liker_id}.put.operationId
+  Line    :   753
+
+  Message :   Operation ids must be snake case
+  Rule    :   operation-id-case-convention
+  Path    :   paths./users/{user_name}/profile/photos/{photo_id}/comments.get.operationId
+  Line    :   796
+
+  Message :   operationIds should follow naming convention: operationId verb should be list or check
+  Rule    :   operation-id-naming-convention
+  Path    :   paths./users/{user_name}/profile/photos/{photo_id}/comments.get.operationId
+  Line    :   796
+
+  Message :   Response bodies should include an example response
+  Rule    :   response-example-provided
+  Path    :   paths./users/{user_name}/profile/photos/{photo_id}/comments.get.responses.200.content.application/json
+  Line    :   808
+
+  Message :   Operation ids must be snake case
+  Rule    :   operation-id-case-convention
+  Path    :   paths./users/{user_name}/profile/photos/{photo_id}/comments/{comment_id}.put.operationId
+  Line    :   846
+
+  Message :   operationIds should follow naming convention: operationId verb should be replace or add
+  Rule    :   operation-id-naming-convention
+  Path    :   paths./users/{user_name}/profile/photos/{photo_id}/comments/{comment_id}.put.operationId
+  Line    :   846
+
+  Message :   Summary should not have a trailing period
+  Rule    :   prohibit-summary-sentence-style
+  Path    :   paths./users/{user_name}/profile/photos/{photo_id}/comments/{comment_id}.put.summary
+  Line    :   847
+
+  Message :   Operation ids must be snake case
+  Rule    :   operation-id-case-convention
+  Path    :   paths./users/{user_name}/profile/photos/{photo_id}/comments/{comment_id}.delete.operationId
+  Line    :   889
+
+  Message :   operationIds should follow naming convention: operationId verb should be delete or remove
+  Rule    :   operation-id-naming-convention
+  Path    :   paths./users/{user_name}/profile/photos/{photo_id}/comments/{comment_id}.delete.operationId
+  Line    :   889
+
+  Message :   Summary should not have a trailing period
+  Rule    :   prohibit-summary-sentence-style
+  Path    :   paths./users/{user_name}/profile/photos/{photo_id}/comments/{comment_id}.delete.summary
+  Line    :   890
+
+  Message :   Operation ids must be snake case
+  Rule    :   operation-id-case-convention
+  Path    :   paths./users/{user_name}/following.get.operationId
+  Line    :   934
+
+  Message :   operationIds should follow naming convention: operationId verb should be list
+  Rule    :   operation-id-naming-convention
+  Path    :   paths./users/{user_name}/following.get.operationId
+  Line    :   934
+
+  Message :   Response bodies should include an example response
+  Rule    :   response-example-provided
+  Path    :   paths./users/{user_name}/following.get.responses.200.content.application/json
+  Line    :   945
+
+  Message :   Operation ids must be snake case
+  Rule    :   operation-id-case-convention
+  Path    :   paths./users/{user_name}/following/{followed_name}.put.operationId
+  Line    :   977
+
+  Message :   operationIds should follow naming convention: operationId verb should be replace or add
+  Rule    :   operation-id-naming-convention
+  Path    :   paths./users/{user_name}/following/{followed_name}.put.operationId
+  Line    :   977
+
+  Message :   Operation ids must be snake case
+  Rule    :   operation-id-case-convention
+  Path    :   paths./users/{user_name}/following/{followed_name}.delete.operationId
+  Line    :   1026
+
+  Message :   operationIds should follow naming convention: operationId verb should be delete or remove
+  Rule    :   operation-id-naming-convention
+  Path    :   paths./users/{user_name}/following/{followed_name}.delete.operationId
+  Line    :   1026
+
+  Message :   Operation ids must be snake case
+  Rule    :   operation-id-case-convention
+  Path    :   paths./users/{user_name}/stream.get.operationId
+  Line    :   1092
+
+  Message :   Response bodies should include an example response
+  Rule    :   response-example-provided
+  Path    :   paths./users/{user_name}/stream.get.responses.200.content.application/json
+  Line    :   1113
+
+  Message :   Operation ids must be snake case
+  Rule    :   operation-id-case-convention
+  Path    :   paths./users/{user_name}/followers.get.operationId
+  Line    :   1140
+
+  Message :   operationIds should follow naming convention: operationId verb should be list
+  Rule    :   operation-id-naming-convention
+  Path    :   paths./users/{user_name}/followers.get.operationId
+  Line    :   1140
+
+  Message :   Response bodies should include an example response
+  Rule    :   response-example-provided
+  Path    :   paths./users/{user_name}/followers.get.responses.200.content.application/json
+  Line    :   1153
+
+  Message :   Operation ids must be snake case
+  Rule    :   operation-id-case-convention
+  Path    :   paths./users/{user_name}/followers/{follower_name}.delete.operationId
+  Line    :   1185
+
+  Message :   Operation ids must be snake case
+  Rule    :   operation-id-case-convention
+  Path    :   paths./users/{user_name}/bans/{banned_name}.delete.operationId
+  Line    :   1242
+
+  Message :   operationIds should follow naming convention: operationId verb should be delete or remove
+  Rule    :   operation-id-naming-convention
+  Path    :   paths./users/{user_name}/bans/{banned_name}.delete.operationId
+  Line    :   1242
+
+  Message :   Operation ids must be snake case
+  Rule    :   operation-id-case-convention
+  Path    :   paths./users/{user_name}/bans/{banned_name}.put.operationId
+  Line    :   1278
+
+  Message :   operationIds should follow naming convention: operationId verb should be replace or add
+  Rule    :   operation-id-naming-convention
+  Path    :   paths./users/{user_name}/bans/{banned_name}.put.operationId
+  Line    :   1278
+
+  Message :   Operation ids must be snake case
+  Rule    :   operation-id-case-convention
+  Path    :   paths./users/{user_name}/bans/{banned_name}.get.operationId
+  Line    :   1313
+
+  Message :   Operation ids must be snake case
+  Rule    :   operation-id-case-convention
+  Path    :   paths./resources/photos/{UUID}.get.operationId
+  Line    :   1345
+
+  Message :   Operation ids must be snake case
+  Rule    :   operation-id-case-convention
+  Path    :   paths./session.put.operationId
+  Line    :   1379
+
+  Message :   operationIds should follow naming convention: operationId verb should be replace
+  Rule    :   operation-id-naming-convention
+  Path    :   paths./session.put.operationId
+  Line    :   1379
+
+  Message :   Response bodies should include an example response
+  Rule    :   response-example-provided
+  Path    :   paths./session.put.responses.201.content.application/json
+  Line    :   1391
+
