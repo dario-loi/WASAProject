@@ -199,52 +199,6 @@ components:
           items:
             $ref: "#/components/schemas/Comment"
 
-    Place:
-      title: Place
-      type: object
-      description: |-
-        A place, it contains a triple of country, state and city, together with 
-        a pair of latitude-longitude coordinates.
-      properties:
-        country: #We use regex to validate the country, state and city names.
-          type: string
-          description: Country
-          example: Italy
-          minLength: 1
-          maxLength: 64
-          pattern: ^[^\\]{1,64}$
-        state:
-          type: string
-          description: State in the Country
-          example: Latium
-          pattern: ^[^\\]{1,64}$
-          minLength: 1
-          maxLength: 64
-        city:
-          type: string
-          description: City in the state
-          example: Rome
-          minLength: 1
-          pattern: ^[^\\]{1,64}$
-          maxLength: 64
-        coordinates:
-          type: object
-          description: |-
-            The coordinates of the birthplace, expressed in latitude and longitude.
-          properties:
-            latitude:
-              type: number
-              description: The latitude of the birthplace
-              minimum: -90
-              maximum: 90
-              example: 42.4242
-            longitude:
-              type: number
-              description: The longitude of the birthplace
-              minimum: -180
-              maximum: 180
-              example: -3.1415
-
     Photopost:
       title: Photopost
       type: object
@@ -1186,42 +1140,6 @@ paths:
         required: true
         schema:
           $ref: "#/components/schemas/Username"
-    delete:
-      operationId: removeFollower
-      summary: Remove a follower
-      description: |-
-        Removes a user from the followers list, useful to  
-        enforce the privacy of the user's profile without 
-        resorting to a hard ban/block.
-      tags:
-        - "followers"
-      security:
-        - bearerAuth: []
-      responses:
-        "204":
-          description: |-
-            The user has been unfollowed
-        "400":
-          description: |-
-            The user to unfollow is not valid
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-        "404":
-          description: |-
-            The user does not exist
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-        "409":
-          description: |-
-            The user is not being followed
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
 
   /users/{user_name}/bans/{banned_name}:
     parameters:
