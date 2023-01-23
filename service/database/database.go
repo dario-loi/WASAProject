@@ -73,6 +73,9 @@ type AppDatabase interface {
 	CheckUsernameExists(username string) (exists bool, err error)
 
 	GetUserPhotos(ID string) (photos string, err error)
+
+	// GetPhoto returns the profile photo of the user with the given ID
+	GetUserProfile(ID string) (profile string, err error)
 }
 
 type appdbimpl struct {
@@ -144,7 +147,6 @@ func (db *appdbimpl) Ping() error {
 func (db *appdbimpl) PostUserID(userName string) (json string, err error) {
 
 	// check if the user already exists
-
 	var count int
 
 	// Selects ALWAYS one row
@@ -165,7 +167,6 @@ func (db *appdbimpl) PostUserID(userName string) (json string, err error) {
 
 	if count == 0 {
 		// create the user
-
 		// Hash the user name with SHA256
 
 		h := sha256.New()
@@ -217,8 +218,6 @@ func (db *appdbimpl) PostUserID(userName string) (json string, err error) {
 
 		return string(data), fmt.Errorf("error converting user to JSON: %w", err)
 	}
-
-	fmt.Println(string(data))
 
 	return string(data), nil
 
@@ -348,8 +347,8 @@ func (db *appdbimpl) GetUserPhotos(userID string) (photo string, err error) {
 
 	photoIDlist := components.IDList{}
 
-	res, err := db.c.Query(`SELECT pt.id FROM photos AS pt, 
-		posts AS p WHERE p.author = ? AND p.photo_id = pt.id`, userID)
+	res, err := db.c.Query(`SELECT ps.photo_name FROM posts AS pt 
+		WHERE ps.poster_name = ?`, userID)
 
 	if err != nil {
 		return components.InternalServerError,
@@ -377,7 +376,6 @@ func (db *appdbimpl) GetUserPhotos(userID string) (photo string, err error) {
 	}
 
 	return string(data), nil
-
 }
 
 func (db *appdbimpl) GetUserID(name string) (ID string, err error) {
@@ -391,5 +389,54 @@ func (db *appdbimpl) GetUserID(name string) (ID string, err error) {
 	}
 
 	return userID, nil
+
+}
+
+func (db *appdbimpl) GetUserProfile(userID string) (profile string, err error) {
+
+	var username string
+
+	err = db.c.QueryRow(`SELECT name FROM Users WHERE id = ?`, userID).Scan(&username)
+
+	if err != nil {
+		return components.InternalServerError, fmt.Errorf("error getting username: %w", err)
+	}
+
+	photoIDlist := []components.SHA256hash{}
+
+	res, err := db.c.Query(`SELECT ps.photo_name FROM posts AS pt 
+		WHERE ps.poster_name = ?`, userID)
+
+	if err != nil {
+		return components.InternalServerError,
+			fmt.Errorf("error getting user's photos: %w", err)
+	}
+
+	for res.Next() {
+		var photoID components.SHA256hash
+
+		err = res.Scan(&photoID.Hash)
+
+		if err != nil {
+			return components.InternalServerError,
+				fmt.Errorf("error scanning photo: %w", err)
+		}
+
+		photoIDlist = append(photoIDlist, photoID)
+	}
+
+	prof_struct := components.Profile{
+		Username: username,
+		Photos:   photoIDlist,
+	}
+
+	data, err := prof_struct.ToJSON()
+
+	if err != nil {
+		return components.InternalServerError,
+			fmt.Errorf("error converting profile to JSON: %w", err)
+	}
+
+	return string(data), nil
 
 }

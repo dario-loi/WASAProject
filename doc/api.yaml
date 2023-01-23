@@ -356,11 +356,6 @@ paths:
                 properties:
                   username:
                     $ref: "#/components/schemas/Username"
-                  profile_photo:
-                    allOf:
-                      - $ref: "#/components/schemas/SHA256hash"
-                      - description: |-
-                          The user's profile photo, identified by its SHA256 hash.
                   photos:
                     type: array
                     description: A list of the user's photos, identified by their SHA256 hash.

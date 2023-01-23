@@ -1,21 +1,32 @@
 package components
 
 import (
-	"database/sql"
 	"encoding/json"
 )
 
 type User struct {
-	Uname   Username   `json:"username-string"`
-	PhotoID SHA256hash `json:"profile_photo"`
-}
-
-type Username struct {
-	Username_string string `json:"username-string"`
+	Uname string `json:"username-string"`
 }
 
 func (u User) ToJSON() ([]byte, error) {
 	return json.MarshalIndent(u, "", "  ")
+}
+
+type SHA256hash struct {
+	Hash string `json:"username-string"`
+}
+
+func (h SHA256hash) ToJSON() ([]byte, error) {
+	return json.MarshalIndent(h, "", "  ")
+}
+
+type Profile struct {
+	Username string       `json:"username-string"`
+	Photos   []SHA256hash `json:"photos"`
+}
+
+func (p Profile) ToJSON() ([]byte, error) {
+	return json.MarshalIndent(p, "", "  ")
 }
 
 type Error struct {
@@ -25,14 +36,6 @@ type Error struct {
 
 func (e Error) ToJSON() ([]byte, error) {
 	return json.MarshalIndent(e, "", "  ")
-}
-
-type SHA256hash struct {
-	Hash sql.NullString `json:"hash"`
-}
-
-func (h SHA256hash) ToJSON() ([]byte, error) {
-	return json.MarshalIndent(h, "", "  ")
 }
 
 type IDList struct {
