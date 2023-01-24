@@ -61,6 +61,8 @@ type AppDatabase interface {
 	// therefore the user is NOT created.
 	GetUserID(name string) (ID string, err error)
 
+	GetUsername(ID string) (username string, err error)
+
 	SearchUserByName(name string) (matches string, err error)
 
 	// CheckUserExists returns true if the user with the given ID exists
@@ -76,6 +78,10 @@ type AppDatabase interface {
 
 	// GetPhoto returns the profile photo of the user with the given ID
 	GetUserProfile(ID string) (profile string, err error)
+
+	GetUserFollowers(ID string) (followers string, err error)
+
+	GetUserFollowing(ID string) (following string, err error)
 }
 
 type appdbimpl struct {
@@ -139,6 +145,16 @@ func New(db *sql.DB) (AppDatabase, error) {
 // prompt the establishment of a new connection.
 func (db *appdbimpl) Ping() error {
 	return db.c.Ping()
+}
+
+func (db *appdbimpl) GetUsername(ID string) (username string, err error) {
+	err = db.c.QueryRow(`SELECT name FROM users WHERE id = ?`, ID).Scan(&username)
+
+	if err != nil {
+		return "", fmt.Errorf("error getting username: %w", err)
+	}
+
+	return username, nil
 }
 
 // PostUserID returns the ID of the user with the given name
@@ -205,7 +221,7 @@ func (db *appdbimpl) PostUserID(userName string) (json string, err error) {
 	}
 
 	// return the user ID
-	userID_json := components.SHA256hash{Hash: sql.NullString{String: userID, Valid: true}}
+	userID_json := components.SHA256hash{Hash: userID}
 
 	data, err := userID_json.ToJSON()
 
@@ -236,7 +252,7 @@ func (db *appdbimpl) SearchUserByName(name string) (matches string, err error) {
 	for res.Next() {
 		user := components.User{}
 
-		err = res.Scan(&user.Uname.Username_string, &user.PhotoID.Hash)
+		err = res.Scan(&user.Uname)
 
 		if err != nil {
 			return components.InternalServerError, fmt.Errorf("error scanning user: %w", err)
@@ -267,7 +283,7 @@ func (db *appdbimpl) SearchUserByName(name string) (matches string, err error) {
 
 		user := components.User{}
 
-		err = res.Scan(&user.Uname.Username_string, &user.PhotoID.Hash)
+		err = res.Scan(&user.Uname)
 
 		if err != nil {
 			return components.InternalServerError, fmt.Errorf("error scanning user: %w", err)
@@ -439,4 +455,86 @@ func (db *appdbimpl) GetUserProfile(userID string) (profile string, err error) {
 
 	return string(data), nil
 
+}
+
+func (db *appdbimpl) GetUserFollowers(userID string) (followers string, err error) {
+
+	res, err := db.c.Query(`SELECT follower FROM followers WHERE followed = ?`, userID)
+
+	if err != nil {
+		return components.InternalServerError,
+			fmt.Errorf("error getting user's followers: %w", err)
+	}
+
+	var followerNames []string
+
+	for res.Next() {
+		var followerID string
+
+		err = res.Scan(&followerID)
+
+		if err != nil {
+			return components.InternalServerError,
+				fmt.Errorf("error scanning follower: %w", err)
+		}
+
+		followerName, err := db.GetUsername(followerID)
+
+		if err != nil {
+			return components.InternalServerError, fmt.Errorf("error getting follower name: %w", err)
+		}
+
+		followerNames = append(followerNames, followerName)
+
+	}
+
+	data, err := json.MarshalIndent(followerNames, "", "	")
+
+	if err != nil {
+		return components.InternalServerError,
+			fmt.Errorf("error converting followers to JSON: %w", err)
+	}
+
+	return string(data), nil
+}
+
+func (db *appdbimpl) GetUserFollowing(userID string) (following string, err error) {
+
+	res, err := db.c.Query(`SELECT followed FROM followers WHERE follower = ?`, userID)
+
+	if err != nil {
+		return components.InternalServerError,
+			fmt.Errorf("error getting user's following: %w", err)
+	}
+
+	var followingNames []string
+
+	for res.Next() {
+		var followingID string
+
+		err = res.Scan(&followingID)
+
+		if err != nil {
+			return components.InternalServerError,
+				fmt.Errorf("error scanning following: %w", err)
+		}
+
+		followingName, err := db.GetUsername(followingID)
+
+		if err != nil {
+			return components.InternalServerError, fmt.Errorf("error getting following name: %w", err)
+		}
+
+		followingNames = append(followingNames, followingName)
+
+	}
+
+	data, err := json.MarshalIndent(followingNames, "", "	")
+
+	if err != nil {
+		return components.InternalServerError,
+			fmt.Errorf("error converting following to JSON: %w", err)
+	}
+
+	return string(data), nil
 }

@@ -906,6 +906,20 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+        "500":
+          description: |-
+            An internal error occurred
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "400":
+          description: |-
+            The request is ill-formed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 
   /users/{user_name}/following/{followed_name}:
     parameters:
@@ -1110,6 +1124,20 @@ paths:
         "404":
           description: |-
             The user does not exist
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: |-
+            An internal error occurred
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "400":
+          description: |-
+            The request is ill-formed
           content:
             application/json:
               schema:

@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"git.sapienzaapps.it/fantasticcoffee/fantastic-coffee-decaffeinated/service/api/reqcontext"
@@ -14,23 +13,23 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 
 	// parse the request body to JSON
 	decoder := json.NewDecoder(r.Body)
-	var uname components.Username
+	var uname components.User
 	err := decoder.Decode(&uname)
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(components.BadRequestError))
-		ctx.Logger().WithError(err).Error("error decoding JSON")
+		ctx.Logger.WithError(err).Error("error decoding JSON")
 		return
 	}
 
 	// get the user ID
-	ret_data, err := rt.db.PostUserID(uname.Username_string)
+	ret_data, err := rt.db.PostUserID(uname.Uname)
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(ret_data))
-		ctx.Logger().WithError(err).Error("error getting user ID")
+		ctx.Logger.WithError(err).Error("error getting user ID")
 		return
 	}
 
