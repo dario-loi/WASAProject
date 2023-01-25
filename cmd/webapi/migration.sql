@@ -1,19 +1,19 @@
-CREATE TABLE IF NOT EXISTS Users (
+CREATE TABLE IF NOT EXISTS users (
 	ID string,
 	name string
 );
 
-CREATE TABLE IF NOT EXISTS Bans (
+CREATE TABLE IF NOT EXISTS bans (
 	banisher string,
 	banished string
 );
 
-CREATE TABLE IF NOT EXISTS Follower (
+CREATE TABLE IF NOT EXISTS followers (
 	follower string,
 	followed string
 );
 
-CREATE TABLE IF NOT EXISTS Posts (
+CREATE TABLE IF NOT EXISTS posts (
 	post_ID string,
 	photo_code string,
 	poster_ID string,
@@ -21,12 +21,12 @@ CREATE TABLE IF NOT EXISTS Posts (
 	creation_date datetime
 );
 
-CREATE TABLE IF NOT EXISTS Likes (
+CREATE TABLE IF NOT EXISTS likes (
 	post_ID string,
 	liker string
 );
 
-CREATE TABLE IF NOT EXISTS Comments (
+CREATE TABLE IF NOT EXISTS comments (
 	post_code string,
 	user_code string,
 	content string,

@@ -2,6 +2,8 @@ package components
 
 import (
 	"encoding/json"
+	"fmt"
+	"time"
 )
 
 type User struct {
@@ -48,4 +50,26 @@ func (i IDList) ToJSON() ([]byte, error) {
 	}
 
 	return json.MarshalIndent(i, "", "  ")
+}
+
+// From https://stackoverflow.com/questions/23695479/how-to-format-timestamp-in-outgoing-json
+// Adapted to use time.RFC3339, the standard from our API.
+
+type JSONTime time.Time
+
+func (t JSONTime) MarshalJSON() ([]byte, error) {
+
+	stamp := fmt.Sprintf("\"%s\"", time.Time(t).Format("time.RFC3339"))
+	return []byte(stamp), nil
+}
+
+type Comment struct {
+	Username     string     `json:"author"`
+	Body         string     `json:"body"`
+	CreationTime JSONTime   `json:"creation-time"`
+	Parent       SHA256hash `json:"parent_post"`
+}
+
+func (c Comment) ToJSON() ([]byte, error) {
+	return json.MarshalIndent(c, "", "  ")
 }

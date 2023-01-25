@@ -29,8 +29,13 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.GET("/users/:user_name/followers", rt.wrap(rt.getUserFollowers))
 	rt.router.GET("/users/:user_name/following", rt.wrap(rt.getUserFollowing))
 
-	// rt.router.GET("/users/:user_name/profile/photos/:photo_id/likes",
-	// 	rt.wrap(rt.GetPhotoLikes))
+	rt.router.GET("/users/:user_name/profile/photos/:photo_id/likes",
+		rt.wrap(rt.GetPhotoLikes))
+
+	rt.router.GET("/users/:user_name/profile/photos/:photo_id/comments",
+		rt.wrap(rt.GetPhotoComments))
+
+	rt.router.GET("/users/:user_name/bans", rt.wrap(rt.getUserBans))
 
 	return rt.router
 }

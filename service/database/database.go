@@ -82,6 +82,12 @@ type AppDatabase interface {
 	GetUserFollowers(ID string) (followers string, err error)
 
 	GetUserFollowing(ID string) (following string, err error)
+
+	GetPhotoLikes(ID string) (likes string, err error)
+
+	GetPhotoComments(ID string) (comments string, err error)
+
+	GetUserBans(ID string) (bans string, err error)
 }
 
 type appdbimpl struct {
@@ -326,7 +332,7 @@ func (db *appdbimpl) CheckPhotoExists(photoID string) (exists bool, err error) {
 	var count int
 
 	// Selects ALWAYS one row
-	err = db.c.QueryRow(`SELECT COUNT(id) FROM photos WHERE id = ?`, photoID).Scan(&count)
+	err = db.c.QueryRow(`SELECT COUNT(photo_code) FROM posts WHERE photo_code = ?`, photoID).Scan(&count)
 
 	if err != nil {
 		return false, fmt.Errorf("error getting photo ID: %w", err)
@@ -345,7 +351,7 @@ func (db *appdbimpl) CheckUsernameExists(username string) (exists bool, err erro
 	var count int
 
 	// Selects ALWAYS one row
-	err = db.c.QueryRow(`SELECT COUNT(id) FROM users WHERE name = ?`, username).Scan(&count)
+	err = db.c.QueryRow(`SELECT COUNT(ID) FROM users WHERE name = ?`, username).Scan(&count)
 
 	if err != nil {
 		return false, fmt.Errorf("error getting user ID: %w", err)
@@ -534,6 +540,110 @@ func (db *appdbimpl) GetUserFollowing(userID string) (following string, err erro
 	if err != nil {
 		return components.InternalServerError,
 			fmt.Errorf("error converting following to JSON: %w", err)
+	}
+
+	return string(data), nil
+}
+
+func (db *appdbimpl) GetPhotoLikes(photoID string) (likes string, err error) {
+
+	res, err := db.c.Query(`SELECT l.liker FROM likes as l, posts as p WHERE p.photo_code = ? AND p.post_ID = l.likes`, photoID)
+
+	if err != nil {
+		return components.InternalServerError,
+			fmt.Errorf("error getting photo's likes: %w", err)
+	}
+
+	var likerNames []string
+
+	for res.Next() {
+		var likerID string
+
+		err = res.Scan(&likerID)
+
+		if err != nil {
+			return components.InternalServerError,
+				fmt.Errorf("error scanning liker: %w", err)
+		}
+
+		likerName, err := db.GetUsername(likerID)
+
+		if err != nil {
+			return components.InternalServerError, fmt.Errorf("error getting liker name: %w", err)
+		}
+
+		likerNames = append(likerNames, likerName)
+
+	}
+
+	data, err := json.MarshalIndent(likerNames, "", "	")
+
+	if err != nil {
+		return components.InternalServerError,
+			fmt.Errorf("error converting likes to JSON: %w", err)
+	}
+
+	return string(data), nil
+}
+
+func (db *appdbimpl) GetPhotoComments(photoID string) (comments string, err error) {
+
+	res, err := db.c.Query(`SELECT u.name, c.content, c.creation_date, c.post_code FROM comments as c, posts as p, users as u WHERE p.photo_code = ? AND p.post_ID = c.post_code AND u.ID = p.poster_ID`, photoID)
+
+	if err != nil {
+		return components.InternalServerError,
+			fmt.Errorf("error getting photo's comments: %w", err)
+	}
+
+	var commentsList []components.Comment
+
+	for res.Next() {
+
+		var comment components.Comment
+
+		err = res.Scan(&comment.Username, &comment.Body, &comment.CreationTime, &comment.Parent)
+
+	}
+
+	data, err := json.MarshalIndent(commentsList, "", "	")
+
+	if err != nil {
+		return components.InternalServerError,
+			fmt.Errorf("error converting comments to JSON: %w", err)
+	}
+
+	return string(data), nil
+}
+
+func (db *appdbimpl) GetUserBans(username string) (bans string, err error) {
+
+	res, err := db.c.Query(`SELECT b.banished FROM bans as b, users as u WHERE u.name = ? AND u.ID = b.banisher`, username)
+
+	if err != nil {
+		return components.InternalServerError,
+			fmt.Errorf("error getting user's bans: %w", err)
+	}
+
+	var banList []components.User
+
+	for res.Next() {
+
+		var ban components.User
+
+		err = res.Scan(&ban.Uname)
+
+		if err != nil {
+			return components.InternalServerError,
+				fmt.Errorf("error scanning ban record: %w", err)
+		}
+
+	}
+
+	data, err := json.MarshalIndent(banList, "", "	")
+
+	if err != nil {
+		return components.InternalServerError,
+			fmt.Errorf("error converting bans to JSON: %w", err)
 	}
 
 	return string(data), nil

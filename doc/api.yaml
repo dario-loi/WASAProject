@@ -99,40 +99,6 @@ components:
         follow-list:
           $ref: "#/components/schemas/UserList"
 
-    BanList:
-      title: BanList
-      type: object
-      description: |-
-        A List of users banned by its owner, structurally identical to a FollowList, we give 
-        it a different name to separate them semantically.
-      properties:
-        owner:
-          allOf:
-            - $ref: "#/components/schemas/Username"
-            - description: The user that *owns* the bans.
-        banned_users:
-          $ref: "#/components/schemas/UserList"
-      example:
-        owner:
-          username-string: Dario_Loi_123
-        banned_users:
-          users:
-            - username-string: Dario_Loi_123
-            - username-string: Dario_Loi_123
-
-    LikesList:
-      title: LikesList
-      type: object
-      description: |-
-        A list of users that liked a specific post.
-      properties:
-        parent_post:
-          allOf:
-            - $ref: "#/components/schemas/SHA256hash"
-            - description: The post whose likes are being listed.
-        likes:
-          $ref: "#/components/schemas/UserList"
-
     IDList:
       title: IDList
       type: object
@@ -634,10 +600,24 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/LikesList"
+                $ref: "#/components/schemas/UserList"
         "404":
           description: |-
             Either the requested user or photo does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: |-
+            Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "400":
+          description: |-
+            Bad Request.
           content:
             application/json:
               schema:
@@ -765,6 +745,20 @@ paths:
         "404":
           description: |-
             Either the requested user or photo does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: |-
+            Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "400":
+          description: |-
+            Bad Request.
           content:
             application/json:
               schema:
@@ -1255,6 +1249,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
+  /users/{user_name}/bans:
     get:
       operationId: getBans
       summary: Get the list of users banned by a user
@@ -1269,7 +1264,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/BanList"
+                $ref: "#/components/schemas/UserList"
         "404":
           description: |-
             The requested user does not exist.
