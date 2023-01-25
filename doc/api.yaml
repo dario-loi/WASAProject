@@ -253,7 +253,7 @@ paths:
   /users:
     parameters:
       - name: searcher_id
-        in: query
+        in: header
         description: The user's id.
         required: true
         schema:

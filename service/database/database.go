@@ -40,6 +40,7 @@ import (
 	"os"
 
 	"git.sapienzaapps.it/fantasticcoffee/fantastic-coffee-decaffeinated/service/components"
+	"github.com/sirupsen/logrus"
 )
 
 // AppDatabase is the high level interface for the DB
@@ -231,8 +232,6 @@ func (db *appdbimpl) PostUserID(userName string) (json string, err error) {
 
 	data, err := userID_json.ToJSON()
 
-	fmt.Println("Data: ", string(data))
-
 	if err != nil {
 		data, e := components.Error{Code: 500, Message: "Internal Server Error"}.ToJSON()
 
@@ -249,34 +248,13 @@ func (db *appdbimpl) PostUserID(userName string) (json string, err error) {
 
 func (db *appdbimpl) SearchUserByName(name string) (matches string, err error) {
 
-	// Print all users (for testing)
-
-	res, err := db.c.Query(`SELECT users.name, users.propic_id FROM users`)
-
-	if err != nil {
-		return components.InternalServerError, fmt.Errorf("error getting users: %w", err)
-	}
-
-	for res.Next() {
-		user := components.User{}
-
-		err = res.Scan(&user.Uname)
-
-		if err != nil {
-			return components.InternalServerError, fmt.Errorf("error scanning user: %w", err)
-		}
-
-		fmt.Println(user)
-
-	}
-
-	res, err = db.c.Query(`SELECT u.name, u.propic_id FROM users as u WHERE u.name LIKE '%'||?||'%'`, name)
+	res, err := db.c.Query(`SELECT u.name FROM users as u WHERE u.name LIKE '%'||?||'%'`, name)
 
 	defer func() {
 		if res != nil {
 			err := res.Close()
 			if err != nil {
-				fmt.Println("error closing result set: ", err)
+				logrus.Errorf("error closing result set: %v", err)
 			}
 		}
 	}()
