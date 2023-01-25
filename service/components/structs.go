@@ -15,11 +15,18 @@ func (u User) ToJSON() ([]byte, error) {
 }
 
 type SHA256hash struct {
-	Hash string `json:"username-string"`
+	Hash string `json:"hash"`
 }
 
 func (h SHA256hash) ToJSON() ([]byte, error) {
-	return json.MarshalIndent(h, "", "  ")
+
+	wrapper := struct {
+		Token SHA256hash `json:"token"`
+	}{
+		Token: h,
+	}
+
+	return json.MarshalIndent(wrapper, "", "  ")
 }
 
 type Profile struct {

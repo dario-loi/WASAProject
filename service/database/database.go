@@ -231,6 +231,8 @@ func (db *appdbimpl) PostUserID(userName string) (json string, err error) {
 
 	data, err := userID_json.ToJSON()
 
+	fmt.Println("Data: ", string(data))
+
 	if err != nil {
 		data, e := components.Error{Code: 500, Message: "Internal Server Error"}.ToJSON()
 
@@ -602,6 +604,11 @@ func (db *appdbimpl) GetPhotoComments(photoID string) (comments string, err erro
 		var comment components.Comment
 
 		err = res.Scan(&comment.Username, &comment.Body, &comment.CreationTime, &comment.Parent)
+
+		if err != nil {
+			return components.InternalServerError,
+				fmt.Errorf("error scanning comment: %w", err)
+		}
 
 	}
 
