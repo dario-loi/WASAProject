@@ -194,3 +194,71 @@ func (rt *_router) getUserFollowing(w http.ResponseWriter, r *http.Request, ps h
 	w.Write(ret_data)
 
 }
+
+func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+
+	// Retrieve username and target from header
+
+	username := r.Header.Get("user_name")
+	followed_name := r.Header.Get("followed_name")
+	token := r.Header.Get("identifier")
+
+	is_valid, err := rt.db.Validate(username, token)
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("error validating user"))
+		ctx.Logger.WithError(err).Error("error validating user")
+		return
+	}
+
+	if !is_valid {
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte("invalid token"))
+		ctx.Logger.WithError(err).Error("invalid token")
+		return
+	}
+
+	// Insert the follow relationship into the database
+
+	ret_data, err := rt.db.FollowUser(username, followed_name)
+
+	if err != nil {
+
+		w.WriteHeader(http.StatusInternalServerError)
+
+		w.Write([]byte(ret_data))
+
+		ctx.Logger.WithError(err).Error("error following user")
+
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+
+}
+
+func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+
+	// Retrieve username and target from header
+
+	username := r.Header.Get("user_name")
+	followed_name := r.Header.Get("followed_name")
+
+	// Insert the follow relationship into the database
+
+	ret_data, err := rt.db.UnfollowUser(username, followed_name)
+
+	if err != nil {
+
+		w.WriteHeader(http.StatusInternalServerError)
+
+		w.Write([]byte(ret_data))
+
+		ctx.Logger.WithError(err).Error("error unfollowing user")
+
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}

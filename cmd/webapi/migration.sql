@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS likes (
 );
 
 CREATE TABLE IF NOT EXISTS comments (
+	comment_ID string,
 	post_code string,
 	user_code string,
 	content string,

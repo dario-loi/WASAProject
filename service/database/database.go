@@ -38,6 +38,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"time"
 
 	"git.sapienzaapps.it/fantasticcoffee/fantastic-coffee-decaffeinated/service/components"
 	"github.com/sirupsen/logrus"
@@ -89,6 +90,24 @@ type AppDatabase interface {
 	GetPhotoComments(ID string) (comments string, err error)
 
 	GetUserBans(ID string) (bans string, err error)
+
+	FollowUser(followerID string, followedID string) (errstring string, err error)
+
+	UnfollowUser(followerID string, followedID string) (errstring string, err error)
+
+	Validate(username string, ID string) (is_valid bool, err error)
+
+	BanUser(bannedID string, bannerID string) (errstring string, err error)
+
+	UnbanUser(bannedID string, bannerID string) (errstring string, err error)
+
+	LikePhoto(likeeID string, likerID string) (errstring string, err error)
+
+	UnlikePhoto(likeeID string, likerID string) (errstring string, err error)
+
+	CommentPhoto(username string, photoID string, comment components.Comment) (errstring string, err error)
+
+	UncommentPhoto(username string, photoID string, comment_id string) (errstring string, err error)
 }
 
 type appdbimpl struct {
@@ -568,7 +587,7 @@ func (db *appdbimpl) GetPhotoLikes(photoID string) (likes string, err error) {
 
 func (db *appdbimpl) GetPhotoComments(photoID string) (comments string, err error) {
 
-	res, err := db.c.Query(`SELECT u.name, c.content, c.creation_date, c.post_code FROM comments as c, posts as p, users as u WHERE p.photo_code = ? AND p.post_ID = c.post_code AND u.ID = p.poster_ID`, photoID)
+	res, err := db.c.Query(`SELECT c.comment_ID, u.name, c.content, c.creation_date, c.post_code FROM comments as c, posts as p, users as u WHERE p.photo_code = ? AND p.post_ID = c.post_code AND u.ID = p.poster_ID`, photoID)
 
 	if err != nil {
 		return components.InternalServerError,
@@ -581,7 +600,7 @@ func (db *appdbimpl) GetPhotoComments(photoID string) (comments string, err erro
 
 		var comment components.Comment
 
-		err = res.Scan(&comment.Username, &comment.Body, &comment.CreationTime, &comment.Parent)
+		err = res.Scan(&comment.Comment_ID, &comment.Username, &comment.Body, &comment.CreationTime, &comment.Parent)
 
 		if err != nil {
 			return components.InternalServerError,
@@ -632,4 +651,181 @@ func (db *appdbimpl) GetUserBans(username string) (bans string, err error) {
 	}
 
 	return string(data), nil
+}
+
+func (db *appdbimpl) FollowUser(follower string, followed string) (errstring string, err error) {
+
+	followerID, err := db.GetUserID(follower)
+
+	if err != nil {
+		return components.InternalServerError, fmt.Errorf("error getting follower ID: %w", err)
+	}
+
+	followedID, err := db.GetUserID(followed)
+
+	if err != nil {
+		return components.InternalServerError, fmt.Errorf("error getting followed ID: %w", err)
+	}
+
+	_, err = db.c.Exec(`INSERT INTO followers (follower, followed) VALUES (?, ?)`, followerID, followedID)
+
+	if err != nil {
+		return components.InternalServerError, fmt.Errorf("error inserting follower: %w", err)
+	}
+
+	return "", nil
+}
+
+func (db *appdbimpl) UnfollowUser(follower, followed string) (errstring string, err error) {
+
+	followerID, err := db.GetUserID(follower)
+
+	if err != nil {
+		return components.InternalServerError, fmt.Errorf("error getting follower ID: %w", err)
+	}
+
+	followedID, err := db.GetUserID(followed)
+
+	if err != nil {
+		return components.InternalServerError, fmt.Errorf("error getting followed ID: %w", err)
+	}
+
+	_, err = db.c.Exec(`DELETE FROM followers WHERE follower = ? AND followed = ?`, followerID, followedID)
+
+	if err != nil {
+		return components.InternalServerError, fmt.Errorf("error deleting follower: %w", err)
+	}
+
+	return "", nil
+}
+
+func (db *appdbimpl) Validate(username string, ID string) (is_valid bool, err error) {
+
+	err = db.c.QueryRow(`SELECT COUNT(*) FROM users as u WHERE u.ID = ? AND u.name = ?`, ID, username).Scan(&is_valid)
+
+	if err != nil {
+		return false, fmt.Errorf("error validating user: %w", err)
+	}
+
+	return is_valid, nil
+
+}
+
+func (db *appdbimpl) BanUser(banisher, banished string) (errstring string, err error) {
+
+	banisherID, err := db.GetUserID(banisher)
+
+	if err != nil {
+		return components.InternalServerError, fmt.Errorf("error getting banisher ID: %w", err)
+	}
+
+	banishedID, err := db.GetUserID(banished)
+
+	if err != nil {
+		return components.InternalServerError, fmt.Errorf("error getting banished ID: %w", err)
+	}
+
+	_, err = db.c.Exec(`INSERT INTO bans (banisher, banished) VALUES (?, ?)`, banisherID, banishedID)
+
+	if err != nil {
+		return components.InternalServerError, fmt.Errorf("error inserting ban: %w", err)
+	}
+
+	return "", nil
+}
+
+func (db *appdbimpl) UnbanUser(banisher, banished string) (errstring string, err error) {
+
+	banisherID, err := db.GetUserID(banisher)
+
+	if err != nil {
+		return components.InternalServerError, fmt.Errorf("error getting banisher ID: %w", err)
+	}
+
+	banishedID, err := db.GetUserID(banished)
+
+	if err != nil {
+		return components.InternalServerError, fmt.Errorf("error getting banished ID: %w", err)
+	}
+
+	_, err = db.c.Exec(`DELETE FROM bans WHERE banisher = ? AND banished = ?`, banisherID, banishedID)
+
+	if err != nil {
+		return components.InternalServerError, fmt.Errorf("error deleting ban: %w", err)
+	}
+
+	return "", nil
+}
+
+func (db *appdbimpl) LikePhoto(username, photoID string) (errstring string, err error) {
+
+	userID, err := db.GetUserID(username)
+
+	if err != nil {
+		return components.InternalServerError, fmt.Errorf("error getting user ID: %w", err)
+	}
+
+	_, err = db.c.Exec(`INSERT INTO likes (post_ID, liker) VALUES (?, ?)`, photoID, userID)
+
+	if err != nil {
+		return components.InternalServerError, fmt.Errorf("error inserting like: %w", err)
+	}
+
+	return "", nil
+}
+
+func (db *appdbimpl) UnlikePhoto(username, photoID string) (errstring string, err error) {
+
+	userID, err := db.GetUserID(username)
+
+	if err != nil {
+		return components.InternalServerError, fmt.Errorf("error getting user ID: %w", err)
+	}
+
+	_, err = db.c.Exec(`DELETE FROM likes WHERE post_ID = ? AND liker = ?`, photoID, userID)
+
+	if err != nil {
+		return components.InternalServerError, fmt.Errorf("error deleting like: %w", err)
+	}
+
+	return "", nil
+}
+
+func (db *appdbimpl) CommentPhoto(username string, photoID string, comment components.Comment) (errstring string, err error) {
+
+	userID, err := db.GetUserID(username)
+
+	if err != nil {
+		return components.InternalServerError, fmt.Errorf("error getting user ID: %w", err)
+	}
+
+	curr_time := time.Now().Format("time.RFC3339")
+
+	// SHA256 hash of the comment and the current time
+	comment_id := fmt.Sprintf("%x", sha256.Sum256([]byte(comment.Body+curr_time)))
+
+	_, err = db.c.Exec(`INSERT INTO comments (comment_ID, post_code, user_code, content, creation_date ) VALUES (?, ?, ?)`, comment_id, comment.Parent, userID, comment.Body, comment.CreationTime)
+
+	if err != nil {
+		return components.InternalServerError, fmt.Errorf("error inserting comment: %w", err)
+	}
+
+	return "", nil
+}
+
+func (db *appdbimpl) UncommentPhoto(username string, photoID string, comment_id string) (errstring string, err error) {
+
+	userID, err := db.GetUserID(username)
+
+	if err != nil {
+		return components.InternalServerError, fmt.Errorf("error getting user ID: %w", err)
+	}
+
+	_, err = db.c.Exec(`DELETE FROM comments WHERE comment_ID = ? AND post_code = ? AND user_code = ?`, comment_id, photoID, userID)
+
+	if err != nil {
+		return components.InternalServerError, fmt.Errorf("error deleting comment: %w", err)
+	}
+
+	return "", nil
 }

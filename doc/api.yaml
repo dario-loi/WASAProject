@@ -120,6 +120,8 @@ components:
         A comment on a post, it contains the comment's author, body, date and time of 
         creation.
       properties:
+        comment_id:
+          $ref: "#/components/schemas/SHA256hash"
         author:
           $ref: "#/components/schemas/Username"
         body:

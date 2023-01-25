@@ -71,6 +71,7 @@ func (t JSONTime) MarshalJSON() ([]byte, error) {
 }
 
 type Comment struct {
+	Comment_ID   SHA256hash `json:"comment_id"`
 	Username     string     `json:"author"`
 	Body         string     `json:"body"`
 	CreationTime JSONTime   `json:"creation-time"`
