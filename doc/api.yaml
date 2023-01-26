@@ -1252,6 +1252,13 @@ paths:
                 $ref: "#/components/schemas/Error"
 
   /users/{user_name}/bans:
+    parameters:
+      - name: user_name
+        in: path
+        description: The user's name
+        required: true
+        schema:
+          $ref: "#/components/schemas/Username"
     get:
       operationId: getBans
       summary: Get the list of users banned by a user

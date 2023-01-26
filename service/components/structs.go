@@ -81,3 +81,8 @@ type Comment struct {
 func (c Comment) ToJSON() ([]byte, error) {
 	return json.MarshalIndent(c, "", "  ")
 }
+
+type Photo struct {
+	Data string `json:"photo_data"`
+	Desc string `json:"photo_desc"`
+}

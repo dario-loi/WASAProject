@@ -28,7 +28,7 @@ func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httproute
 	if uuid == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(components.BadRequestError))
-		fmt.Println("Empty photo id")
+		ctx.Logger.Error("error getting photo id")
 		return
 	}
 
@@ -39,7 +39,7 @@ func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httproute
 	if err != nil || !exists {
 		w.WriteHeader(http.StatusNotFound)
 		w.Write([]byte(fmt.Errorf(components.NotFoundErrorF, err).Error()))
-		fmt.Println("Requested photo does not exist")
+		ctx.Logger.WithError(err).Error("error checking photo existence")
 		return
 	}
 
@@ -50,7 +50,7 @@ func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httproute
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(fmt.Errorf(components.InternalServerErrorF, err).Error()))
-		fmt.Println(fmt.Errorf("error opening photo: %w", err))
+		ctx.Logger.WithError(err).Error("error opening photo")
 		return
 	}
 
@@ -63,7 +63,7 @@ func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httproute
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(fmt.Errorf(components.InternalServerErrorF, err).Error()))
-		fmt.Println(fmt.Errorf("error decoding photo: %w", err))
+		ctx.Logger.WithError(err).Error("error decoding photo")
 		return
 	}
 
@@ -75,7 +75,7 @@ func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httproute
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(fmt.Errorf(components.InternalServerErrorF, err).Error()))
-		fmt.Println(fmt.Errorf("error encoding photo: %w", err))
+		ctx.Logger.WithError(err).Error("error encoding photo")
 		return
 	}
 

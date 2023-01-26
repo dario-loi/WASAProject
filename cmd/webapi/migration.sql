@@ -15,7 +15,6 @@ CREATE TABLE IF NOT EXISTS followers (
 
 CREATE TABLE IF NOT EXISTS posts (
 	post_ID string,
-	photo_code string,
 	poster_ID string,
 	description string,
 	creation_date datetime

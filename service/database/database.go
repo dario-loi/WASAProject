@@ -31,12 +31,15 @@ Then you can initialize the AppDatabase and pass it to the api package.
 package database
 
 import (
+	"bytes"
 	"crypto/sha256"
 	"database/sql"
+	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"image/jpeg"
 	"os"
 	"time"
 
@@ -108,6 +111,10 @@ type AppDatabase interface {
 	CommentPhoto(username string, photoID string, comment components.Comment) (errstring string, err error)
 
 	UncommentPhoto(username string, photoID string, comment_id string) (errstring string, err error)
+
+	UploadPhoto(username string, photo components.Photo, photo_ID string) (errstring string, err error)
+
+	DeletePhoto(username string, photoID string) (errstring string, err error)
 }
 
 type appdbimpl struct {
@@ -799,10 +806,7 @@ func (db *appdbimpl) CommentPhoto(username string, photoID string, comment compo
 		return components.InternalServerError, fmt.Errorf("error getting user ID: %w", err)
 	}
 
-	curr_time := time.Now().Format("time.RFC3339")
-
-	// SHA256 hash of the comment and the current time
-	comment_id := fmt.Sprintf("%x", sha256.Sum256([]byte(comment.Body+curr_time)))
+	comment_id := comment.Comment_ID.Hash
 
 	_, err = db.c.Exec(`INSERT INTO comments (comment_ID, post_code, user_code, content, creation_date ) VALUES (?, ?, ?)`, comment_id, comment.Parent, userID, comment.Body, comment.CreationTime)
 
@@ -825,6 +829,97 @@ func (db *appdbimpl) UncommentPhoto(username string, photoID string, comment_id 
 
 	if err != nil {
 		return components.InternalServerError, fmt.Errorf("error deleting comment: %w", err)
+	}
+
+	return "", nil
+}
+
+func (db *appdbimpl) UploadPhoto(username string, photo components.Photo, photo_ID string) (errstring string, err error) {
+
+	var data string = photo.Data
+
+	// Encode data to base64
+
+	encoded_data, err := base64.StdEncoding.DecodeString(data)
+
+	if err != nil {
+		return components.InternalServerError, fmt.Errorf("error encoding data: %w", err)
+	}
+
+	// Get user ID
+
+	userID, err := db.GetUserID(username)
+
+	if err != nil {
+		return components.InternalServerError, fmt.Errorf("error getting user ID: %w", err)
+	}
+
+	// Get current time
+
+	creation_time := time.Now().Format("time.RFC3339")
+
+	// Insert photo
+
+	_, err = db.c.Exec(`INSERT INTO posts (post_ID, user_code, description, creation_date) VALUES (?, ?, ?, ?)`, photo_ID, userID, photo.Desc, creation_time)
+
+	if err != nil {
+		return components.InternalServerError, fmt.Errorf("error inserting photo: %w", err)
+	}
+
+	JPEG_reader := bytes.NewReader(encoded_data)
+
+	img, err := jpeg.Decode(JPEG_reader)
+
+	if err != nil {
+		return components.InternalServerError, fmt.Errorf("error decoding JPEG: %w", err)
+	}
+
+	_, err = os.Stat("./photos")
+
+	if os.IsNotExist(err) {
+		err = os.Mkdir("./photos", 0755)
+		if err != nil {
+			return components.InternalServerError, fmt.Errorf("error creating ./photos: %w", err)
+		}
+	}
+
+	f, err := os.OpenFile("./photos/"+photo_ID+".jpg", os.O_WRONLY|os.O_CREATE, 0777)
+
+	if err != nil {
+		return components.InternalServerError, fmt.Errorf("error creating file: %w", err)
+	}
+
+	defer f.Close()
+
+	err = jpeg.Encode(f, img, nil)
+
+	if err != nil {
+		return components.InternalServerError, fmt.Errorf("error encoding JPEG: %w", err)
+	}
+
+	return "", nil
+}
+
+func (db *appdbimpl) DeletePhoto(username string, photoID string) (errstring string, err error) {
+
+	userID, err := db.GetUserID(username)
+
+	if err != nil {
+		return components.InternalServerError, fmt.Errorf("error getting user ID: %w", err)
+	}
+
+	_, err = db.c.Exec(`DELETE FROM posts WHERE post_ID = ? AND user_code = ?`, photoID, userID)
+
+	if err != nil {
+		return components.InternalServerError, fmt.Errorf("error deleting photo: %w", err)
+	}
+
+	// erase from ./photos
+
+	err = os.Remove("./photos/" + photoID + ".jpg")
+
+	if err != nil {
+		return components.InternalServerError, fmt.Errorf("error deleting photo: %w", err)
 	}
 
 	return "", nil

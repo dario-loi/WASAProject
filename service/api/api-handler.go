@@ -55,7 +55,12 @@ func (rt *_router) Handler() http.Handler {
 	// Comment routes
 
 	rt.router.PUT("/users/:user_name/profile/photos/:photo_id/comments/:comment_id", rt.wrap(rt.commentPhoto))
-	rt.router.DELETE("/users/:user_name/profile/photos/:photo_id/comments/:comment_id", rt.wrap(rt.uncommentPhoto))
+	rt.router.DELETE("/users/:user_name/profile/photos/:photo_id/comments/:comment_id", rt.wrap(rt.deleteComment))
+
+	// Photo routes
+
+	rt.router.PUT("/users/:user_name/profile/photos", rt.wrap(rt.uploadPhoto))
+	rt.router.DELETE("/users/:user_name/profile/photos/:photo_id", rt.wrap(rt.deletePhoto))
 
 	return rt.router
 }

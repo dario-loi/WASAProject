@@ -199,6 +199,10 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 		return // exit the function
 	}
 
+	comment_id := ps.ByName("comment_id")
+
+	comment.Comment_ID.Hash = comment_id
+
 	ret, err := rt.db.CommentPhoto(userName, photoID, comment)
 
 	if err != nil {
@@ -244,6 +248,97 @@ func (rt *_router) deleteComment(w http.ResponseWriter, r *http.Request, ps http
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		ctx.Logger.WithError(err).Error("error deleting comment")
+		w.Write([]byte(ret))
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+
+}
+
+func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+
+	// get the user ID
+
+	token := r.Header.Get("user_id")
+
+	userName := ps.ByName("user_name")
+
+	is_valid, err := rt.db.Validate(userName, token)
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		ctx.Logger.WithError(err).Error("error validating user")
+		return
+	}
+
+	if !is_valid {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	// Retrieve photo from request body
+
+	decoder := json.NewDecoder(r.Body)
+
+	var photo components.Photo
+
+	err = decoder.Decode(&photo)
+
+	if err != nil {
+
+		w.WriteHeader(http.StatusBadRequest)
+
+		w.Write([]byte(components.BadRequestError))
+
+		ctx.Logger.WithError(err).Error("error decoding JSON")
+
+		return // exit the function
+	}
+
+	photo_id := ps.ByName("photo_id")
+
+	ret, err := rt.db.UploadPhoto(userName, photo, photo_id)
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		ctx.Logger.WithError(err).Error("error uploading photo")
+		w.Write([]byte(ret))
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+
+}
+
+func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+
+	// get the user ID
+
+	token := r.Header.Get("user_id")
+
+	userName := ps.ByName("user_name")
+
+	is_valid, err := rt.db.Validate(userName, token)
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		ctx.Logger.WithError(err).Error("error validating user")
+		return
+	}
+
+	if !is_valid {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	photo_id := ps.ByName("photo_id")
+
+	ret, err := rt.db.DeletePhoto(userName, photo_id)
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		ctx.Logger.WithError(err).Error("error deleting photo")
 		w.Write([]byte(ret))
 		return
 	}
