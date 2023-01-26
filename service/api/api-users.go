@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -145,6 +146,65 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(ret_data))
 		fmt.Println(fmt.Errorf("error getting user profile: %w", err))
+		return
+	}
+
+	fmt.Println(ret_data)
+	w.Write([]byte(ret_data))
+
+}
+
+func (rt *_router) changeUsername(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+
+	// Get user name from path
+
+	user_name := ps.ByName("user_name")
+
+	// Get user id from header
+
+	id := r.Header.Get("user_id")
+
+	is_valid, err := rt.db.Validate(id, user_name)
+
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte(fmt.Errorf(components.UnauthorizedErrorF, err).Error()))
+		fmt.Println("Invalid user")
+		return
+	}
+
+	if !is_valid {
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte(components.UnauthorizedError))
+		fmt.Println("Invalid user")
+		return
+	}
+
+	// Get the new username from the request body
+
+	// Read the request body
+
+	dec := json.NewDecoder(r.Body)
+
+	var new_username string
+
+	err = dec.Decode(&new_username)
+
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(components.BadRequestError))
+		fmt.Println("Error decoding request body")
+		return
+	}
+
+	// Change the username in the database
+
+	ret_data, err := rt.db.ChangeUsername(user_name, new_username)
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(ret_data))
+		fmt.Println(fmt.Errorf("error changing username: %w", err))
 		return
 	}
 

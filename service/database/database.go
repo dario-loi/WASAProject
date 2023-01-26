@@ -115,6 +115,8 @@ type AppDatabase interface {
 	UploadPhoto(username string, photo components.Photo, photo_ID string) (errstring string, err error)
 
 	DeletePhoto(username string, photoID string) (errstring string, err error)
+
+	ChangeUsername(username string, ID string) (errstring string, err error)
 }
 
 type appdbimpl struct {
@@ -920,6 +922,23 @@ func (db *appdbimpl) DeletePhoto(username string, photoID string) (errstring str
 
 	if err != nil {
 		return components.InternalServerError, fmt.Errorf("error deleting photo: %w", err)
+	}
+
+	return "", nil
+}
+
+func (db *appdbimpl) ChangeUsername(user_name string, new_username string) (errstring string, err error) {
+
+	userID, err := db.GetUserID(user_name)
+
+	if err != nil {
+		return components.InternalServerError, fmt.Errorf("error getting user ID: %w", err)
+	}
+
+	_, err = db.c.Exec(`UPDATE users SET username = ? WHERE user_code = ?`, new_username, userID)
+
+	if err != nil {
+		return components.InternalServerError, fmt.Errorf("error changing username: %w", err)
 	}
 
 	return "", nil

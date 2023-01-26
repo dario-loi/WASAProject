@@ -339,7 +339,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
-    patch:
+    put:
       operationId: setMyUserName
       tags:
         - "users"
@@ -394,13 +394,6 @@ paths:
           description: |-
             The identifier is not valid, it is either ill-formed or does not belong to the
             user that is requesting the update.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-        "409":
-          description: |-
-            The username is already taken/is identical to the previous
           content:
             application/json:
               schema:
