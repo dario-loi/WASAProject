@@ -86,3 +86,14 @@ type Photo struct {
 	Data string `json:"photo_data"`
 	Desc string `json:"photo_desc"`
 }
+
+type Post struct {
+	Photo_ID     SHA256hash `json:"photo_id"`
+	Author_ID    SHA256hash `json:"author_identifier"`
+	Description  string     `json:"description"`
+	CreationTime JSONTime   `json:"created-at"`
+}
+
+type Stream struct {
+	Posts []Post `json:"posts"`
+}

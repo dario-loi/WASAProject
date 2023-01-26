@@ -174,14 +174,10 @@ components:
         A post containing a photo to be displayed in various environments,
         both user profiles and the main feed.
       properties:
-        id:
+        photo_id:
           $ref: "#/components/schemas/SHA256hash"
         author_identifier:
           $ref: "#/components/schemas/Username"
-        photo:
-          $ref: "#/components/schemas/SHA256hash"
-        comments-list:
-          $ref: "#/components/schemas/CommentList"
         description:
           type: string
           minLength: 0
@@ -197,6 +193,11 @@ components:
           pattern: ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$
           minLength: 20
           maxLength: 20
+      example:
+        photo_id: 2dbe33913ae5d6b16a801119f5fa1c419620c26d1a456e01490d697eb9b12589
+        author_identifier: user1
+        description: This photo is super cool!
+        created_at: 2020-12-31T23:59:59Z
 
     Stream:
       title: Stream
@@ -211,13 +212,6 @@ components:
             $ref: "#/components/schemas/Photopost"
           minItems: 1
           maxItems: 256
-      example:
-        posts:
-          - id: 0000000000000000000000000000000000000000000000000000000000000000
-            author_identifier: user1
-            photo: 0000000000000000000000000000000000000000000000000000000000000000
-            comments-list:
-              comments:
 
     Error:
       title: Error
@@ -1036,15 +1030,24 @@ paths:
         in: header
         schema:
           $ref: "#/components/schemas/UserID"
-      - name: upto
-        description: The maximum number of posts to retrieve.
+      - name: from
+        description: The index of the first post to retrieve.
+        required: false
+        in: query
+        schema:
+          type: integer
+          minimum: 0
+          default: 0
+      - name: offset
+        description: The offset of the last post to retrieve starting from the base.
         required: false
         in: query
         schema:
           type: integer
           minimum: 1
-          maximum: 100
+          maximum: 255
           default: 10
+
     get:
       operationId: getMyStream
       summary: Gets the stream of a user

@@ -117,6 +117,8 @@ type AppDatabase interface {
 	DeletePhoto(username string, photoID string) (errstring string, err error)
 
 	ChangeUsername(username string, ID string) (errstring string, err error)
+
+	GetStream(username string, from, offset int) (stream string, err error)
 }
 
 type appdbimpl struct {
@@ -942,4 +944,49 @@ func (db *appdbimpl) ChangeUsername(user_name string, new_username string) (errs
 	}
 
 	return "", nil
+}
+
+func (db *appdbimpl) GetStream(user_name string, from, offset int) (stream string, err error) {
+
+	userID, err := db.GetUserID(user_name)
+
+	if err != nil {
+		return "", fmt.Errorf("error getting user ID: %w", err)
+	}
+
+	rows, err := db.c.Query(`SELECT post_ID, poster_ID, description, creation_date FROM posts AS p, followers AS f WHERE f.follower = ? AND f.followed = p.poster_ID ORDER BY p.creation_date DESC LIMIT ?, ?`, userID, from, offset)
+
+	if err != nil {
+		return "", fmt.Errorf("error getting stream: %w", err)
+	}
+
+	defer rows.Close()
+
+	var posts []components.Post
+
+	for rows.Next() {
+
+		// for each retrieved post, get the comments and likes
+
+		var post components.Post
+
+		err := rows.Scan(&post.Photo_ID, &post.Author_ID, &post.Description, &post.CreationTime)
+
+		if err != nil {
+			return "", fmt.Errorf("error scanning row: %w", err)
+		}
+
+		posts = append(posts, post)
+	}
+
+	stream_str := components.Stream{Posts: posts}
+
+	stream_data, err := json.MarshalIndent(stream_str, "", "  ")
+
+	if err != nil {
+		return "", fmt.Errorf("error marshaling stream: %w", err)
+	}
+
+	return string(stream_data), nil
+
 }

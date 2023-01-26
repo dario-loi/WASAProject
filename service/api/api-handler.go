@@ -66,5 +66,9 @@ func (rt *_router) Handler() http.Handler {
 
 	rt.router.PUT("/users/:user_name/username", rt.wrap(rt.changeUsername))
 
+	// Stream routes
+
+	rt.router.GET("/users/:user_name/stream", rt.wrap(rt.getStream))
+
 	return rt.router
 }

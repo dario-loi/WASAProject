@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"git.sapienzaapps.it/fantasticcoffee/fantastic-coffee-decaffeinated/service/api/reqcontext"
 	"git.sapienzaapps.it/fantasticcoffee/fantastic-coffee-decaffeinated/service/components"
@@ -344,5 +345,87 @@ func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	w.WriteHeader(http.StatusNoContent)
+
+}
+
+func (rt *_router) getStream(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+
+	// get the user ID
+
+	token := r.Header.Get("user_id")
+
+	userName := ps.ByName("user_name")
+
+	is_valid, err := rt.db.Validate(userName, token)
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(components.InternalServerError))
+		ctx.Logger.WithError(err).Error("error validating user")
+		return
+	}
+
+	if !is_valid {
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte(components.UnauthorizedError))
+		ctx.Logger.Info("unauthorized getstream request received")
+		return
+	}
+
+	// get bounds from query
+
+	lower_bound_str := r.URL.Query().Get("from")
+
+	if lower_bound_str == "" {
+		lower_bound_str = "0"
+	}
+
+	lower_bound, err := strconv.Atoi(lower_bound_str)
+
+	if err != nil {
+
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(components.BadRequestError))
+		ctx.Logger.WithError(err).Error("bad getstream request query")
+		return
+
+	}
+
+	offset_str := r.URL.Query().Get("offset")
+
+	if offset_str == "" {
+		offset_str = "10"
+	}
+
+	offset, err := strconv.Atoi(offset_str)
+
+	if err != nil {
+
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(components.BadRequestError))
+		ctx.Logger.WithError(err).Error("bad getstream request query")
+		return
+
+	}
+
+	if lower_bound < 0 || offset < 1 || offset > 255 {
+
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(components.BadRequestError))
+		ctx.Logger.WithError(err).Error("bad getstream request")
+		return
+
+	}
+
+	ret_json_string, err := rt.db.GetStream(userName, lower_bound, offset)
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		ctx.Logger.WithError(err).Error("error getting stream")
+		w.Write([]byte(ret_json_string))
+		return
+	}
+
+	w.Write([]byte(ret_json_string))
 
 }
