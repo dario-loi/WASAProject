@@ -1130,27 +1130,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
-  /users/{user_name}/followers/{follower_name}:
-    parameters:
-      - name: identifier
-        in: header
-        description: The user's id
-        required: true
-        schema:
-          $ref: "#/components/schemas/UserID"
-      - name: user_name
-        in: path
-        description: The user's username
-        required: true
-        schema:
-          $ref: "#/components/schemas/Username"
-      - name: follower_name
-        in: path
-        description: The follower's username
-        required: true
-        schema:
-          $ref: "#/components/schemas/Username"
-
   /users/{user_name}/bans/{banned_name}:
     parameters:
       - name: user_name
