@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/gorilla/handlers"
 	"net/http"
+
+	"github.com/gorilla/handlers"
 )
 
 // applyCORSHandler applies a CORS policy to the router. CORS stands for Cross-Origin Resource Sharing: it's a security
@@ -15,5 +16,7 @@ func applyCORSHandler(h http.Handler) http.Handler {
 		}),
 		handlers.AllowedMethods([]string{"GET", "POST", "OPTIONS", "DELETE", "PUT"}),
 		handlers.AllowedOrigins([]string{"*"}),
-	)(h)
+		handlers.ExposedHeaders([]string{"Authorization"}),
+		handlers.AllowedHeaders([]string{"Authorization", "Content-Type", "searcher_id",
+			"identifier", "requester_ID", "user_id"}))(h)
 }
