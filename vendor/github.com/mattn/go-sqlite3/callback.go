@@ -32,7 +32,7 @@ import (
 	"unsafe"
 )
 
-//export callbackTrampoline
+// export callbackTrampoline
 func callbackTrampoline(ctx *C.sqlite3_context, argc int, argv **C.sqlite3_value) {
 	args := (*[(math.MaxInt32 - 1) / unsafe.Sizeof((*C.sqlite3_value)(nil))]*C.sqlite3_value)(unsafe.Pointer(argv))[:argc:argc]
 	fi := lookupHandle(C.sqlite3_user_data(ctx)).(*functionInfo)
@@ -360,11 +360,11 @@ func callbackRetGeneric(ctx *C.sqlite3_context, v reflect.Value) error {
 	}
 
 	cb, err := callbackRet(v.Elem().Type())
-        if err != nil {
-                return err
-        }
+	if err != nil {
+		return err
+	}
 
-        return cb(ctx, v.Elem())
+	return cb(ctx, v.Elem())
 }
 
 func callbackRet(typ reflect.Type) (callbackRetConverter, error) {

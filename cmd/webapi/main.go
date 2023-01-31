@@ -73,7 +73,7 @@ func run() error {
 	// Init logging
 	logger := logrus.New()
 	logger.SetOutput(os.Stdout)
-	logger.SetReportCaller(true) //add file and line number to log
+	logger.SetReportCaller(true) // add file and line number to log
 	if cfg.Debug {
 		logger.SetLevel(logrus.DebugLevel)
 	} else {
