@@ -16,7 +16,11 @@ func (rt *_router) searchUser(w http.ResponseWriter, r *http.Request, ps httprou
 
 	if id == "" {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(components.BadRequestError))
+		_, err := w.Write([]byte(components.BadRequestError))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
 		ctx.Logger.Error("Empty request header")
 		return
 	}
@@ -27,7 +31,11 @@ func (rt *_router) searchUser(w http.ResponseWriter, r *http.Request, ps httprou
 
 	if err != nil || !exists {
 		w.WriteHeader(http.StatusUnauthorized)
-		w.Write([]byte(fmt.Errorf(components.UnauthorizedErrorF, err).Error()))
+		_, err := w.Write([]byte(fmt.Errorf(components.UnauthorizedErrorF, err).Error()))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
 		return
 	}
 	// get the token from the request query
@@ -39,12 +47,20 @@ func (rt *_router) searchUser(w http.ResponseWriter, r *http.Request, ps httprou
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(ret_data))
+		_, err := w.Write([]byte(ret_data))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
 		ctx.Logger.WithError(err).Error("error searching user")
 		return
 	}
 
-	w.Write([]byte(ret_data))
+	_, err = w.Write([]byte(ret_data))
+
+	if err != nil {
+		ctx.Logger.WithError(err).Error("error writing response")
+	}
 
 }
 
@@ -56,7 +72,12 @@ func (rt *_router) getUserPhotos(w http.ResponseWriter, r *http.Request, ps http
 
 	if name == "" {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(components.BadRequestError))
+		_, err := w.Write([]byte(components.BadRequestError))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
+
 		ctx.Logger.Error("Empty username")
 		return
 	}
@@ -67,7 +88,12 @@ func (rt *_router) getUserPhotos(w http.ResponseWriter, r *http.Request, ps http
 
 	if err != nil || !exists {
 		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte(fmt.Errorf(components.NotFoundErrorF, err).Error()))
+		_, err := w.Write([]byte(fmt.Errorf(components.NotFoundErrorF, err).Error()))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
+
 		ctx.Logger.Error("error checking user existence")
 		return
 	}
@@ -78,7 +104,12 @@ func (rt *_router) getUserPhotos(w http.ResponseWriter, r *http.Request, ps http
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(id))
+		_, err := w.Write([]byte(id))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
+
 		ctx.Logger.WithError(err).Error("error getting user id")
 		return
 	}
@@ -89,12 +120,21 @@ func (rt *_router) getUserPhotos(w http.ResponseWriter, r *http.Request, ps http
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(ret_data))
+		_, err := w.Write([]byte(ret_data))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
+
 		ctx.Logger.WithError(err).Error("error getting user photos")
 		return
 	}
 
-	w.Write([]byte(ret_data))
+	_, err = w.Write([]byte(ret_data))
+
+	if err != nil {
+		ctx.Logger.WithError(err).Error("error writing response")
+	}
 
 }
 
@@ -106,7 +146,12 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 
 	if name == "" {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(components.BadRequestError))
+		_, err := w.Write([]byte(components.BadRequestError))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
+
 		ctx.Logger.Error("Empty username")
 		return
 	}
@@ -117,7 +162,12 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 
 	if err != nil || !exists {
 		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte(fmt.Errorf(components.NotFoundErrorF, err).Error()))
+		_, err := w.Write([]byte(fmt.Errorf(components.NotFoundErrorF, err).Error()))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
+
 		ctx.Logger.Error("error checking user existence")
 		return
 	}
@@ -128,7 +178,11 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(id))
+		_, err := w.Write([]byte(id))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
 		ctx.Logger.WithError(err).Error("error getting user id")
 		return
 	}
@@ -139,12 +193,20 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(ret_data))
+		_, err := w.Write([]byte(ret_data))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
 		ctx.Logger.WithError(err).Error("error getting user profile")
 		return
 	}
 
-	w.Write([]byte(ret_data))
+	_, err = w.Write([]byte(ret_data))
+
+	if err != nil {
+		ctx.Logger.WithError(err).Error("error writing response")
+	}
 
 }
 
@@ -162,14 +224,23 @@ func (rt *_router) changeUsername(w http.ResponseWriter, r *http.Request, ps htt
 
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
-		w.Write([]byte(fmt.Errorf(components.UnauthorizedErrorF, err).Error()))
+		_, err := w.Write([]byte(fmt.Errorf(components.UnauthorizedErrorF, err).Error()))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
+
 		ctx.Logger.WithError(err).Error("error authenticating")
 		return
 	}
 
 	if !is_valid {
 		w.WriteHeader(http.StatusUnauthorized)
-		w.Write([]byte(components.UnauthorizedError))
+		_, err := w.Write([]byte(components.UnauthorizedError))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
 		ctx.Logger.Error("error authenticating")
 		return
 	}
@@ -186,7 +257,12 @@ func (rt *_router) changeUsername(w http.ResponseWriter, r *http.Request, ps htt
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(components.BadRequestError))
+		_, err := w.Write([]byte(components.BadRequestError))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
+
 		ctx.Logger.WithError(err).Error("error decoding request body")
 		return
 	}
@@ -197,11 +273,19 @@ func (rt *_router) changeUsername(w http.ResponseWriter, r *http.Request, ps htt
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(ret_data))
+		_, err := w.Write([]byte(ret_data))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
 		ctx.Logger.WithError(err).Error("error changing username")
 		return
 	}
 
-	w.Write([]byte(ret_data))
+	_, err = w.Write([]byte(ret_data))
+
+	if err != nil {
+		ctx.Logger.WithError(err).Error("error writing response")
+	}
 
 }

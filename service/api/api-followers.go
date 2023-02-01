@@ -9,34 +9,6 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-// func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-
-// 	// parse the request body to JSON
-// 	decoder := json.NewDecoder(r.Body)
-// 	var uname components.Username
-// 	err := decoder.Decode(&uname)
-
-// 	if err != nil {
-// 		w.WriteHeader(http.StatusBadRequest)
-// 		w.Write([]byte(components.BadRequestError))
-// 		ctx.Logger().WithError(err).Error("error decoding JSON")
-// 		return
-// 	}
-
-// 	// get the user ID
-// 	ret_data, err := rt.db.PostUserID(uname.Username_string)
-
-// 	if err != nil {
-// 		w.WriteHeader(http.StatusInternalServerError)
-// 		w.Write([]byte(ret_data))
-// 		ctx.Logger().WithError(err).Error("error getting user ID")
-// 		return
-// 	}
-
-// 	w.Write([]byte(ret_data))
-
-// }
-
 func (rt *_router) getUserFollowers(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	// Retrieve username from request body
@@ -51,7 +23,11 @@ func (rt *_router) getUserFollowers(w http.ResponseWriter, r *http.Request, ps h
 
 		w.WriteHeader(http.StatusBadRequest)
 
-		w.Write([]byte(components.BadRequestError))
+		_, err := w.Write([]byte(components.BadRequestError))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
 
 		ctx.Logger.WithError(err).Error("error decoding JSON")
 
@@ -66,7 +42,11 @@ func (rt *_router) getUserFollowers(w http.ResponseWriter, r *http.Request, ps h
 
 		w.WriteHeader(http.StatusInternalServerError)
 
-		w.Write([]byte(followers))
+		_, err := w.Write([]byte(followers))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
 
 		ctx.Logger.WithError(err).Error("error getting user followers")
 
@@ -83,7 +63,11 @@ func (rt *_router) getUserFollowers(w http.ResponseWriter, r *http.Request, ps h
 
 		w.WriteHeader(http.StatusInternalServerError)
 
-		w.Write([]byte(followers))
+		_, err := w.Write([]byte(followers))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
 
 		ctx.Logger.WithError(err).Error("error unmarshaling followers JSON")
 
@@ -105,14 +89,22 @@ func (rt *_router) getUserFollowers(w http.ResponseWriter, r *http.Request, ps h
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 
-		w.Write([]byte(followers))
+		_, err := w.Write([]byte(followers))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
 
 		ctx.Logger.WithError(err).Error("error marshaling followers JSON")
 
 		return
 	}
 
-	w.Write(ret_data)
+	_, err = w.Write(ret_data)
+
+	if err != nil {
+		ctx.Logger.WithError(err).Error("error writing response")
+	}
 
 }
 
@@ -130,7 +122,11 @@ func (rt *_router) getUserFollowing(w http.ResponseWriter, r *http.Request, ps h
 
 		w.WriteHeader(http.StatusBadRequest)
 
-		w.Write([]byte(components.BadRequestError))
+		_, err := w.Write([]byte(components.BadRequestError))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
 
 		ctx.Logger.WithError(err).Error("error decoding JSON")
 
@@ -145,7 +141,11 @@ func (rt *_router) getUserFollowing(w http.ResponseWriter, r *http.Request, ps h
 
 		w.WriteHeader(http.StatusInternalServerError)
 
-		w.Write([]byte(following))
+		_, err := w.Write([]byte(following))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
 
 		ctx.Logger.WithError(err).Error("error getting user following")
 
@@ -162,7 +162,11 @@ func (rt *_router) getUserFollowing(w http.ResponseWriter, r *http.Request, ps h
 
 		w.WriteHeader(http.StatusInternalServerError)
 
-		w.Write([]byte(following))
+		_, err := w.Write([]byte(following))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
 
 		ctx.Logger.WithError(err).Error("error unmarshaling following JSON")
 
@@ -184,14 +188,22 @@ func (rt *_router) getUserFollowing(w http.ResponseWriter, r *http.Request, ps h
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 
-		w.Write([]byte(following))
+		_, err := w.Write([]byte(following))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
 
 		ctx.Logger.WithError(err).Error("error marshaling following JSON")
 
 		return
 	}
 
-	w.Write(ret_data)
+	_, err = w.Write(ret_data)
+
+	if err != nil {
+		ctx.Logger.WithError(err).Error("error writing response")
+	}
 
 }
 
@@ -207,14 +219,24 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("error validating user"))
+		_, err := w.Write([]byte("error validating user"))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
+
 		ctx.Logger.WithError(err).Error("error validating user")
 		return
 	}
 
 	if !is_valid {
 		w.WriteHeader(http.StatusUnauthorized)
-		w.Write([]byte("invalid token"))
+		_, err := w.Write([]byte("invalid token"))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
+
 		ctx.Logger.WithError(err).Error("invalid token")
 		return
 	}
@@ -227,7 +249,11 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 
 		w.WriteHeader(http.StatusInternalServerError)
 
-		w.Write([]byte(ret_data))
+		_, err := w.Write([]byte(ret_data))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
 
 		ctx.Logger.WithError(err).Error("error following user")
 
@@ -253,7 +279,11 @@ func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httpr
 
 		w.WriteHeader(http.StatusInternalServerError)
 
-		w.Write([]byte(ret_data))
+		_, err := w.Write([]byte(ret_data))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
 
 		ctx.Logger.WithError(err).Error("error unfollowing user")
 

@@ -14,12 +14,21 @@ func (rt *_router) getUserBans(w http.ResponseWriter, r *http.Request, ps httpro
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(ret_data))
+		_, err := w.Write([]byte(ret_data))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
+
 		ctx.Logger.WithError(err).Error("error getting user bans")
 		return
 	}
 
-	w.Write([]byte(ret_data))
+	_, err = w.Write([]byte(ret_data))
+
+	if err != nil {
+		ctx.Logger.WithError(err).Error("error writing response")
+	}
 
 }
 
@@ -49,7 +58,12 @@ func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		ctx.Logger.WithError(err).Error("error banning user")
-		w.Write([]byte(ret))
+		_, err := w.Write([]byte(ret))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
+
 		return
 	}
 
@@ -83,7 +97,12 @@ func (rt *_router) unbanUser(w http.ResponseWriter, r *http.Request, ps httprout
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		ctx.Logger.WithError(err).Error("error unbanning user")
-		w.Write([]byte(ret))
+		_, err := w.Write([]byte(ret))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
+
 		return
 	}
 

@@ -27,7 +27,12 @@ func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httproute
 
 	if uuid == "" {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(components.BadRequestError))
+		_, err := w.Write([]byte(components.BadRequestError))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
+
 		ctx.Logger.Error("error getting photo id")
 		return
 	}
@@ -38,7 +43,12 @@ func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httproute
 
 	if err != nil || !exists {
 		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte(fmt.Errorf(components.NotFoundErrorF, err).Error()))
+		_, err := w.Write([]byte(fmt.Errorf(components.NotFoundErrorF, err).Error()))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
+
 		ctx.Logger.WithError(err).Error("error checking photo existence")
 		return
 	}
@@ -49,7 +59,12 @@ func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httproute
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(fmt.Errorf(components.InternalServerErrorF, err).Error()))
+		_, err := w.Write([]byte(fmt.Errorf(components.InternalServerErrorF, err).Error()))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
+
 		ctx.Logger.WithError(err).Error("error opening photo")
 		return
 	}
@@ -62,7 +77,12 @@ func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httproute
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(fmt.Errorf(components.InternalServerErrorF, err).Error()))
+		_, err := w.Write([]byte(fmt.Errorf(components.InternalServerErrorF, err).Error()))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
+
 		ctx.Logger.WithError(err).Error("error decoding photo")
 		return
 	}
@@ -74,7 +94,12 @@ func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httproute
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(fmt.Errorf(components.InternalServerErrorF, err).Error()))
+		_, err := w.Write([]byte(fmt.Errorf(components.InternalServerErrorF, err).Error()))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
+
 		ctx.Logger.WithError(err).Error("error encoding photo")
 		return
 	}
@@ -82,6 +107,10 @@ func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httproute
 	bin := buf.Bytes()
 
 	// Send the photo to the client
-	w.Write([]byte(toBase64(bin)))
+	_, err = w.Write([]byte(toBase64(bin)))
+
+	if err != nil {
+		ctx.Logger.WithError(err).Error("error writing response")
+	}
 
 }

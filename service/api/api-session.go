@@ -18,7 +18,12 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(components.BadRequestError))
+		_, err := w.Write([]byte(components.BadRequestError))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
+
 		ctx.Logger.WithError(err).Error("error decoding JSON")
 		return
 	}
@@ -28,11 +33,20 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(ret_data))
+		_, err := w.Write([]byte(ret_data))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
+
 		ctx.Logger.WithError(err).Error("error getting user ID")
 		return
 	}
 
-	w.Write([]byte(ret_data))
+	_, err = w.Write([]byte(ret_data))
+
+	if err != nil {
+		ctx.Logger.WithError(err).Error("error writing response")
+	}
 
 }

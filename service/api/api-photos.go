@@ -24,7 +24,11 @@ func (rt *_router) GetPhotoLikes(w http.ResponseWriter, r *http.Request, ps http
 
 		w.WriteHeader(http.StatusBadRequest)
 
-		w.Write([]byte(components.BadRequestError))
+		_, err := w.Write([]byte(components.BadRequestError))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
 
 		ctx.Logger.WithError(err).Error("error decoding JSON")
 
@@ -36,12 +40,22 @@ func (rt *_router) GetPhotoLikes(w http.ResponseWriter, r *http.Request, ps http
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(ret_data))
+		_, err := w.Write([]byte(ret_data))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
+
 		ctx.Logger.WithError(err).Error("error getting photo likes")
+
 		return
 	}
 
-	w.Write([]byte(ret_data))
+	_, err = w.Write([]byte(ret_data))
+
+	if err != nil {
+		ctx.Logger.WithError(err).Error("error writing response")
+	}
 
 }
 
@@ -59,7 +73,11 @@ func (rt *_router) GetPhotoComments(w http.ResponseWriter, r *http.Request, ps h
 
 		w.WriteHeader(http.StatusBadRequest)
 
-		w.Write([]byte(components.BadRequestError))
+		_, err := w.Write([]byte(components.BadRequestError))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
 
 		ctx.Logger.WithError(err).Error("error decoding JSON")
 
@@ -71,12 +89,21 @@ func (rt *_router) GetPhotoComments(w http.ResponseWriter, r *http.Request, ps h
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(ret_data))
+		_, err := w.Write([]byte(ret_data))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
+
 		ctx.Logger.WithError(err).Error("error getting photo comments")
 		return
 	}
 
-	w.Write([]byte(ret_data))
+	_, err = w.Write([]byte(ret_data))
+
+	if err != nil {
+		ctx.Logger.WithError(err).Error("error writing response")
+	}
 
 }
 
@@ -110,7 +137,12 @@ func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprout
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		ctx.Logger.WithError(err).Error("error liking photo")
-		w.Write([]byte(ret))
+		_, err := w.Write([]byte(ret))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
+
 		return
 	}
 
@@ -148,7 +180,12 @@ func (rt *_router) unlikePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		ctx.Logger.WithError(err).Error("error unliking photo")
-		w.Write([]byte(ret))
+		_, err := w.Write([]byte(ret))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
+
 		return
 	}
 
@@ -172,12 +209,24 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+
+		_, err := w.Write([]byte(components.InternalServerError))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
+
 		ctx.Logger.WithError(err).Error("error validating user")
 		return
 	}
 
 	if !is_valid {
 		w.WriteHeader(http.StatusUnauthorized)
+		_, err := w.Write([]byte(components.UnauthorizedError))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
 		return
 	}
 
@@ -193,8 +242,11 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 
 		w.WriteHeader(http.StatusBadRequest)
 
-		w.Write([]byte(components.BadRequestError))
+		_, err := w.Write([]byte(components.BadRequestError))
 
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
 		ctx.Logger.WithError(err).Error("error decoding JSON")
 
 		return // exit the function
@@ -209,7 +261,10 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		ctx.Logger.WithError(err).Error("error commenting photo")
-		w.Write([]byte(ret))
+		_, err := w.Write([]byte(ret))
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
 		return
 	}
 
@@ -233,12 +288,26 @@ func (rt *_router) deleteComment(w http.ResponseWriter, r *http.Request, ps http
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+
+		_, err := w.Write([]byte(components.InternalServerError))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
+
 		ctx.Logger.WithError(err).Error("error validating user")
 		return
 	}
 
 	if !is_valid {
 		w.WriteHeader(http.StatusUnauthorized)
+
+		_, err := w.Write([]byte(components.UnauthorizedError))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
+
 		return
 	}
 
@@ -249,7 +318,10 @@ func (rt *_router) deleteComment(w http.ResponseWriter, r *http.Request, ps http
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		ctx.Logger.WithError(err).Error("error deleting comment")
-		w.Write([]byte(ret))
+		_, err := w.Write([]byte(ret))
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
 		return
 	}
 
@@ -269,12 +341,28 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+
+		_, err := w.Write([]byte(components.InternalServerError))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
+
 		ctx.Logger.WithError(err).Error("error validating user")
 		return
 	}
 
 	if !is_valid {
 		w.WriteHeader(http.StatusUnauthorized)
+
+		_, err := w.Write([]byte(components.UnauthorizedError))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
+
+		ctx.Logger.WithError(err).Error("error validating user")
+
 		return
 	}
 
@@ -290,7 +378,11 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 
 		w.WriteHeader(http.StatusBadRequest)
 
-		w.Write([]byte(components.BadRequestError))
+		_, err := w.Write([]byte(components.BadRequestError))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
 
 		ctx.Logger.WithError(err).Error("error decoding JSON")
 
@@ -304,7 +396,12 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		ctx.Logger.WithError(err).Error("error uploading photo")
-		w.Write([]byte(ret))
+		_, err := w.Write([]byte(ret))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
+
 		return
 	}
 
@@ -325,11 +422,25 @@ func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		ctx.Logger.WithError(err).Error("error validating user")
+
+		_, err := w.Write([]byte(components.InternalServerError))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
+
 		return
 	}
 
 	if !is_valid {
 		w.WriteHeader(http.StatusUnauthorized)
+
+		_, err := w.Write([]byte(components.UnauthorizedError))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
+
 		return
 	}
 
@@ -340,7 +451,12 @@ func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		ctx.Logger.WithError(err).Error("error deleting photo")
-		w.Write([]byte(ret))
+		_, err := w.Write([]byte(ret))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
+
 		return
 	}
 
@@ -360,15 +476,25 @@ func (rt *_router) getStream(w http.ResponseWriter, r *http.Request, ps httprout
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(components.InternalServerError))
+		_, err := w.Write([]byte(components.InternalServerError))
 		ctx.Logger.WithError(err).Error("error validating user")
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
+
 		return
 	}
 
 	if !is_valid {
 		w.WriteHeader(http.StatusUnauthorized)
-		w.Write([]byte(components.UnauthorizedError))
+		_, err := w.Write([]byte(components.UnauthorizedError))
 		ctx.Logger.Info("unauthorized getstream request received")
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
+
 		return
 	}
 
@@ -385,8 +511,13 @@ func (rt *_router) getStream(w http.ResponseWriter, r *http.Request, ps httprout
 	if err != nil {
 
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(components.BadRequestError))
+		_, err := w.Write([]byte(components.BadRequestError))
 		ctx.Logger.WithError(err).Error("bad getstream request query")
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
+
 		return
 
 	}
@@ -402,8 +533,13 @@ func (rt *_router) getStream(w http.ResponseWriter, r *http.Request, ps httprout
 	if err != nil {
 
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(components.BadRequestError))
+		_, err := w.Write([]byte(components.BadRequestError))
 		ctx.Logger.WithError(err).Error("bad getstream request query")
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
+
 		return
 
 	}
@@ -411,8 +547,13 @@ func (rt *_router) getStream(w http.ResponseWriter, r *http.Request, ps httprout
 	if lower_bound < 0 || offset < 1 || offset > 255 {
 
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(components.BadRequestError))
+		_, err := w.Write([]byte(components.BadRequestError))
 		ctx.Logger.WithError(err).Error("bad getstream request")
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
+
 		return
 
 	}
@@ -422,10 +563,19 @@ func (rt *_router) getStream(w http.ResponseWriter, r *http.Request, ps httprout
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		ctx.Logger.WithError(err).Error("error getting stream")
-		w.Write([]byte(ret_json_string))
+		_, err := w.Write([]byte(ret_json_string))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
+
 		return
 	}
 
-	w.Write([]byte(ret_json_string))
+	_, err = w.Write([]byte(ret_json_string))
+
+	if err != nil {
+		ctx.Logger.WithError(err).Error("error writing response")
+	}
 
 }
