@@ -297,6 +297,10 @@ func (db *appdbimpl) SearchUserByName(name string) (matches string, err error) {
 
 	for res.Next() {
 
+		if res.Err() != nil {
+			return components.InternalServerError, fmt.Errorf("error getting next user: %w", res.Err())
+		}
+
 		user := components.User{}
 
 		err = res.Scan(&user.Uname)
@@ -388,6 +392,11 @@ func (db *appdbimpl) GetUserPhotos(userID string) (photo string, err error) {
 	}
 
 	for res.Next() {
+
+		if res.Err() != nil {
+			return components.InternalServerError, fmt.Errorf("error getting next user: %w", res.Err())
+		}
+
 		var photoID components.SHA256hash
 
 		err = res.Scan(&photoID.Hash)
@@ -445,6 +454,11 @@ func (db *appdbimpl) GetUserProfile(userID string) (profile string, err error) {
 	}
 
 	for res.Next() {
+
+		if res.Err() != nil {
+			return components.InternalServerError, fmt.Errorf("error getting next user: %w", res.Err())
+		}
+
 		var photoID components.SHA256hash
 
 		err = res.Scan(&photoID.Hash)
@@ -485,6 +499,11 @@ func (db *appdbimpl) GetUserFollowers(userID string) (followers string, err erro
 	var followerNames []string
 
 	for res.Next() {
+
+		if res.Err() != nil {
+			return components.InternalServerError, fmt.Errorf("error getting next user: %w", res.Err())
+		}
+
 		var followerID string
 
 		err = res.Scan(&followerID)
@@ -526,6 +545,11 @@ func (db *appdbimpl) GetUserFollowing(userID string) (following string, err erro
 	var followingNames []string
 
 	for res.Next() {
+
+		if res.Err() != nil {
+			return components.InternalServerError, fmt.Errorf("error getting next user: %w", res.Err())
+		}
+
 		var followingID string
 
 		err = res.Scan(&followingID)
@@ -567,6 +591,11 @@ func (db *appdbimpl) GetPhotoLikes(photoID string) (likes string, err error) {
 	var likerNames []string
 
 	for res.Next() {
+
+		if res.Err() != nil {
+			return components.InternalServerError, fmt.Errorf("error getting next user: %w", res.Err())
+		}
+
 		var likerID string
 
 		err = res.Scan(&likerID)
@@ -609,6 +638,10 @@ func (db *appdbimpl) GetPhotoComments(photoID string) (comments string, err erro
 
 	for res.Next() {
 
+		if res.Err() != nil {
+			return components.InternalServerError, fmt.Errorf("error getting next user: %w", res.Err())
+		}
+
 		var comment components.Comment
 
 		err = res.Scan(&comment.Comment_ID, &comment.Username, &comment.Body, &comment.CreationTime, &comment.Parent)
@@ -642,6 +675,10 @@ func (db *appdbimpl) GetUserBans(username string) (bans string, err error) {
 	var banList []components.User
 
 	for res.Next() {
+
+		if res.Err() != nil {
+			return components.InternalServerError, fmt.Errorf("error getting next user: %w", res.Err())
+		}
 
 		var ban components.User
 
