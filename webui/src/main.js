@@ -11,12 +11,23 @@ import './assets/dashboard.css'
 import './assets/main.css'
 
 const app = createApp(App)
+
+
+var state = {
+    headers: {
+        Authorization: null
+    },
+    username: null
+}
+
 app.config.globalProperties.$axios = axios;
+app.config.globalProperties.$user_state = state
 
 app.component("ErrorMsg", ErrorMsg);
 app.component("LoadingSpinner", LoadingSpinner);
 app.component("Comment", Comment);
 app.component("LikeCounter", LikeCounter);
+
 
 app.use(router)
 app.mount('#app')

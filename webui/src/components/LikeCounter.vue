@@ -6,35 +6,26 @@ export default {
     data: function () {
         return {
             is_liked: this.liked,
-            count: this.likes_count
+            count: parseInt(this.likes_count)
         }
     },
 
     methods: {
         async like() {
-            this.is_liked = !this.is_liked
+
             if (this.is_liked) {
                 this.count += 1
 
             } else {
                 this.count -= 1
             }
+
+
+            this.is_liked = !this.is_liked
         },
 
         async refresh() {
-            this.loading = true;
-            this.errormsg = null;
-            /*
-            try {
-                let response = await this.$axios.get("/");
-                this.some_data = response.data;
-            } catch (e) {
-                this.errormsg = e.toString();
-            }
-            */
-            this.loading = false;
 
-            console.log("refresh")
         }
 
     },
@@ -53,8 +44,8 @@ export default {
         <a type="button" class="btn btn-sm btn-outline-secondary likeButton" @click="like"
             :class="{'btn-outline-success': is_liked, 'btn-outline-danger': !is_liked}">
             <Transition name="slide-up" mode="out-in">
-                <span v-if="is_liked" class="bi bi-heart-fill"> Like</span>
-                <span v-else class="bi bi-heart"> Unlike</span>
+                <span v-if="is_liked" class="bi bi-heart"> Like</span>
+                <span v-else class="bi bi-heart-fill"> Unlike</span>
             </Transition>
         </a>
         <span class="badge bg-secondary ms-2 me-2">
