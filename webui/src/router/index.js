@@ -6,6 +6,8 @@ const router = createRouter({
 	history: createWebHashHistory(import.meta.env.BASE_URL),
 	routes: [
 		{path: '/', component: LoginView},
+		{path: '/login', component: LoginView},
+		{path: '/#/', component: LoginView},
 		{path: '/stream/:username', component: StreamView},
 	]
 })

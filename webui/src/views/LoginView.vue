@@ -11,6 +11,7 @@ export default {
         async refresh() {
 
             this.$user_state.current_view = this.$views.LOGIN;
+            this.$user_state.username = null;
 
         },
         async login() {
