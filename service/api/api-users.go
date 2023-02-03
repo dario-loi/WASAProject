@@ -12,32 +12,31 @@ import (
 
 func (rt *_router) searchUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	id := r.Header.Get("searcher_id")
+	id := r.Header.Get("Authorization")
+	username := r.Header.Get("user_name")
 
-	if id == "" {
-		w.WriteHeader(http.StatusBadRequest)
-		_, err := w.Write([]byte(components.BadRequestError))
+	// check if the user is logged in
+
+	is_valid, err := rt.db.Validate(username, id)
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+
+		_, err := w.Write([]byte(components.InternalServerError))
 
 		if err != nil {
 			ctx.Logger.WithError(err).Error("error writing response")
 		}
-		ctx.Logger.Error("Empty request header")
+
+		ctx.Logger.WithError(err).Error("error validating user")
 		return
 	}
 
-	// Check if the user exists
-
-	exists, err := rt.db.CheckUserExists(id)
-
-	if err != nil || !exists {
+	if !is_valid {
 		w.WriteHeader(http.StatusUnauthorized)
-		_, err := w.Write([]byte(fmt.Errorf(components.UnauthorizedErrorF, err).Error()))
-
-		if err != nil {
-			ctx.Logger.WithError(err).Error("error writing response")
-		}
 		return
 	}
+
 	// get the token from the request query
 
 	json_out := r.URL.Query().Get("search_term")

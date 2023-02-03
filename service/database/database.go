@@ -1005,6 +1005,10 @@ func (db *appdbimpl) GetStream(user_name string, from, offset int) (stream strin
 
 		// for each retrieved post, get the comments and likes
 
+		if rows.Err() != nil {
+			return "", fmt.Errorf("error getting post in the stream: %w", err)
+		}
+
 		var post components.Post
 
 		err := rows.Scan(&post.Photo_ID, &post.Author_ID, &post.Description, &post.CreationTime)

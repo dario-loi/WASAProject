@@ -35,7 +35,7 @@ func (rt *_router) getUserBans(w http.ResponseWriter, r *http.Request, ps httpro
 func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	// get the user ID
-	token := r.Header.Get("user_id")
+	token := r.Header.Get("Authorization")
 	banisher := ps.ByName("user_name")
 
 	is_valid, err := rt.db.Validate(banisher, token)
@@ -74,7 +74,7 @@ func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter
 func (rt *_router) unbanUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	// get the user ID
-	token := r.Header.Get("user_id")
+	token := r.Header.Get("Authorization")
 	banisher := ps.ByName("user_name")
 
 	is_valid, err := rt.db.Validate(banisher, token)

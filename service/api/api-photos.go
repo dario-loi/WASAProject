@@ -158,7 +158,7 @@ func (rt *_router) unlikePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 
 	// get the user ID
 
-	token := r.Header.Get("user_id")
+	token := r.Header.Get("Authorization")
 
 	userName := ps.ByName("user_name")
 
@@ -201,7 +201,7 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 
 	// get the user ID
 
-	token := r.Header.Get("user_id")
+	token := r.Header.Get("Authorization")
 
 	userName := ps.ByName("user_name")
 
@@ -280,7 +280,7 @@ func (rt *_router) deleteComment(w http.ResponseWriter, r *http.Request, ps http
 
 	// get the user ID
 
-	token := r.Header.Get("user_id")
+	token := r.Header.Get("Authorization")
 
 	userName := ps.ByName("user_name")
 
@@ -333,7 +333,7 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 
 	// get the user ID
 
-	token := r.Header.Get("user_id")
+	token := r.Header.Get("Authorization")
 
 	userName := ps.ByName("user_name")
 
@@ -413,7 +413,7 @@ func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 
 	// get the user ID
 
-	token := r.Header.Get("user_id")
+	token := r.Header.Get("Authorization")
 
 	userName := ps.ByName("user_name")
 
@@ -468,7 +468,7 @@ func (rt *_router) getStream(w http.ResponseWriter, r *http.Request, ps httprout
 
 	// get the user ID
 
-	token := r.Header.Get("user_id")
+	token := r.Header.Get("Authorization")
 
 	userName := ps.ByName("user_name")
 

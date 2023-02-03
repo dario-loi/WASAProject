@@ -14,15 +14,11 @@ func (rt *_router) getUserFollowers(w http.ResponseWriter, r *http.Request, ps h
 	// Retrieve username from request body
 
 	decoder := json.NewDecoder(r.Body)
-
 	var uname components.User
-
 	err := decoder.Decode(&uname)
-
 	if err != nil {
 
 		w.WriteHeader(http.StatusBadRequest)
-
 		_, err := w.Write([]byte(components.BadRequestError))
 
 		if err != nil {
@@ -30,18 +26,14 @@ func (rt *_router) getUserFollowers(w http.ResponseWriter, r *http.Request, ps h
 		}
 
 		ctx.Logger.WithError(err).Error("error decoding JSON")
-
-		return // exit the function
+		return
 	}
 
 	// Get the list of followers
-
 	followers, err := rt.db.GetUserFollowers(uname.Uname)
-
 	if err != nil {
 
 		w.WriteHeader(http.StatusInternalServerError)
-
 		_, err := w.Write([]byte(followers))
 
 		if err != nil {
@@ -49,20 +41,16 @@ func (rt *_router) getUserFollowers(w http.ResponseWriter, r *http.Request, ps h
 		}
 
 		ctx.Logger.WithError(err).Error("error getting user followers")
-
 		return
 	}
 
 	// Unmarshal the followers JSON into a slice of names
 
 	var followers_names []string
-
 	err = json.Unmarshal([]byte(followers), &followers_names)
-
 	if err != nil {
 
 		w.WriteHeader(http.StatusInternalServerError)
-
 		_, err := w.Write([]byte(followers))
 
 		if err != nil {
@@ -70,7 +58,6 @@ func (rt *_router) getUserFollowers(w http.ResponseWriter, r *http.Request, ps h
 		}
 
 		ctx.Logger.WithError(err).Error("error unmarshaling followers JSON")
-
 		return
 	}
 
@@ -85,10 +72,8 @@ func (rt *_router) getUserFollowers(w http.ResponseWriter, r *http.Request, ps h
 	// Marshal the struct into JSON
 
 	ret_data, err := json.Marshal(return_struct)
-
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-
 		_, err := w.Write([]byte(followers))
 
 		if err != nil {
@@ -96,7 +81,6 @@ func (rt *_router) getUserFollowers(w http.ResponseWriter, r *http.Request, ps h
 		}
 
 		ctx.Logger.WithError(err).Error("error marshaling followers JSON")
-
 		return
 	}
 
@@ -113,9 +97,7 @@ func (rt *_router) getUserFollowing(w http.ResponseWriter, r *http.Request, ps h
 	// Retrieve username from request body
 
 	decoder := json.NewDecoder(r.Body)
-
 	var uname components.User
-
 	err := decoder.Decode(&uname)
 
 	if err != nil {
@@ -130,17 +112,14 @@ func (rt *_router) getUserFollowing(w http.ResponseWriter, r *http.Request, ps h
 
 		ctx.Logger.WithError(err).Error("error decoding JSON")
 
-		return // exit the function
+		return
 	}
-
-	// Get the list of followers
 
 	following, err := rt.db.GetUserFollowing(uname.Uname)
 
 	if err != nil {
 
 		w.WriteHeader(http.StatusInternalServerError)
-
 		_, err := w.Write([]byte(following))
 
 		if err != nil {
@@ -148,16 +127,13 @@ func (rt *_router) getUserFollowing(w http.ResponseWriter, r *http.Request, ps h
 		}
 
 		ctx.Logger.WithError(err).Error("error getting user following")
-
 		return
 	}
 
 	// Unmarshal the followers JSON into a slice of names
 
 	var following_names []string
-
 	err = json.Unmarshal([]byte(following), &following_names)
-
 	if err != nil {
 
 		w.WriteHeader(http.StatusInternalServerError)
@@ -184,10 +160,8 @@ func (rt *_router) getUserFollowing(w http.ResponseWriter, r *http.Request, ps h
 	// Marshal the struct into JSON
 
 	ret_data, err := json.Marshal(return_struct)
-
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-
 		_, err := w.Write([]byte(following))
 
 		if err != nil {
@@ -195,12 +169,10 @@ func (rt *_router) getUserFollowing(w http.ResponseWriter, r *http.Request, ps h
 		}
 
 		ctx.Logger.WithError(err).Error("error marshaling following JSON")
-
 		return
 	}
 
 	_, err = w.Write(ret_data)
-
 	if err != nil {
 		ctx.Logger.WithError(err).Error("error writing response")
 	}
@@ -213,7 +185,7 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 
 	username := r.Header.Get("user_name")
 	followed_name := r.Header.Get("followed_name")
-	token := r.Header.Get("identifier")
+	token := r.Header.Get("Authorization")
 
 	is_valid, err := rt.db.Validate(username, token)
 
@@ -270,6 +242,37 @@ func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httpr
 
 	username := r.Header.Get("user_name")
 	followed_name := r.Header.Get("followed_name")
+	token := r.Header.Get("Authorization")
+
+	is_valid, err := rt.db.Validate(username, token)
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		_, err := w.Write([]byte("error validating user"))
+
+		if err != nil {
+			ctx.Logger.WithError(err).Error("error writing response")
+		}
+
+		ctx.Logger.WithError(err).Error("error validating user")
+		return
+	}
+
+	if !is_valid {
+
+		w.WriteHeader(http.StatusUnauthorized)
+		_, err := w.Write([]byte("invalid token"))
+
+		if err != nil {
+
+			ctx.Logger.WithError(err).Error("error writing response")
+
+		}
+
+		ctx.Logger.WithError(err).Error("invalid token")
+		return
+
+	}
 
 	// Insert the follow relationship into the database
 

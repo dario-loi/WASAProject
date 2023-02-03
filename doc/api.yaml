@@ -243,12 +243,18 @@ tags:
 paths:
   /users:
     parameters:
-      - name: searcher_id
+      - name: Authorization
         in: header
         description: The user's id.
         required: true
         schema:
           $ref: "#/components/schemas/UserID"
+      - name: user_name
+        in: header
+        description: The user's name.
+        required: true
+        schema:
+          $ref: "#/components/schemas/Username"
       - name: search_term
         in: query
         description: The search term.
@@ -344,7 +350,7 @@ paths:
         Returns the new identifier in the response body so that the user can continue 
         using the application seamlessly.
       parameters:
-        - name: identifier
+        - name: Authorization
           in: header
           description: |-
             The identifier of the user that is requesting the update, used for 
@@ -459,7 +465,7 @@ paths:
       tags:
         - "photos"
       parameters:
-        - name: identifier
+        - name: Authorization
           in: header
           description: The user's identifier, for authentication purposes.
           required: true
@@ -494,7 +500,7 @@ paths:
       description: |-
         Post a photo to the user's profile
       parameters:
-        - name: identifier
+        - name: Authorization
           in: header
           description: The user's identifier, for authentication purposes.
           required: true
@@ -627,7 +633,7 @@ paths:
         required: true
         schema:
           $ref: "#/components/schemas/UserID"
-      - name: identifier
+      - name: Authorization
         in: header
         description: The user's identifier
         required: true
@@ -768,7 +774,7 @@ paths:
         required: true
         schema:
           $ref: "#/components/schemas/CommentID"
-      - name: identifier
+      - name: Authorization
         in: header
         description: The commenter's Identifier (for authentication).
         required: true
@@ -913,7 +919,7 @@ paths:
         required: true
         schema:
           $ref: "#/components/schemas/Username"
-      - name: identifier
+      - name: Authorization
         in: header
         description: The user's identifier, used for authentication purposes.
         required: true
@@ -1019,7 +1025,7 @@ paths:
         in: path
         schema:
           $ref: "#/components/schemas/Username"
-      - name: requester_ID
+      - name: Authorization
         description: The identifier of the request's issuer.
         required: true
         in: header
@@ -1087,7 +1093,7 @@ paths:
     parameters:
       - name: user_name
         in: path
-        description: The user's id
+        description: The user's name
         required: true
         schema:
           $ref: "#/components/schemas/Username"
@@ -1144,7 +1150,7 @@ paths:
         required: true
         schema:
           $ref: "#/components/schemas/Username"
-      - name: user_id
+      - name: Authorization
         in: header
         description: The user's identifier, used for authentication purposes.
         required: true
