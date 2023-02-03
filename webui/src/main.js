@@ -12,16 +12,24 @@ import './assets/main.css'
 
 const app = createApp(App)
 
+const views = {
+    LOGIN: "login",
+    STREAM: "register",
+    PROFILE: "profile"
+}
 
 var state = {
     headers: {
         Authorization: null
     },
-    username: null
+    username: null,
+    current_view: null
 }
 
+
+app.config.globalProperties.$views = views;
 app.config.globalProperties.$axios = axios;
-app.config.globalProperties.$user_state = state
+app.config.globalProperties.$user_state = reactive(state);
 
 app.component("ErrorMsg", ErrorMsg);
 app.component("LoadingSpinner", LoadingSpinner);

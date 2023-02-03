@@ -11,11 +11,11 @@ export default {
 	},
 
 	methods: {
-		async logout() {
+		async Logout() {
 
 			this.$user_state.username = null;
 			this.$user_state.headers.Authorization = null;
-			this.$router.push("/login");
+			this.$router.push("/");
 
 		},
 
@@ -24,8 +24,6 @@ export default {
 			let search = document.querySelector("input").value;
 
 			search = search.trim();
-
-			console.log("searching for: " + search);
 
 			if (search.length > 0) {
 				// query /users/ for results
@@ -41,22 +39,43 @@ export default {
 					"searcher_id": searcher_id
 				}
 
-				let response = await this.$axios.get("/users/", {
+				let response = await this.$axios.get("/users", {
 					params: {
-						"search-term": search,
+						"search_term": search,
 					},
 					headers: header
 				});
 
 				if (response.status == 200) {
 					this.search_results = response.data;
-
-					console.table(this.search_results);
 				} else {
-					console.log(response);
+					this.search_results = null;
 				}
 			}
+			else {
+				this.search_results = null;
+			}
+		},
+
+		async ToProfile() {
+
+			if (this.$user_state.username == null) {
+				return
+			}
+
+			this.$router.push("/profile/" + this.$user_state.username);
+		},
+
+		async refresh() {
+			if (this.$user_state.username == null) {
+				this.$router.push("/");
+			}
 		}
+
+	},
+
+	mounted() {
+		this.refresh()
 	}
 }
 
@@ -71,32 +90,49 @@ export default {
 				<span class="navbar-toggler-icon"></span>
 			</button>
 
-			<div class="collapse navbar-collapse" id="Links">
-				<ul class="navbar-nav mr-auto col-9">
+			<div class="collapse navbar-collapse row" id="Links">
+				<ul class="navbar-nav mr-auto col-md-9 col-sm-6">
 					<li class="nav-item active">
-						<RouterLink class="nav-link" to="/">Stream</RouterLink>
+						<a class="nav-link" :class="{
+							disabled: $user_state.username == null, 'd-none': $user_state.username == null,
+							active: $current_view == $views.STREAM
+						}" to="/">Stream
+						</a>
 					</li>
 					<li class="nav-item">
-						<RouterLink class="nav-link" to="/about">Profile</RouterLink>
+						<a class="nav-link" :class="{
+							disabled: $user_state.username == null, 'd-none': $user_state.username == null,
+							active: $current_view == $views.PROFILE
+						}" href="#" @click="ToProfile()">Profile</a>
 					</li>
 					<li class="nav-item">
-						<a class="nav-link" href="#" @click="Logout()">Logout</a>
+						<a class="nav-link"
+							:class="{ disabled: $user_state.username == null, 'd-none': $user_state.username == null }"
+							href="#" @click="Logout()">Logout</a>
 					</li>
 				</ul>
 
-				<div class="col-3">
-					<form class="nav form-inline my-2 my-md-0">
-						<input class="form-control" type="text" placeholder="Search" aria-label="Search"
+				<div class="col-md-3 col-sm-6">
+					<form class="nav form-inline my-2 my-md-0" :class="{
+						disabled: $user_state.username == null, 'd-none': $user_state.username == null
+					}">
+						<input class="form-control" ref="SearchBox" type="text" placeholder="Search" aria-label="Search"
 							@input="PerformSearch()">
 						<!-- Results -->
-						<ul class="list-group">
-							<li class="list-group-item" v-for="user in search_results" :key="user.id">
-								<RouterLink :to="'/users/' + user.id">
-									{{ user.username }}
-								</RouterLink>
-							</li>
+						<datalist class="list-group w-75 dropdown mt-5 position-absolute" :style="{
+							'left': $refs.SearchBox.offsetLeft + 'px',
+							'width': $refs.SearchBox.offsetWidth + 'px',
+							'z-index': 1000
+						}">
 
-						</ul>
+							<option class=" list-group-item w-75" v-for="user in search_results"
+								:key="user['username-string']">
+								<RouterLink :to="'/users/' + user['username-string']">
+									{{ user['username-string'] }}
+								</RouterLink>
+							</option>
+
+						</datalist>
 					</form>
 				</div>
 			</div>
@@ -107,11 +143,11 @@ export default {
 		<main class="h-100">
 			<div class="container-fluid h-100">
 				<div class="row h-100 p-4">
-					<div class="col-3"></div>
-					<div class="col-6 shadow-lg bg-light opacity-75 rounded">
+					<div class="col-md-3 col-sm-1"></div>
+					<div class="col-md-6 col-sm-10 shadow-lg bg-light opacity-75 rounded">
 						<RouterView></RouterView>
 					</div>
-					<div class="col-3"></div>
+					<div class="col-md-3 col-sm-1"></div>
 				</div>
 			</div>
 		</main>

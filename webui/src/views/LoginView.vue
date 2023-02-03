@@ -10,6 +10,8 @@ export default {
     methods: {
         async refresh() {
 
+            this.$user_state.current_view = this.$views.LOGIN;
+
         },
         async login() {
 
