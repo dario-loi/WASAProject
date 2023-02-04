@@ -24,6 +24,7 @@ var state = {
     },
     username: null,
     current_view: null
+
 }
 
 

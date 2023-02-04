@@ -8,7 +8,7 @@ export default {
         }
     },
     methods: {
-        async refresh() {
+        async initialize() {
 
             this.$user_state.current_view = this.$views.LOGIN;
             this.$user_state.username = null;
@@ -32,7 +32,7 @@ export default {
                 this.error = false;
                 this.$user_state.username = username
                 this.$user_state.headers.Authorization = response.data["token"]["hash"]
-                this.$router.push("/stream/" + username + "/");
+                this.$router.push("/stream/" + username);
             } else {
                 console.table(response);
                 this.error = true;
@@ -40,7 +40,7 @@ export default {
         }
     },
     mounted() {
-        this.refresh()
+        this.initialize()
     }
 }
 </script>

@@ -334,9 +334,7 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	// get the user ID
 
 	token := r.Header.Get("Authorization")
-
 	userName := ps.ByName("user_name")
-
 	is_valid, err := rt.db.Validate(userName, token)
 
 	if err != nil {
@@ -369,9 +367,7 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	// Retrieve photo from request body
 
 	decoder := json.NewDecoder(r.Body)
-
 	var photo components.Photo
-
 	err = decoder.Decode(&photo)
 
 	if err != nil {

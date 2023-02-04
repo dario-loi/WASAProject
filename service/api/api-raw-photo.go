@@ -5,7 +5,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"image"
-	"image/jpeg"
+	"image/png"
 	_ "image/png"
 	"net/http"
 	"os"
@@ -20,6 +20,8 @@ func toBase64(b []byte) string {
 }
 
 func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+
+	const well_known = "default"
 
 	// Get photo id from path
 
@@ -38,19 +40,20 @@ func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httproute
 	}
 
 	// Check if the picture exists
+	if uuid != well_known {
+		exists, err := rt.db.CheckPhotoExists(uuid)
 
-	exists, err := rt.db.CheckPhotoExists(uuid)
+		if err != nil || !exists {
+			w.WriteHeader(http.StatusNotFound)
+			_, err := w.Write([]byte(fmt.Errorf(components.NotFoundErrorF, err).Error()))
 
-	if err != nil || !exists {
-		w.WriteHeader(http.StatusNotFound)
-		_, err := w.Write([]byte(fmt.Errorf(components.NotFoundErrorF, err).Error()))
+			if err != nil {
+				ctx.Logger.WithError(err).Error("error writing response")
+			}
 
-		if err != nil {
-			ctx.Logger.WithError(err).Error("error writing response")
+			ctx.Logger.WithError(err).Error(fmt.Sprintf("photo %s not found, error: %s", uuid, err))
+			return
 		}
-
-		ctx.Logger.WithError(err).Error("error checking photo existence")
-		return
 	}
 
 	// Get the photo from the filesystem
@@ -58,6 +61,8 @@ func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httproute
 	img_file, err := os.Open("photos/" + uuid + ".png")
 
 	if err != nil {
+		fmt.Println(err)
+
 		w.WriteHeader(http.StatusInternalServerError)
 		_, err := w.Write([]byte(fmt.Errorf(components.InternalServerErrorF, err).Error()))
 
@@ -87,10 +92,10 @@ func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httproute
 		return
 	}
 
-	// Encode the photo as JPEG
+	// Encode the photo as PNG
 
 	buf := new(bytes.Buffer)
-	err = jpeg.Encode(buf, img, nil)
+	err = png.Encode(buf, img)
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -105,6 +110,8 @@ func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httproute
 	}
 
 	bin := buf.Bytes()
+
+	w.Write([]byte("data:image/png;base64,"))
 
 	// Send the photo to the client
 	_, err = w.Write([]byte(toBase64(bin)))

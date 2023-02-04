@@ -15,6 +15,7 @@ export default {
 
 			this.$user_state.username = null;
 			this.$user_state.headers.Authorization = null;
+			console.log("Logging out")
 			this.$router.push("/");
 
 		},
@@ -26,7 +27,7 @@ export default {
 			search = search.trim();
 
 			if (search.length > 0) {
-				// query /users/ for results
+				// query ./users for results
 
 				const searcher_id = this.$user_state.headers.Authorization;
 
@@ -66,8 +67,18 @@ export default {
 			this.$router.push("/profile/" + this.$user_state.username);
 		},
 
+		async ToStream() {
+
+			if (this.$user_state.username == null) {
+				return
+			}
+
+			this.$router.push("/stream/" + this.$user_state.username);
+		},
+
 		async refresh() {
 			if (this.$user_state.username == null) {
+				console.log("Empty username, redirecting to login")
 				this.$router.push("/");
 			}
 		}
@@ -98,28 +109,28 @@ export default {
 				<ul class="navbar-nav mr-auto col-md-4 col-sm-6 p-5 pt-1 pb-0" style="font-size: large;">
 					<li class="nav-item active">
 						<div class="flex-row align-content-center">
-							<a class=" nav-link" :class="{
+							<a class="nav-link" role="button" :class="{
 								disabled: $user_state.username == null, 'd-none': $user_state.username == null,
-								active: $current_view == $views.STREAM
-							}" to="/"><i class="bi m-1 mt-0 mb-0 bi-film text-white" style="vertical-align: middle"></i>Stream
+								active: $user_state.current_view == $views.STREAM
+							}" @click="ToStream()"><i class="bi m-1 mt-0 mb-0 bi-film text-white" style="vertical-align: middle"></i>Stream
 							</a>
 						</div>
 
 					</li>
 					<li class="nav-item">
 
-						<a class="nav-link" :class="{
+						<a class="nav-link" role="button" :class="{
 							disabled: $user_state.username == null, 'd-none': $user_state.username == null,
-							active: $current_view == $views.PROFILE
-						}" href="#" @click="ToProfile()"><i class="bi m-1 mt-0 mb-0 bi-person-circle text-white m-1 mb-1 mt-1"
+							active: $user_state.current_view == $views.PROFILE
+						}" @click="ToProfile()"><i class="bi m-1 mt-0 mb-0 bi-person-circle text-white m-1 mb-1 mt-1"
 								style="vertical-align: middle;">
 							</i>Profile</a>
 					</li>
 					<li class="nav-item">
 
-						<a class="nav-link"
+						<a class="nav-link" role="button"
 							:class="{ disabled: $user_state.username == null, 'd-none': $user_state.username == null }"
-							href="#" @click="Logout()"><i class="bi m-1 mt-0 mb-0 bi-door-open text-white m-1 mb-1 mt-1"
+							@click="Logout()"><i class="bi m-1 mt-0 mb-0 bi-door-open text-white m-1 mb-1 mt-1"
 								style="vertical-align: middle;">
 							</i>Logout</a>
 					</li>
@@ -168,7 +179,7 @@ export default {
 			<div class="container-fluid h-100">
 				<div class="row h-100 p-4">
 					<div class="col-md-3 col-sm-1"></div>
-					<div class="col-md-6 col-sm-10 shadow-lg bg-light opacity-75 rounded">
+					<div class="col-md-6 col-sm-10 mt-2 shadow-lg bg-light opacity-75 rounded">
 						<RouterView></RouterView>
 					</div>
 					<div class="col-md-3 col-sm-1"></div>

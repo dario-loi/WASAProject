@@ -39,7 +39,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"image/jpeg"
+	"image/png"
 	"os"
 	"time"
 
@@ -879,8 +879,6 @@ func (db *appdbimpl) UploadPhoto(username string, photo components.Photo, photo_
 
 	var data string = photo.Data
 
-	// Encode data to base64
-
 	encoded_data, err := base64.StdEncoding.DecodeString(data)
 
 	if err != nil {
@@ -901,18 +899,18 @@ func (db *appdbimpl) UploadPhoto(username string, photo components.Photo, photo_
 
 	// Insert photo
 
-	_, err = db.c.Exec(`INSERT INTO posts (post_ID, user_code, description, creation_date) VALUES (?, ?, ?, ?)`, photo_ID, userID, photo.Desc, creation_time)
+	_, err = db.c.Exec(`INSERT INTO posts (post_ID, poster_ID, description, creation_date) VALUES (?, ?, ?, ?)`, photo_ID, userID, photo.Desc, creation_time)
 
 	if err != nil {
 		return components.InternalServerError, fmt.Errorf("error inserting photo: %w", err)
 	}
 
-	JPEG_reader := bytes.NewReader(encoded_data)
+	PNG_reader := bytes.NewReader(encoded_data)
 
-	img, err := jpeg.Decode(JPEG_reader)
+	img, err := png.Decode(PNG_reader)
 
 	if err != nil {
-		return components.InternalServerError, fmt.Errorf("error decoding JPEG: %w", err)
+		return components.InternalServerError, fmt.Errorf("error decoding PNG: %w", err)
 	}
 
 	_, err = os.Stat("./photos")
@@ -924,7 +922,7 @@ func (db *appdbimpl) UploadPhoto(username string, photo components.Photo, photo_
 		}
 	}
 
-	f, err := os.OpenFile("./photos/"+photo_ID+".jpg", os.O_WRONLY|os.O_CREATE, 0777)
+	f, err := os.OpenFile("./photos/"+photo_ID+".png", os.O_WRONLY|os.O_CREATE, 0777)
 
 	if err != nil {
 		return components.InternalServerError, fmt.Errorf("error creating file: %w", err)
@@ -932,10 +930,10 @@ func (db *appdbimpl) UploadPhoto(username string, photo components.Photo, photo_
 
 	defer f.Close()
 
-	err = jpeg.Encode(f, img, nil)
+	err = png.Encode(f, img)
 
 	if err != nil {
-		return components.InternalServerError, fmt.Errorf("error encoding JPEG: %w", err)
+		return components.InternalServerError, fmt.Errorf("error encoding PNG: %w", err)
 	}
 
 	return "", nil
@@ -997,7 +995,12 @@ func (db *appdbimpl) GetStream(user_name string, from, offset int) (stream strin
 		return "", fmt.Errorf("error getting stream: %w", err)
 	}
 
-	defer rows.Close()
+	defer func() {
+		err = rows.Close()
+		if err != nil {
+			logrus.Errorf("error closing rows: %v", err)
+		}
+	}()
 
 	var posts []components.Post
 
@@ -1021,7 +1024,6 @@ func (db *appdbimpl) GetStream(user_name string, from, offset int) (stream strin
 	}
 
 	stream_str := components.Stream{Posts: posts}
-
 	stream_data, err := json.MarshalIndent(stream_str, "", "  ")
 
 	if err != nil {
