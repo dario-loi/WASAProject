@@ -227,7 +227,7 @@ func (db *appdbimpl) PostUserID(userName string) (json string, err error) {
 		userID = hex.EncodeToString(h.Sum(nil))
 
 		// Insert the user in the DB
-		_, err = db.c.Exec(`INSERT INTO users (id, name) VALUES (?, ?)`, userID, userName)
+		_, err = db.c.Exec(`INSERT OR REPLACE INTO users (id, name) VALUES (?, ?)`, userID, userName)
 
 		if err != nil {
 			data, e := components.Error{Code: 500, Message: "Internal Server Error"}.ToJSON()
@@ -496,7 +496,11 @@ func (db *appdbimpl) GetUserFollowers(userID string) (followers string, err erro
 			fmt.Errorf("error getting user's followers: %w", err)
 	}
 
-	var followerNames []string
+	followerNames := struct {
+		Names []components.User `json:"follow-list"`
+	}{
+		Names: []components.User{},
+	}
 
 	for res.Next() {
 
@@ -519,7 +523,11 @@ func (db *appdbimpl) GetUserFollowers(userID string) (followers string, err erro
 			return components.InternalServerError, fmt.Errorf("error getting follower name: %w", err)
 		}
 
-		followerNames = append(followerNames, followerName)
+		follower := components.User{
+			Uname: followerName,
+		}
+
+		followerNames.Names = append(followerNames.Names, follower)
 
 	}
 
@@ -542,7 +550,11 @@ func (db *appdbimpl) GetUserFollowing(userID string) (following string, err erro
 			fmt.Errorf("error getting user's following: %w", err)
 	}
 
-	var followingNames []string
+	followingNames := struct {
+		Names []components.User `json:"follow-list"`
+	}{
+		Names: []components.User{},
+	}
 
 	for res.Next() {
 
@@ -561,11 +573,15 @@ func (db *appdbimpl) GetUserFollowing(userID string) (following string, err erro
 
 		followingName, err := db.GetUsername(followingID)
 
+		followed := components.User{
+			Uname: followingName,
+		}
+
 		if err != nil {
 			return components.InternalServerError, fmt.Errorf("error getting following name: %w", err)
 		}
 
-		followingNames = append(followingNames, followingName)
+		followingNames.Names = append(followingNames.Names, followed)
 
 	}
 
@@ -588,7 +604,11 @@ func (db *appdbimpl) GetPhotoLikes(photoID string) (likes string, err error) {
 			fmt.Errorf("error getting photo's likes: %w", err)
 	}
 
-	var likerNames []string
+	likerNames := struct {
+		Names []components.User `json:"users"`
+	}{
+		Names: []components.User{},
+	}
 
 	for res.Next() {
 
@@ -607,11 +627,15 @@ func (db *appdbimpl) GetPhotoLikes(photoID string) (likes string, err error) {
 
 		likerName, err := db.GetUsername(likerID)
 
+		liker := components.User{
+			Uname: likerName,
+		}
+
 		if err != nil {
 			return components.InternalServerError, fmt.Errorf("error getting liker name: %w", err)
 		}
 
-		likerNames = append(likerNames, likerName)
+		likerNames.Names = append(likerNames.Names, liker)
 
 	}
 
@@ -634,7 +658,11 @@ func (db *appdbimpl) GetPhotoComments(photoID string) (comments string, err erro
 			fmt.Errorf("error getting photo's comments: %w", err)
 	}
 
-	var commentsList []components.Comment
+	commentsList := struct {
+		Comments []components.Comment `json:"comments"`
+	}{
+		Comments: []components.Comment{},
+	}
 
 	for res.Next() {
 
@@ -650,6 +678,8 @@ func (db *appdbimpl) GetPhotoComments(photoID string) (comments string, err erro
 			return components.InternalServerError,
 				fmt.Errorf("error scanning comment: %w", err)
 		}
+
+		commentsList.Comments = append(commentsList.Comments, comment)
 
 	}
 
@@ -672,7 +702,11 @@ func (db *appdbimpl) GetUserBans(username string) (bans string, err error) {
 			fmt.Errorf("error getting user's bans: %w", err)
 	}
 
-	var banList []components.User
+	banList := struct {
+		Bans []components.User `json:"users"`
+	}{
+		Bans: []components.User{},
+	}
 
 	for res.Next() {
 
@@ -688,6 +722,8 @@ func (db *appdbimpl) GetUserBans(username string) (bans string, err error) {
 			return components.InternalServerError,
 				fmt.Errorf("error scanning ban record: %w", err)
 		}
+
+		banList.Bans = append(banList.Bans, ban)
 
 	}
 
@@ -715,7 +751,7 @@ func (db *appdbimpl) FollowUser(follower string, followed string) (errstring str
 		return components.InternalServerError, fmt.Errorf("error getting followed ID: %w", err)
 	}
 
-	_, err = db.c.Exec(`INSERT INTO followers (follower, followed) VALUES (?, ?)`, followerID, followedID)
+	_, err = db.c.Exec(`INSERT OR REPLACE INTO followers (follower, followed) VALUES (?, ?)`, followerID, followedID)
 
 	if err != nil {
 		return components.InternalServerError, fmt.Errorf("error inserting follower: %w", err)
@@ -773,7 +809,7 @@ func (db *appdbimpl) BanUser(banisher, banished string) (errstring string, err e
 		return components.InternalServerError, fmt.Errorf("error getting banished ID: %w", err)
 	}
 
-	_, err = db.c.Exec(`INSERT INTO bans (banisher, banished) VALUES (?, ?)`, banisherID, banishedID)
+	_, err = db.c.Exec(` OR REPLACE INTO bans (banisher, banished) VALUES (?, ?)`, banisherID, banishedID)
 
 	if err != nil {
 		return components.InternalServerError, fmt.Errorf("error inserting ban: %w", err)
@@ -813,7 +849,7 @@ func (db *appdbimpl) LikePhoto(username, photoID string) (errstring string, err 
 		return components.InternalServerError, fmt.Errorf("error getting user ID: %w", err)
 	}
 
-	_, err = db.c.Exec(`INSERT INTO likes (post_ID, liker) VALUES (?, ?)`, photoID, userID)
+	_, err = db.c.Exec(`INSERT OR REPLACE INTO likes (post_ID, liker) VALUES (?, ?)`, photoID, userID)
 
 	if err != nil {
 		return components.InternalServerError, fmt.Errorf("error inserting like: %w", err)
@@ -849,7 +885,7 @@ func (db *appdbimpl) CommentPhoto(username string, photoID string, comment compo
 
 	comment_id := comment.Comment_ID.Hash
 
-	_, err = db.c.Exec(`INSERT INTO comments (comment_ID, post_code, user_code, content, creation_date ) VALUES (?, ?, ?)`, comment_id, comment.Parent, userID, comment.Body, comment.CreationTime)
+	_, err = db.c.Exec(`INSERT OR REPLACE INTO comments (comment_ID, post_code, user_code, content, creation_date ) VALUES (?, ?, ?)`, comment_id, comment.Parent, userID, comment.Body, comment.CreationTime)
 
 	if err != nil {
 		return components.InternalServerError, fmt.Errorf("error inserting comment: %w", err)
@@ -899,7 +935,7 @@ func (db *appdbimpl) UploadPhoto(username string, photo components.Photo, photo_
 
 	// Insert photo
 
-	_, err = db.c.Exec(`INSERT INTO posts (post_ID, poster_ID, description, creation_date) VALUES (?, ?, ?, ?)`, photo_ID, userID, photo.Desc, creation_time)
+	_, err = db.c.Exec(`INSERT OR REPLACE INTO posts (post_ID, poster_ID, description, creation_date) VALUES (?, ?, ?, ?)`, photo_ID, userID, photo.Desc, creation_time)
 
 	if err != nil {
 		return components.InternalServerError, fmt.Errorf("error inserting photo: %w", err)
@@ -1002,7 +1038,11 @@ func (db *appdbimpl) GetStream(user_name string, from, offset int) (stream strin
 		}
 	}()
 
-	var posts []components.Post
+	posts := struct {
+		Posts []components.Post `json:"posts"`
+	}{
+		Posts: []components.Post{},
+	}
 
 	for rows.Next() {
 
@@ -1020,11 +1060,10 @@ func (db *appdbimpl) GetStream(user_name string, from, offset int) (stream strin
 			return "", fmt.Errorf("error scanning row: %w", err)
 		}
 
-		posts = append(posts, post)
+		posts.Posts = append(posts.Posts, post)
 	}
 
-	stream_str := components.Stream{Posts: posts}
-	stream_data, err := json.MarshalIndent(stream_str, "", "  ")
+	stream_data, err := json.MarshalIndent(posts, "", "  ")
 
 	if err != nil {
 		return "", fmt.Errorf("error marshaling stream: %w", err)

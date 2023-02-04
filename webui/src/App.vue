@@ -35,14 +35,14 @@ export default {
 					return
 				}
 
-				//TODO: standardize to Authorization header
 				const header = {
-					"searcher_id": searcher_id
+					"Authorization": searcher_id,
+					"user_name": this.$user_state.username
 				}
 
 				let response = await this.$axios.get("/users", {
 					params: {
-						"search_term": search,
+						"search_term": search
 					},
 					headers: header
 				});
@@ -50,6 +50,7 @@ export default {
 				if (response.status == 200) {
 					this.search_results = response.data;
 				} else {
+					console.log
 					this.search_results = null;
 				}
 			}
@@ -161,7 +162,7 @@ export default {
 
 								<i class="bi-person-circle m-2 fa-lg" style="font-size: 1.5rem;"></i>
 								<RouterLink class="text-dark text-decoration-none m-0" style="font-size: 1.0rem;"
-									:to="'/users/' + user['username-string']">
+									:to="'/profile/' + user['username-string']">
 									{{ user['username-string'] }}
 								</RouterLink>
 							</option>
@@ -180,7 +181,7 @@ export default {
 				<div class="row h-100 p-4">
 					<div class="col-md-3 col-sm-1"></div>
 					<div class="col-md-6 col-sm-10 mt-2 shadow-lg bg-light opacity-75 rounded">
-						<RouterView></RouterView>
+						<RouterView :key="$route.fullPath"></RouterView>
 					</div>
 					<div class="col-md-3 col-sm-1"></div>
 				</div>

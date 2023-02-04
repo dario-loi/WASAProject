@@ -5,32 +5,17 @@ import (
 	"net/http"
 
 	"git.sapienzaapps.it/fantasticcoffee/fantastic-coffee-decaffeinated/service/api/reqcontext"
-	"git.sapienzaapps.it/fantasticcoffee/fantastic-coffee-decaffeinated/service/components"
 	"github.com/julienschmidt/httprouter"
 )
 
 func (rt *_router) getUserFollowers(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	// Retrieve username from request body
+	// Retrieve username from path
 
-	decoder := json.NewDecoder(r.Body)
-	var uname components.User
-	err := decoder.Decode(&uname)
-	if err != nil {
-
-		w.WriteHeader(http.StatusBadRequest)
-		_, err := w.Write([]byte(components.BadRequestError))
-
-		if err != nil {
-			ctx.Logger.WithError(err).Error("error writing response")
-		}
-
-		ctx.Logger.WithError(err).Error("error decoding JSON")
-		return
-	}
+	uname := ps.ByName("user_name")
 
 	// Get the list of followers
-	followers, err := rt.db.GetUserFollowers(uname.Uname)
+	followers, err := rt.db.GetUserFollowers(uname)
 	if err != nil {
 
 		w.WriteHeader(http.StatusInternalServerError)
@@ -65,7 +50,7 @@ func (rt *_router) getUserFollowers(w http.ResponseWriter, r *http.Request, ps h
 		Username  string   `json:"owner"`
 		Followers []string `json:"follow-list"`
 	}{
-		Username:  uname.Uname,
+		Username:  uname,
 		Followers: followers_names,
 	}
 
@@ -94,28 +79,11 @@ func (rt *_router) getUserFollowers(w http.ResponseWriter, r *http.Request, ps h
 
 func (rt *_router) getUserFollowing(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	// Retrieve username from request body
+	// Retrieve username from the path
 
-	decoder := json.NewDecoder(r.Body)
-	var uname components.User
-	err := decoder.Decode(&uname)
+	uname := ps.ByName("user_name")
 
-	if err != nil {
-
-		w.WriteHeader(http.StatusBadRequest)
-
-		_, err := w.Write([]byte(components.BadRequestError))
-
-		if err != nil {
-			ctx.Logger.WithError(err).Error("error writing response")
-		}
-
-		ctx.Logger.WithError(err).Error("error decoding JSON")
-
-		return
-	}
-
-	following, err := rt.db.GetUserFollowing(uname.Uname)
+	following, err := rt.db.GetUserFollowing(uname)
 
 	if err != nil {
 
@@ -153,7 +121,7 @@ func (rt *_router) getUserFollowing(w http.ResponseWriter, r *http.Request, ps h
 		Username  string   `json:"owner"`
 		Following []string `json:"follow-list"`
 	}{
-		Username:  uname.Uname,
+		Username:  uname,
 		Following: following_names,
 	}
 

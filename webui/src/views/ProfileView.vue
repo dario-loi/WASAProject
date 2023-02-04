@@ -5,11 +5,18 @@ export default {
             followers: 0,
             following: 0,
             posts: 0,
-
+            is_me: false,
+            is_banned: false,
+            is_following: false,
+            username: null,
+            has_banned_you: false,
+            photos: [] // list of IDs, pairs of ("hash", SHA256 hash of the photo)
         }
     },
     methods: {
-        async initialize() {
+        async refresh() {
+
+            this.username = this.$route.params.username;
 
             // Redirect to login if not logged in
             if (this.$user_state.username == null) {
@@ -17,28 +24,83 @@ export default {
                 return
             }
 
+            if (this.$route.params.username == this.$user_state.username) {
+                this.is_me = true;
+            }
+
             this.$user_state.current_view = this.$views.PROFILE;
+
+            // Check  if you are banned
+
+            let response = await this.$axios.get("/users/" + this.username + "/bans", {
+                headers: this.$user_state.headers
+            });
+
+            this.has_banned_you = response.data.users.includes(this.$user_state.username);
+
+            // Check if banned
+
+            response = await this.$axios.get("/users/" + this.$user_state.username + "/bans", {
+                headers: this.$user_state.headers
+            });
+
+            this.is_banned = response.data.users.includes(this.username);
+
+            if (!this.has_banned_you) {
+
+                // Get following
+
+                let response = await this.$axios.get("/users/" + this.username + "/following", {
+                    headers: this.$user_state.headers
+                });
+
+
+                this.following = response.data["follow-list"].length;
+
+                // Get followers 
+
+                response = await this.$axios.get("/users/" + this.username + "/followers", {
+                    headers: this.$user_state.headers
+                });
+
+                this.followers = response.data["follow-list"].length;
+
+                if (!this.is_me) {
+
+                    // check if I follow him
+
+                    this.is_following = response.data["follow-list"].includes(this.$user_state.username);
+
+                }
+
+                // Get photos
+
+                response = await this.$axios.get("/users/" + this.username + "/profile/photos", {
+                    headers: this.$user_state.headers
+                });
+
+                this.photos = response.data["ids"];
+                this.posts = this.photos.length;
+
+            }
 
         },
     },
+
     mounted() {
-        this.initialize()
+        this.refresh()
     }
 }
 </script>
 
 <template>
-
     <div class="container">
-
         <div class="align-items-center text-center h-100">
-
             <div class="container text-center pt-3 pb-2 border-bottom">
                 <div class="row w-100">
                     <h2 class="col-3">
-                        <i class="bi-person-circle mx-1"></i>{{ this.$user_state.username }}'s profile.
+                        <i class="bi-person-circle mx-1"></i>{{ username }}'s profile.
                     </h2>
-
                     <div class="col-9" style="align-items: center; vertical-align: middle;">
                         <div class="row">
                             <div class="col-4">
@@ -73,33 +135,76 @@ export default {
                             </div>
                         </div>
                     </div>
-
                 </div>
-                <div class="row w-100 align-content-between my-1">
-
-                    <!-- Follow Button -->
-
-                    <div class="col">
-                        <button class="btn btn-primary btn-lg" type="button">
-                            <i class="bi-person-plus-fill"></i>
-                            Follow
-                        </button>
+                <div v-if="is_me" class="row w-100">
+                    <div class="row w-100">
+                        <div class="col-3">
+                            <button class="btn btn-primary btn-md" type="button" @click="ChangeName()">
+                                <i class="bi-pencil-square"></i>
+                                Change Name
+                            </button>
+                        </div>
                     </div>
-
-                    <!-- Ban Button -->
-
-                    <div class="col">
-                        <button class="btn btn-danger btn-lg" type="button">
-                            <i class="bi-person-x-fill"></i>
-                            Ban
-                        </button>
+                </div>
+                <div v-else>
+                    <div class="row w-100 align-content-between my-1">
+                        <!-- Follow Button -->
+                        <div class="col">
+                            <div v-if="is_following && !has_banned_you">
+                                <button class="btn btn-primary btn-lg" type="button" @click="Unfollow()">
+                                    <i class="bi-person-dash-fill"></i>
+                                    Unfollow
+                                </button>
+                            </div>
+                            <div v-if="!is_following && !has_banned_you">
+                                <button class="btn btn-primary btn-lg" type="button" @click="Follow()">
+                                    <i class="bi-person-plus-fill"></i>
+                                    Follow
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Ban Button -->
+                        <div class="col">
+                            <div v-if="is_banned && !has_banned_you">
+                                <button class="btn btn-success btn-lg" type="button" @click="UnBan()">
+                                    <i class="bi-person-check-fill"></i>
+                                    Unban
+                                </button>
+                            </div>
+                            <div v-if="!is_banned && !has_banned_you">
+                                <button class=" btn btn-danger btn-lg" type="button" @click="Ban()">
+                                    <i class="bi-person-x-fill"></i>
+                                    Ban
+                                </button>
+                            </div>
+                        </div>
                     </div>
-
                 </div>
             </div>
-
         </div>
-
     </div>
-
+    <div v-if="has_banned_you" class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="alert alert-danger" role="alert">
+                    <h4 class="alert-heading">You have been banned!</h4>
+                    <p>Sorry, but you have been banned from this user's profile. You cannot view their posts or
+                        interact with them.</p>
+                    <hr>
+                    <p class="mb-0">Try not to be so mean next time!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div v-else class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="card-columns">
+                    <div v-for="photo in photos" class="card">
+                        {{ photo }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </template>

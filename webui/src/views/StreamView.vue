@@ -60,7 +60,12 @@ export default {
 
             const filename = image.name;
 
-            const textAsBuffer = new TextEncoder().encode(filename);
+            // Hash the filename, username, and current time to get a unique id for the image
+            // This avoids hash collisions by the "Trust me bro" theorem. (The converse of 
+            // the law of large numbers)
+            const to_hash = filename + this.$user_state.username + Date.now().toString();
+
+            const textAsBuffer = new TextEncoder().encode(to_hash);
             const hashBuffer = await window.crypto.subtle.digest('SHA-256', textAsBuffer);
             const hashArray = Array.from(new Uint8Array(hashBuffer))
             const img_id = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
@@ -169,7 +174,8 @@ export default {
                                 <input class="form-control" type="file" id="fileInput">
 
                                 <label for="formFile" class="form-label">Caption</label>
-                                <input class="form-control" type="text" id="captionInput">
+                                <textarea class="form-control" type="text" id="captionInput" rows="6">
+                                </textarea>
                             </form>
                         </div>
                     </div>
