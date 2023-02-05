@@ -12,3 +12,4 @@ docker-compose.log
 /doc/json
 /doc/markdown
 ./cmd/webapi/webapi
+cmd/webapi/photos

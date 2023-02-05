@@ -11,6 +11,8 @@ const router = createRouter({
 		{path: '/#/', component: LoginView},
 		{path: '/stream/:username', component: StreamView},
 		{path: '/profile/:username', component: ProfileView},
+		// allow GET requests to /photos/... to be handled by the backend
+		{path: '/photos/.*', redirect: '/'},
 	]
 })
 

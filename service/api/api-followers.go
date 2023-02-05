@@ -1,7 +1,6 @@
 package api
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"git.sapienzaapps.it/fantasticcoffee/fantastic-coffee-decaffeinated/service/api/reqcontext"
@@ -29,47 +28,7 @@ func (rt *_router) getUserFollowers(w http.ResponseWriter, r *http.Request, ps h
 		return
 	}
 
-	// Unmarshal the followers JSON into a slice of names
-
-	var followers_names []string
-	err = json.Unmarshal([]byte(followers), &followers_names)
-	if err != nil {
-
-		w.WriteHeader(http.StatusInternalServerError)
-		_, err := w.Write([]byte(followers))
-
-		if err != nil {
-			ctx.Logger.WithError(err).Error("error writing response")
-		}
-
-		ctx.Logger.WithError(err).Error("error unmarshaling followers JSON")
-		return
-	}
-
-	return_struct := struct {
-		Username  string   `json:"owner"`
-		Followers []string `json:"follow-list"`
-	}{
-		Username:  uname,
-		Followers: followers_names,
-	}
-
-	// Marshal the struct into JSON
-
-	ret_data, err := json.Marshal(return_struct)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		_, err := w.Write([]byte(followers))
-
-		if err != nil {
-			ctx.Logger.WithError(err).Error("error writing response")
-		}
-
-		ctx.Logger.WithError(err).Error("error marshaling followers JSON")
-		return
-	}
-
-	_, err = w.Write(ret_data)
+	_, err = w.Write([]byte(followers))
 
 	if err != nil {
 		ctx.Logger.WithError(err).Error("error writing response")
@@ -98,49 +57,7 @@ func (rt *_router) getUserFollowing(w http.ResponseWriter, r *http.Request, ps h
 		return
 	}
 
-	// Unmarshal the followers JSON into a slice of names
-
-	var following_names []string
-	err = json.Unmarshal([]byte(following), &following_names)
-	if err != nil {
-
-		w.WriteHeader(http.StatusInternalServerError)
-
-		_, err := w.Write([]byte(following))
-
-		if err != nil {
-			ctx.Logger.WithError(err).Error("error writing response")
-		}
-
-		ctx.Logger.WithError(err).Error("error unmarshaling following JSON")
-
-		return
-	}
-
-	return_struct := struct {
-		Username  string   `json:"owner"`
-		Following []string `json:"follow-list"`
-	}{
-		Username:  uname,
-		Following: following_names,
-	}
-
-	// Marshal the struct into JSON
-
-	ret_data, err := json.Marshal(return_struct)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		_, err := w.Write([]byte(following))
-
-		if err != nil {
-			ctx.Logger.WithError(err).Error("error writing response")
-		}
-
-		ctx.Logger.WithError(err).Error("error marshaling following JSON")
-		return
-	}
-
-	_, err = w.Write(ret_data)
+	_, err = w.Write([]byte(following))
 	if err != nil {
 		ctx.Logger.WithError(err).Error("error writing response")
 	}

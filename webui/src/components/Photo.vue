@@ -4,6 +4,9 @@
 export default {
 
     props: {
+        src: {
+            type: String
+        },
         alt: {
             type: String
         },
@@ -13,13 +16,35 @@ export default {
     },
     data: function () {
         return {
-            src: null,
+            is_loading: false,
+            src_: null,
             alt_: null,
             style_: null,
         }
     },
 
     methods: {
+
+        async initialize() {
+
+            this.is_loading = true
+            this.alt_ = this.alt;
+            this.style_ = this.style;
+
+            // Get the image data from the server
+
+            console.log("Getting image data from server...");
+
+            console.log("src: " + this.src)
+
+            const response = await this.$axios.get("/resources/photos/" + this.src, {
+                responseType: "image/jpeg"
+            });
+
+            this.src_ = response.data;
+            this.is_loading = false;
+        }
+
     },
     mounted() {
 
@@ -27,22 +52,22 @@ export default {
         // to get the image data from the server. We need to get the image data
         // likes, comments, etc...
 
+        this.initialize();
 
 
     }
-
 }
-
-
-
 </script>
 
 <template>
 
-    <img :src="src" :alt="(alt != null ? alt : 'Wasaphoto Image')" class="img-fluid"
-        :style="(style_ != null ? style_ : '')" />
-
-
+    <div v-if="!is_loading">
+        <img :src="src_" :alt="(alt != null ? alt : 'Wasaphoto Image')" class="img-fluid opacity-100"
+            :style="(style_ != null ? style_ : '')" />
+    </div>
+    <div v-else>
+        <LoadingSpinner></LoadingSpinner>
+    </div>
 
 </template>
 

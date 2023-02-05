@@ -106,6 +106,16 @@ export default {
                             <div class="col-4">
                                 <div class="row">
                                     <div class="col-12">
+                                        <h5>Posts</h5>
+                                    </div>
+                                    <div class="col-12">
+                                        <h5> {{ posts }}</h5>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="row">
+                                    <div class="col-12">
                                         <h5>Followers</h5>
                                     </div>
                                     <div class="col-12">
@@ -120,16 +130,6 @@ export default {
                                     </div>
                                     <div class="col-12">
                                         <h5>{{ following }}</h5>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <div class="row">
-                                    <div class="col-12">
-                                        <h5>Posts</h5>
-                                    </div>
-                                    <div class="col-12">
-                                        <h5> {{ posts }}</h5>
                                     </div>
                                 </div>
                             </div>
@@ -200,8 +200,8 @@ export default {
         <div class="row">
             <div class="col-12">
                 <div class="card-columns">
-                    <div v-for="photo in photos" class="card">
-                        {{ photo }}
+                    <div v-for="photo in photos" class="card w-100">
+                        <Photo :src=photo.hash></Photo>
                     </div>
                 </div>
             </div>

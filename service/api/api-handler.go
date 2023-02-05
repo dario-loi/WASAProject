@@ -24,7 +24,6 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.GET("/resources/photos/:UUID", rt.wrap(rt.getPhoto))
 
 	rt.router.GET("/users/:user_name/profile/photos", rt.wrap(rt.getUserPhotos))
-	rt.router.GET("/users/:user_name/profile", rt.wrap(rt.getUserProfile))
 
 	rt.router.GET("/users/:user_name/followers", rt.wrap(rt.getUserFollowers))
 	rt.router.GET("/users/:user_name/following", rt.wrap(rt.getUserFollowing))

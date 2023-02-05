@@ -1,18 +1,15 @@
 <script>
 export default {
-	props: ["loading"]
 }
 </script>
 
 <template>
-	<div v-if="loading">
-		<div style="text-align: center">
-			<div class="spinner-border" role="status">
-				<span class="visually-hidden">Loading...</span>
-			</div>
-		</div>
+	<div style="text-align: center; vertical-align: middle;">
+		<i class="spinner-border mx-1" role="status"></i>
+		<span class="sr-only">Loading...</span>
 	</div>
-	<div v-if="!loading"><slot /></div>
 </template>
 
-<style></style>
+<style>
+
+</style>

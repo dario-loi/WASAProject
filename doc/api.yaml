@@ -243,12 +243,6 @@ tags:
 paths:
   /users:
     parameters:
-      - name: Authorization
-        in: header
-        description: The user's id.
-        required: true
-        schema:
-          $ref: "#/components/schemas/UserID"
       - name: user_name
         in: header
         description: The user's name.
@@ -299,40 +293,6 @@ paths:
         required: true
         schema:
           $ref: "#/components/schemas/Username"
-    get:
-      operationId: getUserProfile
-      tags:
-        - "users"
-      summary: Get a user's profile
-      description: |-
-        Get a user's profile, including their username and the list of photos they have posted.
-      responses:
-        "200":
-          description: |-
-            The user's profile
-          content:
-            application/json:
-              schema:
-                description: |-
-                  The user's profile.
-                type: object
-                properties:
-                  username:
-                    $ref: "#/components/schemas/Username"
-                  photos:
-                    type: array
-                    description: A list of the user's photos, identified by their SHA256 hash.
-                    minItems: 0
-                    maxItems: 65536
-                    items:
-                      $ref: "#/components/schemas/IDList"
-        "404":
-          description: |-
-            The user does not exist
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
 
     put:
       operationId: setMyUserName
@@ -349,15 +309,6 @@ paths:
 
         Returns the new identifier in the response body so that the user can continue 
         using the application seamlessly.
-      parameters:
-        - name: Authorization
-          in: header
-          description: |-
-            The identifier of the user that is requesting the update, used for 
-            authentication purposes.
-          required: true
-          schema:
-            $ref: "#/components/schemas/UserID"
       security:
         - bearerAuth: []
       requestBody:
@@ -464,13 +415,6 @@ paths:
         to go ahead.
       tags:
         - "photos"
-      parameters:
-        - name: Authorization
-          in: header
-          description: The user's identifier, for authentication purposes.
-          required: true
-          schema:
-            $ref: "#/components/schemas/UserID"
       security:
         - bearerAuth: []
       responses:
@@ -499,14 +443,6 @@ paths:
         - "photos"
       description: |-
         Post a photo to the user's profile
-      parameters:
-        - name: Authorization
-          in: header
-          description: The user's identifier, for authentication purposes.
-          required: true
-          schema:
-            $ref: "#/components/schemas/UserID"
-
       security:
         - bearerAuth: []
       requestBody:
@@ -630,12 +566,6 @@ paths:
       - name: liker_id
         in: path
         description: The user's id
-        required: true
-        schema:
-          $ref: "#/components/schemas/UserID"
-      - name: Authorization
-        in: header
-        description: The user's identifier
         required: true
         schema:
           $ref: "#/components/schemas/UserID"
@@ -774,12 +704,6 @@ paths:
         required: true
         schema:
           $ref: "#/components/schemas/CommentID"
-      - name: Authorization
-        in: header
-        description: The commenter's Identifier (for authentication).
-        required: true
-        schema:
-          $ref: "#/components/schemas/UserID"
     put:
       operationId: commentPhoto
       summary: Comment a photo.
@@ -919,12 +843,6 @@ paths:
         required: true
         schema:
           $ref: "#/components/schemas/Username"
-      - name: Authorization
-        in: header
-        description: The user's identifier, used for authentication purposes.
-        required: true
-        schema:
-          $ref: "#/components/schemas/UserID"
     put:
       operationId: followUser
       summary: Follow a user
@@ -1025,12 +943,6 @@ paths:
         in: path
         schema:
           $ref: "#/components/schemas/Username"
-      - name: Authorization
-        description: The identifier of the request's issuer.
-        required: true
-        in: header
-        schema:
-          $ref: "#/components/schemas/UserID"
       - name: from
         description: The index of the first post to retrieve.
         required: false
@@ -1150,12 +1062,6 @@ paths:
         required: true
         schema:
           $ref: "#/components/schemas/Username"
-      - name: Authorization
-        in: header
-        description: The user's identifier, used for authentication purposes.
-        required: true
-        schema:
-          $ref: "#/components/schemas/UserID"
     delete:
       operationId: unbanUser
       summary: Unban a user

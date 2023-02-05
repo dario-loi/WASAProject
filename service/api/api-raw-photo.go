@@ -43,7 +43,7 @@ func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httproute
 	if uuid != well_known {
 		exists, err := rt.db.CheckPhotoExists(uuid)
 
-		if err != nil || !exists {
+		if err != nil {
 			w.WriteHeader(http.StatusNotFound)
 			_, err := w.Write([]byte(fmt.Errorf(components.NotFoundErrorF, err).Error()))
 
@@ -51,8 +51,12 @@ func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httproute
 				ctx.Logger.WithError(err).Error("error writing response")
 			}
 
-			ctx.Logger.WithError(err).Error(fmt.Sprintf("photo %s not found, error: %s", uuid, err))
+			ctx.Logger.WithError(err).Error(fmt.Sprintf("error checking photo (uuid: %s) existence, details: %s", uuid, err))
 			return
+		}
+		if !exists {
+			// If the photo doesn't exist, return the default one
+			uuid = well_known
 		}
 	}
 
@@ -61,7 +65,6 @@ func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httproute
 	img_file, err := os.Open("photos/" + uuid + ".png")
 
 	if err != nil {
-		fmt.Println(err)
 
 		w.WriteHeader(http.StatusInternalServerError)
 		_, err := w.Write([]byte(fmt.Errorf(components.InternalServerErrorF, err).Error()))

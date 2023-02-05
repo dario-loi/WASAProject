@@ -6,6 +6,7 @@ import ErrorMsg from './components/ErrorMsg.vue'
 import LoadingSpinner from './components/LoadingSpinner.vue'
 import Comment from './components/Comment.vue'
 import LikeCounter from './components/LikeCounter.vue'
+import Photo from './components/Photo.vue'
 
 import './assets/dashboard.css'
 import './assets/main.css'
@@ -36,6 +37,7 @@ app.component("ErrorMsg", ErrorMsg);
 app.component("LoadingSpinner", LoadingSpinner);
 app.component("Comment", Comment);
 app.component("LikeCounter", LikeCounter);
+app.component("Photo", Photo);
 
 
 app.use(router)

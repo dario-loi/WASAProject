@@ -81,12 +81,9 @@ type AppDatabase interface {
 
 	GetUserPhotos(ID string) (photos string, err error)
 
-	// GetPhoto returns the profile photo of the user with the given ID
-	GetUserProfile(ID string) (profile string, err error)
+	GetUserFollowers(username string) (followers string, err error)
 
-	GetUserFollowers(ID string) (followers string, err error)
-
-	GetUserFollowing(ID string) (following string, err error)
+	GetUserFollowing(username string) (following string, err error)
 
 	GetPhotoLikes(ID string) (likes string, err error)
 
@@ -346,7 +343,7 @@ func (db *appdbimpl) CheckPhotoExists(photoID string) (exists bool, err error) {
 	var count int
 
 	// Selects ALWAYS one row
-	err = db.c.QueryRow(`SELECT COUNT(photo_code) FROM posts WHERE photo_code = ?`, photoID).Scan(&count)
+	err = db.c.QueryRow(`SELECT COUNT(post_ID) FROM posts WHERE post_ID = ?`, photoID).Scan(&count)
 
 	if err != nil {
 		return false, fmt.Errorf("error getting photo ID: %w", err)
@@ -381,12 +378,17 @@ func (db *appdbimpl) CheckUsernameExists(username string) (exists bool, err erro
 
 func (db *appdbimpl) GetUserPhotos(userID string) (photo string, err error) {
 
-	photoIDlist := components.IDList{}
+	photoIDlist := struct {
+		IDs []components.SHA256hash `json:"ids"`
+	}{
+		IDs: []components.SHA256hash{},
+	}
 
-	res, err := db.c.Query(`SELECT ps.photo_name FROM posts AS pt 
-		WHERE ps.poster_name = ?`, userID)
+	res, err := db.c.Query(`SELECT pt.post_ID FROM posts AS pt 
+		WHERE pt.poster_ID = ?`, userID)
 
 	if err != nil {
+
 		return components.InternalServerError,
 			fmt.Errorf("error getting user's photos: %w", err)
 	}
@@ -409,7 +411,9 @@ func (db *appdbimpl) GetUserPhotos(userID string) (photo string, err error) {
 		photoIDlist.IDs = append(photoIDlist.IDs, photoID)
 	}
 
-	data, err := photoIDlist.ToJSON()
+	data, err := json.MarshalIndent(
+		photoIDlist, "", "	",
+	)
 
 	if err != nil {
 		return components.InternalServerError,
@@ -487,7 +491,15 @@ func (db *appdbimpl) GetUserProfile(userID string) (profile string, err error) {
 
 }
 
-func (db *appdbimpl) GetUserFollowers(userID string) (followers string, err error) {
+func (db *appdbimpl) GetUserFollowers(username string) (followers string, err error) {
+
+	userID, err := db.GetUserID(username)
+
+	if err != nil {
+
+		return components.InternalServerError,
+			fmt.Errorf("error getting user ID: %w", err)
+	}
 
 	res, err := db.c.Query(`SELECT follower FROM followers WHERE followed = ?`, userID)
 
@@ -497,8 +509,12 @@ func (db *appdbimpl) GetUserFollowers(userID string) (followers string, err erro
 	}
 
 	followerNames := struct {
+		Owner components.User   `json:"owner"`
 		Names []components.User `json:"follow-list"`
 	}{
+		Owner: components.User{
+			Uname: username,
+		},
 		Names: []components.User{},
 	}
 
@@ -541,7 +557,14 @@ func (db *appdbimpl) GetUserFollowers(userID string) (followers string, err erro
 	return string(data), nil
 }
 
-func (db *appdbimpl) GetUserFollowing(userID string) (following string, err error) {
+func (db *appdbimpl) GetUserFollowing(username string) (following string, err error) {
+
+	userID, err := db.GetUserID(username)
+
+	if err != nil {
+		return components.InternalServerError,
+			fmt.Errorf("error getting user ID: %w", err)
+	}
 
 	res, err := db.c.Query(`SELECT followed FROM followers WHERE follower = ?`, userID)
 
@@ -551,8 +574,10 @@ func (db *appdbimpl) GetUserFollowing(userID string) (following string, err erro
 	}
 
 	followingNames := struct {
+		Owner components.User   `json:"owner"`
 		Names []components.User `json:"follow-list"`
 	}{
+		Owner: components.User{Uname: username},
 		Names: []components.User{},
 	}
 
