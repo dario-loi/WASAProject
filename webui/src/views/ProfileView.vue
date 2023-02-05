@@ -30,13 +30,13 @@ export default {
 
             this.$user_state.current_view = this.$views.PROFILE;
 
-            // Check  if you are banned
+            // Check if you are banned
 
             let response = await this.$axios.get("/users/" + this.username + "/bans", {
                 headers: this.$user_state.headers
             });
 
-            this.has_banned_you = response.data.users.includes(this.$user_state.username);
+            this.has_banned_you = response.data.users.map(x => x["username-string"]).includes(this.$user_state.username);
 
             // Check if banned
 
@@ -44,7 +44,7 @@ export default {
                 headers: this.$user_state.headers
             });
 
-            this.is_banned = response.data.users.includes(this.username);
+            this.is_banned = response.data.users.map(x => x["username-string"]).includes(this.username);
 
             if (!this.has_banned_you) {
 
@@ -69,8 +69,7 @@ export default {
 
                     // check if I follow him
 
-                    this.is_following = response.data["follow-list"].includes(this.$user_state.username);
-
+                    this.is_following = response.data["follow-list"].map(x => x["username-string"]).includes(this.$user_state.username);
                 }
 
                 // Get photos
@@ -79,12 +78,124 @@ export default {
                     headers: this.$user_state.headers
                 });
 
-                this.photos = response.data["ids"];
+                this.photos = response.data["posts"];
+
                 this.posts = this.photos.length;
+
+                console.log(this.has_banned_you)
 
             }
 
         },
+
+        async ChangeName() {
+
+            const new_name = prompt("Change name", "New name");
+
+            if (new_name == null || new_name == "") {
+                return
+            }
+
+            const req_body = {
+                "username-string": new_name
+            }
+
+            const res = await this.$axios.put("/users/" + this.$user_state.username + "/profile", req_body, {
+                headers: this.$user_state.headers
+            });
+
+            if (res.statusText != "No Content") {
+
+                alert("Error: " + res.statusText);
+                console.table(res);
+                return
+            }
+
+            this.$user_state.username = new_name;
+            this.username = new_name;
+            this.$user_state.headers["Authorization"] = res.data.token.hash;
+        },
+
+        async Follow() {
+
+            const req_body = {
+                "username-string": this.$user_state.username
+            }
+
+            const res = await this.$axios.put("/users/" + this.$user_state.username + "/following/" + this.username, req_body, {
+                headers: this.$user_state.headers
+            });
+
+            if (res.statusText != "No Content") {
+
+                alert("Error: " + res.statusText);
+                console.table(res);
+                return
+            }
+
+            this.is_following = true;
+            this.followers += 1;
+        },
+
+        async Unfollow() {
+
+            if (!this.is_following) {
+                return
+            }
+
+            const req_body = {
+                "username-string": this.$user_state.username
+            }
+
+            const res = await this.$axios.delete("/users/" + this.$user_state.username + "/following/" + this.username, {
+                headers: this.$user_state.headers,
+                data: req_body
+            });
+
+            if (res.statusText != "No Content") {
+
+                alert("Error: " + res.statusText);
+                console.table(res);
+                return
+            }
+
+            this.is_following = false;
+            this.followers -= 1;
+        },
+
+        async Ban() {
+
+            const res = await this.$axios.put("/users/" + this.$user_state.username + "/bans/" + this.username, {}, {
+                headers: this.$user_state.headers
+            });
+
+            if (res.statusText != "No Content") {
+
+                alert("Error: " + res.statusText);
+                console.table(res);
+                return
+            }
+
+            this.is_banned = true;
+        },
+
+        async UnBan() {
+
+            const res = await this.$axios.delete("/users/" + this.$user_state.username + "/bans/" + this.username, {
+                headers: this.$user_state.headers
+            });
+
+            if (res.statusText != "No Content") {
+
+                alert("Error: " + res.statusText);
+                console.table(res);
+                return
+            }
+
+            this.is_banned = false;
+
+        },
+
     },
 
     mounted() {
@@ -97,14 +208,14 @@ export default {
     <div class="container">
         <div class="align-items-center text-center h-100">
             <div class="container text-center pt-3 pb-2 border-bottom">
-                <div class="row w-100">
+                <div class="row w-100 my-3">
                     <h2 class="col-3">
                         <i class="bi-person-circle mx-1"></i>{{ username }}'s profile.
                     </h2>
                     <div class="col-9" style="align-items: center; vertical-align: middle;">
                         <div class="row">
                             <div class="col-4">
-                                <div class="row">
+                                <div class="row border p-1 pt-2 rounded me-1 shadow-sm">
                                     <div class="col-12">
                                         <h5>Posts</h5>
                                     </div>
@@ -114,7 +225,7 @@ export default {
                                 </div>
                             </div>
                             <div class="col-4">
-                                <div class="row">
+                                <div class="row border p-1 pt-2 rounded me-1 shadow-sm">
                                     <div class="col-12">
                                         <h5>Followers</h5>
                                     </div>
@@ -124,7 +235,7 @@ export default {
                                 </div>
                             </div>
                             <div class="col-4">
-                                <div class="row">
+                                <div class="row border p-1 pt-2 rounded me-1 shadow-sm">
                                     <div class="col-12">
                                         <h5>Following</h5>
                                     </div>
@@ -150,33 +261,37 @@ export default {
                     <div class="row w-100 align-content-between my-1">
                         <!-- Follow Button -->
                         <div class="col">
-                            <div v-if="is_following && !has_banned_you">
-                                <button class="btn btn-primary btn-lg" type="button" @click="Unfollow()">
-                                    <i class="bi-person-dash-fill"></i>
-                                    Unfollow
-                                </button>
-                            </div>
-                            <div v-if="!is_following && !has_banned_you">
-                                <button class="btn btn-primary btn-lg" type="button" @click="Follow()">
-                                    <i class="bi-person-plus-fill"></i>
-                                    Follow
-                                </button>
-                            </div>
+                            <Transition name="fade" mode="out-in">
+                                <div v-if="is_following && !has_banned_you">
+                                    <button class="btn btn-warning btn-lg" type="button" @click="Unfollow()">
+                                        <i class="bi-person-dash-fill"></i>
+                                        Unfollow
+                                    </button>
+                                </div>
+                                <div v-else-if="!is_following && !has_banned_you">
+                                    <button class="btn btn-primary btn-lg" type="button" @click="Follow()">
+                                        <i class="bi-person-plus-fill"></i>
+                                        Follow
+                                    </button>
+                                </div>
+                            </Transition>
                         </div>
                         <!-- Ban Button -->
                         <div class="col">
-                            <div v-if="is_banned && !has_banned_you">
-                                <button class="btn btn-success btn-lg" type="button" @click="UnBan()">
-                                    <i class="bi-person-check-fill"></i>
-                                    Unban
-                                </button>
-                            </div>
-                            <div v-if="!is_banned && !has_banned_you">
-                                <button class=" btn btn-danger btn-lg" type="button" @click="Ban()">
-                                    <i class="bi-person-x-fill"></i>
-                                    Ban
-                                </button>
-                            </div>
+                            <Transition name="fade" mode="out-in">
+                                <div v-if="is_banned && !has_banned_you">
+                                    <button class="btn btn-success btn-lg" type="button" @click="UnBan()">
+                                        <i class="bi-person-check-fill"></i>
+                                        Unban
+                                    </button>
+                                </div>
+                                <div v-else-if="!is_banned && !has_banned_you">
+                                    <button class=" btn btn-danger btn-lg" type="button" @click="Ban()">
+                                        <i class="bi-person-x-fill"></i>
+                                        Ban
+                                    </button>
+                                </div>
+                            </Transition>
                         </div>
                     </div>
                 </div>
@@ -187,7 +302,7 @@ export default {
         <div class="row">
             <div class="col-12">
                 <div class="alert alert-danger" role="alert">
-                    <h4 class="alert-heading">You have been banned!</h4>
+                    <h4 class="alert-heading">You have been banned by this user!</h4>
                     <p>Sorry, but you have been banned from this user's profile. You cannot view their posts or
                         interact with them.</p>
                     <hr>
@@ -197,14 +312,18 @@ export default {
         </div>
     </div>
     <div v-else class="container">
-        <div class="row">
-            <div class="col-12">
-                <div class="card-columns">
-                    <div v-for="photo in photos" class="card w-100">
-                        <Photo :src=photo.hash></Photo>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <Stream :posts="photos" />
     </div>
 </template>
+
+<style>
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity cubic-bezier(0.4, 0, 0.2, 1) 0.1s
+}
+
+.fade-enter,
+.fade-leave-to {
+    opacity: 0
+}
+</style>

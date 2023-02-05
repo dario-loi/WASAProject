@@ -66,10 +66,10 @@ func (rt *_router) getUserFollowing(w http.ResponseWriter, r *http.Request, ps h
 
 func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	// Retrieve username and target from header
+	// Retrieve target, username from path
 
-	username := r.Header.Get("user_name")
-	followed_name := r.Header.Get("followed_name")
+	username := ps.ByName("user_name")
+	followed_name := ps.ByName("followed_name")
 	token := r.Header.Get("Authorization")
 
 	is_valid, err := rt.db.Validate(username, token)
@@ -123,10 +123,10 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 
 func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	// Retrieve username and target from header
+	// Retrieve username and target from path
 
-	username := r.Header.Get("user_name")
-	followed_name := r.Header.Get("followed_name")
+	username := ps.ByName("user_name")
+	followed_name := ps.ByName("followed_name")
 	token := r.Header.Get("Authorization")
 
 	is_valid, err := rt.db.Validate(username, token)

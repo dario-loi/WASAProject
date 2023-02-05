@@ -91,9 +91,9 @@ type AppDatabase interface {
 
 	GetUserBans(ID string) (bans string, err error)
 
-	FollowUser(followerID string, followedID string) (errstring string, err error)
+	FollowUser(follower string, followed string) (errstring string, err error)
 
-	UnfollowUser(followerID string, followedID string) (errstring string, err error)
+	UnfollowUser(follower string, followed string) (errstring string, err error)
 
 	Validate(username string, ID string) (is_valid bool, err error)
 
@@ -379,16 +379,15 @@ func (db *appdbimpl) CheckUsernameExists(username string) (exists bool, err erro
 func (db *appdbimpl) GetUserPhotos(userID string) (photo string, err error) {
 
 	photoIDlist := struct {
-		IDs []components.SHA256hash `json:"ids"`
+		Posts []components.Post `json:"posts"`
 	}{
-		IDs: []components.SHA256hash{},
+		Posts: []components.Post{},
 	}
 
-	res, err := db.c.Query(`SELECT pt.post_ID FROM posts AS pt 
-		WHERE pt.poster_ID = ?`, userID)
+	res, err := db.c.Query(`SELECT * FROM posts AS pt 
+		WHERE pt.poster_ID = ? ORDER BY pt.creation_date DESC`, userID)
 
 	if err != nil {
-
 		return components.InternalServerError,
 			fmt.Errorf("error getting user's photos: %w", err)
 	}
@@ -399,16 +398,23 @@ func (db *appdbimpl) GetUserPhotos(userID string) (photo string, err error) {
 			return components.InternalServerError, fmt.Errorf("error getting next user: %w", res.Err())
 		}
 
-		var photoID components.SHA256hash
+		var post components.Post
 
-		err = res.Scan(&photoID.Hash)
+		err = res.Scan(&post.Photo_ID.Hash, &post.Author_Name.Uname, &post.Description, &post.CreationTime)
 
 		if err != nil {
 			return components.InternalServerError,
 				fmt.Errorf("error scanning photo: %w", err)
 		}
 
-		photoIDlist.IDs = append(photoIDlist.IDs, photoID)
+		post.Author_Name.Uname, err = db.GetUsername(post.Author_Name.Uname)
+
+		if err != nil {
+			return components.InternalServerError,
+				fmt.Errorf("error getting username: %w", err)
+		}
+
+		photoIDlist.Posts = append(photoIDlist.Posts, post)
 	}
 
 	data, err := json.MarshalIndent(
@@ -622,9 +628,10 @@ func (db *appdbimpl) GetUserFollowing(username string) (following string, err er
 
 func (db *appdbimpl) GetPhotoLikes(photoID string) (likes string, err error) {
 
-	res, err := db.c.Query(`SELECT l.liker FROM likes as l, posts as p WHERE p.photo_code = ? AND p.post_ID = l.likes`, photoID)
+	res, err := db.c.Query(`SELECT l.liker FROM likes as l, posts as p WHERE p.post_ID = ? AND p.post_ID = l.post_ID`, photoID)
 
 	if err != nil {
+
 		return components.InternalServerError,
 			fmt.Errorf("error getting photo's likes: %w", err)
 	}
@@ -676,7 +683,7 @@ func (db *appdbimpl) GetPhotoLikes(photoID string) (likes string, err error) {
 
 func (db *appdbimpl) GetPhotoComments(photoID string) (comments string, err error) {
 
-	res, err := db.c.Query(`SELECT c.comment_ID, u.name, c.content, c.creation_date, c.post_code FROM comments as c, posts as p, users as u WHERE p.photo_code = ? AND p.post_ID = c.post_code AND u.ID = p.poster_ID`, photoID)
+	res, err := db.c.Query(`SELECT c.comment_ID, u.name, c.content, c.creation_date, c.post_code FROM comments as c, posts as p, users as u WHERE c.post_code = p.post_ID AND p.post_ID = ? AND u.ID = c.user_code`, photoID)
 
 	if err != nil {
 		return components.InternalServerError,
@@ -748,6 +755,12 @@ func (db *appdbimpl) GetUserBans(username string) (bans string, err error) {
 				fmt.Errorf("error scanning ban record: %w", err)
 		}
 
+		ban.Uname, err = db.GetUsername(ban.Uname)
+
+		if err != nil {
+			return components.InternalServerError, fmt.Errorf("error getting banished user name: %w", err)
+		}
+
 		banList.Bans = append(banList.Bans, ban)
 
 	}
@@ -810,7 +823,10 @@ func (db *appdbimpl) UnfollowUser(follower, followed string) (errstring string, 
 
 func (db *appdbimpl) Validate(username string, ID string) (is_valid bool, err error) {
 
-	err = db.c.QueryRow(`SELECT COUNT(*) FROM users as u WHERE u.ID = ? AND u.name = ?`, ID, username).Scan(&is_valid)
+	count := 0
+
+	err = db.c.QueryRow(`SELECT COUNT(*) FROM users as u WHERE u.ID = ? AND u.name = ?`, ID, username).Scan(&count)
+	is_valid = count == 1
 
 	if err != nil {
 		return false, fmt.Errorf("error validating user: %w", err)
@@ -834,7 +850,7 @@ func (db *appdbimpl) BanUser(banisher, banished string) (errstring string, err e
 		return components.InternalServerError, fmt.Errorf("error getting banished ID: %w", err)
 	}
 
-	_, err = db.c.Exec(` OR REPLACE INTO bans (banisher, banished) VALUES (?, ?)`, banisherID, banishedID)
+	_, err = db.c.Exec(`INSERT OR REPLACE INTO bans (banisher, banished) VALUES (?, ?)`, banisherID, banishedID)
 
 	if err != nil {
 		return components.InternalServerError, fmt.Errorf("error inserting ban: %w", err)
@@ -956,7 +972,7 @@ func (db *appdbimpl) UploadPhoto(username string, photo components.Photo, photo_
 
 	// Get current time
 
-	creation_time := time.Now().Format("time.RFC3339")
+	creation_time := time.Now().Format(time.RFC3339)
 
 	// Insert photo
 
@@ -1033,7 +1049,7 @@ func (db *appdbimpl) ChangeUsername(user_name string, new_username string) (errs
 		return components.InternalServerError, fmt.Errorf("error getting user ID: %w", err)
 	}
 
-	_, err = db.c.Exec(`UPDATE users SET username = ? WHERE user_code = ?`, new_username, userID)
+	_, err = db.c.Exec(`UPDATE users SET name = ? WHERE ID = ?`, new_username, userID)
 
 	if err != nil {
 		return components.InternalServerError, fmt.Errorf("error changing username: %w", err)
@@ -1050,7 +1066,9 @@ func (db *appdbimpl) GetStream(user_name string, from, offset int) (stream strin
 		return "", fmt.Errorf("error getting user ID: %w", err)
 	}
 
-	rows, err := db.c.Query(`SELECT post_ID, poster_ID, description, creation_date FROM posts AS p, followers AS f WHERE f.follower = ? AND f.followed = p.poster_ID ORDER BY p.creation_date DESC LIMIT ?, ?`, userID, from, offset)
+	rows, err := db.c.Query(`SELECT post_ID, poster_ID, description, creation_date FROM posts AS p, followers AS f WHERE f.follower = ? AND f.followed = p.poster_ID AND ? NOT IN (
+		SELECT banned FROM bans WHERE banisher = p.poster_ID AND banished = ?
+	)  ORDER BY p.creation_date DESC LIMIT ?, ?`, userID, userID, userID, from, offset)
 
 	if err != nil {
 		return "", fmt.Errorf("error getting stream: %w", err)
@@ -1079,11 +1097,19 @@ func (db *appdbimpl) GetStream(user_name string, from, offset int) (stream strin
 
 		var post components.Post
 
-		err := rows.Scan(&post.Photo_ID, &post.Author_ID, &post.Description, &post.CreationTime)
+		err := rows.Scan(&post.Photo_ID, &post.Author_Name.Uname, &post.Description, &post.CreationTime)
 
 		if err != nil {
 			return "", fmt.Errorf("error scanning row: %w", err)
 		}
+
+		auth_name, err := db.GetUsername(post.Author_Name.Uname)
+
+		if err != nil {
+			return "", fmt.Errorf("error getting author name: %w", err)
+		}
+
+		post.Author_Name.Uname = auth_name
 
 		posts.Posts = append(posts.Posts, post)
 	}

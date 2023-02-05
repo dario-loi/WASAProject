@@ -145,9 +145,9 @@ func (rt *_router) changeUsername(w http.ResponseWriter, r *http.Request, ps htt
 
 	// Get user id from header
 
-	id := r.Header.Get("user_id")
+	id := r.Header.Get("Authorization")
 
-	is_valid, err := rt.db.Validate(id, user_name)
+	is_valid, err := rt.db.Validate(user_name, id)
 
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
@@ -178,7 +178,7 @@ func (rt *_router) changeUsername(w http.ResponseWriter, r *http.Request, ps htt
 
 	dec := json.NewDecoder(r.Body)
 
-	var new_username string
+	var new_username components.User
 
 	err = dec.Decode(&new_username)
 
@@ -196,7 +196,7 @@ func (rt *_router) changeUsername(w http.ResponseWriter, r *http.Request, ps htt
 
 	// Change the username in the database
 
-	ret_data, err := rt.db.ChangeUsername(user_name, new_username)
+	ret_data, err := rt.db.ChangeUsername(user_name, new_username.Uname)
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)

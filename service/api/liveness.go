@@ -1,8 +1,9 @@
 package api
 
 import (
-	"github.com/julienschmidt/httprouter"
 	"net/http"
+
+	"github.com/julienschmidt/httprouter"
 )
 
 // liveness is an HTTP handler that checks the API server status. If the server cannot serve requests (e.g., some

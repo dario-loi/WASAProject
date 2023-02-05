@@ -66,7 +66,7 @@ type JSONTime time.Time
 
 func (t JSONTime) MarshalJSON() ([]byte, error) {
 
-	stamp := fmt.Sprintf("\"%s\"", time.Time(t).Format("time.RFC3339"))
+	stamp := fmt.Sprintf("\"%s\"", time.Time(t).Format(time.RFC3339))
 	return []byte(stamp), nil
 }
 
@@ -89,9 +89,9 @@ type Photo struct {
 
 type Post struct {
 	Photo_ID     SHA256hash `json:"photo_id"`
-	Author_ID    SHA256hash `json:"author_identifier"`
+	Author_Name  User       `json:"author_name"`
 	Description  string     `json:"description"`
-	CreationTime JSONTime   `json:"created-at"`
+	CreationTime JSONTime   `json:"created_at"`
 }
 
 type Stream struct {

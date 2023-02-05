@@ -174,8 +174,7 @@ export default {
                                 <input class="form-control" type="file" id="fileInput">
 
                                 <label for="formFile" class="form-label">Caption</label>
-                                <textarea class="form-control" type="text" id="captionInput" rows="6">
-                                </textarea>
+                                <textarea class="form-control" type="text" id="captionInput" rows="6"></textarea>
                             </form>
                         </div>
                     </div>

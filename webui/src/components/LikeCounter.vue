@@ -14,18 +14,20 @@ export default {
         async like() {
 
             if (this.is_liked) {
-                this.count += 1
+                this.count -= 1
+                this.$emit('unlike')
 
             } else {
-                this.count -= 1
+                this.count += 1
+                this.$emit('like')
             }
-
 
             this.is_liked = !this.is_liked
         },
 
         async refresh() {
-
+            this.is_liked = this.liked
+            this.count = parseInt(this.likes_count)
         }
 
     },
@@ -42,13 +44,13 @@ export default {
     <div class="d-flex align-items-center pb-2">
 
         <a type="button" class="btn btn-sm btn-outline-secondary likeButton" @click="like"
-            :class="{'btn-outline-success': is_liked, 'btn-outline-danger': !is_liked}">
+            :class="{ 'btn-outline-danger': is_liked, 'btn-outline-success': !is_liked}">
             <Transition name="slide-up" mode="out-in">
-                <span v-if="is_liked" class="bi bi-heart"> Like</span>
-                <span v-else class="bi bi-heart-fill"> Unlike</span>
+                <span v-if="is_liked" class="bi bi-heart-fill"> Unlike</span>
+                <span v-else class="bi bi-heart"> Like</span>
             </Transition>
         </a>
-        <span class="badge bg-secondary ms-2 me-2">
+        <span class="badge bg-secondary ms-1 me-1">
             <Transition name="slide-up" mode="out-in" :duration="{ 'enter': 300, 'leave': 100 }">
                 <div :key="count">
                     {{ count }}

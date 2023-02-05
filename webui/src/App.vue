@@ -180,7 +180,7 @@ export default {
 			<div class="container-fluid h-100">
 				<div class="row h-100 p-4">
 					<div class="col-md-3 col-sm-1"></div>
-					<div class="col-md-6 col-sm-10 mt-2 shadow-lg bg-light rounded">
+					<div class="col-md-6 col-sm-10 mt-2 mb-4 shadow-lg bg-light rounded">
 						<RouterView :key="$route.fullPath"></RouterView>
 					</div>
 					<div class="col-md-3 col-sm-1"></div>

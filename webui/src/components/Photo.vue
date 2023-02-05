@@ -33,10 +33,6 @@ export default {
 
             // Get the image data from the server
 
-            console.log("Getting image data from server...");
-
-            console.log("src: " + this.src)
-
             const response = await this.$axios.get("/resources/photos/" + this.src, {
                 responseType: "image/jpeg"
             });
@@ -53,7 +49,6 @@ export default {
         // likes, comments, etc...
 
         this.initialize();
-
 
     }
 }

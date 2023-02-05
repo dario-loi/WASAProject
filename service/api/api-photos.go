@@ -12,31 +12,12 @@ import (
 
 func (rt *_router) GetPhotoLikes(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	// Retrieve photo ID from request body
+	// Retrieve photo ID from path
 
-	decoder := json.NewDecoder(r.Body)
-
-	var photoID components.SHA256hash
-
-	err := decoder.Decode(&photoID)
-
-	if err != nil {
-
-		w.WriteHeader(http.StatusBadRequest)
-
-		_, err := w.Write([]byte(components.BadRequestError))
-
-		if err != nil {
-			ctx.Logger.WithError(err).Error("error writing response")
-		}
-
-		ctx.Logger.WithError(err).Error("error decoding JSON")
-
-		return // exit the function
-	}
+	photoID := ps.ByName("photo_id")
 
 	// get the photo likes
-	ret_data, err := rt.db.GetPhotoLikes(photoID.Hash)
+	ret_data, err := rt.db.GetPhotoLikes(photoID)
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -61,31 +42,12 @@ func (rt *_router) GetPhotoLikes(w http.ResponseWriter, r *http.Request, ps http
 
 func (rt *_router) GetPhotoComments(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	// Retrieve photo ID from request body
+	// Retrieve photo ID from request path
 
-	decoder := json.NewDecoder(r.Body)
-
-	var photoID components.SHA256hash
-
-	err := decoder.Decode(&photoID)
-
-	if err != nil {
-
-		w.WriteHeader(http.StatusBadRequest)
-
-		_, err := w.Write([]byte(components.BadRequestError))
-
-		if err != nil {
-			ctx.Logger.WithError(err).Error("error writing response")
-		}
-
-		ctx.Logger.WithError(err).Error("error decoding JSON")
-
-		return // exit the function
-	}
+	photoID := ps.ByName("photo_id")
 
 	// get the photo comments
-	ret_data, err := rt.db.GetPhotoComments(photoID.Hash)
+	ret_data, err := rt.db.GetPhotoComments(photoID)
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -111,7 +73,7 @@ func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprout
 
 	// Retrieve photo ID from path
 
-	photoID := ps.ByName("photoID")
+	photoID := ps.ByName("photo_id")
 
 	// get the user ID
 
@@ -154,7 +116,7 @@ func (rt *_router) unlikePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 
 	// Retrieve photo ID from path
 
-	photoID := ps.ByName("photoID")
+	photoID := ps.ByName("photo_id")
 
 	// get the user ID
 
@@ -197,7 +159,7 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 
 	// Retrieve photo ID from path
 
-	photoID := ps.ByName("photoID")
+	photoID := ps.ByName("photo_id")
 
 	// get the user ID
 
@@ -276,7 +238,7 @@ func (rt *_router) deleteComment(w http.ResponseWriter, r *http.Request, ps http
 
 	// Retrieve photo ID from path
 
-	photoID := ps.ByName("photoID")
+	photoID := ps.ByName("photo_id")
 
 	// get the user ID
 
