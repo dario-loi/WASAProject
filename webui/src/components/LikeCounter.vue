@@ -3,10 +3,21 @@
 export default {
     props: ['likes_count', 'liked'],
 
+    emits: ['like', 'unlike'],
+
     data: function () {
         return {
             is_liked: this.liked,
             count: parseInt(this.likes_count)
+        }
+    },
+
+    watch: {
+        likes_count: function (newVal, oldVal) {
+            this.refresh()
+        },
+        liked: function (newVal, oldVal) {
+            this.refresh()
         }
     },
 

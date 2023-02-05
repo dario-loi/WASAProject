@@ -1,6 +1,35 @@
 <script>
 export default {
-    props: ['author', 'date', 'text']
+    props: ['comment'],
+
+
+    data: function () {
+        return {
+            author: this.comment.author,
+            date: null,
+            text: this.comment.text
+        }
+    },
+
+    methods: {
+        async initialize() {
+            this.date = this.comment.creation_time;
+
+            // format to dd month yyyy at hh:mm
+
+            this.date = this.date.split("T");
+            let date = this.date[0].split("-");
+            let time = this.date[1].split(":");
+            time = time[0] + ":" + time[1];
+            date = date[2] + " " + this.$months[parseInt(date[1]) - 1] + " " + date[0] + " at " + time;
+
+            this.date = date;
+        }
+    },
+
+    mounted() {
+        this.initialize();
+    }
 }
 </script>
 

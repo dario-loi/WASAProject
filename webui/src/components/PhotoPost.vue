@@ -46,13 +46,13 @@ export default {
             let response = await this.$axios.get("/users/" + this.post_data.author_name["username-string"] + "/profile/photos/" + this.photo_id + "/likes");
 
             this.likes = response.data.users.length;
-            this.have_i_liked_this = response.data.users.includes(this.$user_state.username);
+            this.have_i_liked_this = response.data.users.map((user) => user["username-string"]).includes(this.$user_state.username);
 
             // Fetch comments
 
             response = await this.$axios.get("/users/" + this.post_data.author_name["username-string"] + "/profile/photos/" + this.photo_id + "/comments");
 
-            console.table(response.data.comments);
+            console.log(this.likes)
         },
 
         async WriteComment() {
@@ -61,6 +61,53 @@ export default {
 
         async DeletePost() {
 
+        },
+
+        async Like() {
+
+            // Update the state on the server
+
+            console.log("Request Path: " + "/users/" + this.post_data.author_name["username-string"] + "/profile/photos/" + this.photo_id + "/likes/" + this.$user_state.headers.Authorization);
+
+            console.log(this.$user_state.headers.Authorization)
+
+            let response = await this.$axios.put("/users/" + this.post_data.author_name["username-string"] + "/profile/photos/" + this.photo_id + "/likes/" + this.$user_state.headers.Authorization, {}, {
+                headers: {
+                    "Authorization": this.$user_state.headers.Authorization
+                }
+            });
+
+            if (response.statusText != "No Content") {
+                alert("Error: " + response.statusText);
+                return;
+            }
+
+            // Only for consistency, the component does this internally.
+            this.have_i_liked_this = true;
+            this.likes++;
+        },
+
+        async Unlike() {
+
+            // Update the state on the server
+
+            console.log("Request Path: " + "/users/" + this.post_data.author_name["username-string"] + "/profile/photos/" + this.photo_id + "/likes/" + this.$user_state.headers.Authorization);
+
+            console.log(this.$user_state.headers.Authorization)
+
+            let response = await this.$axios.delete("/users/" + this.post_data.author_name["username-string"] + "/profile/photos/" + this.photo_id + "/likes/" + this.$user_state.headers.Authorization, {
+                headers: {
+                    "Authorization": this.$user_state.headers.Authorization
+                }
+            });
+
+            if (response.statusText != "No Content") {
+                alert("Error: " + response.statusText);
+                return;
+            }
+
+            this.have_i_liked_this = false;
+            this.likes--;
         }
 
     },
@@ -116,7 +163,8 @@ export default {
 
         <div class="row mt-3 align-content-start">
             <div class="col-auto">
-                <LikeCounter class="v-center" :likes_count="this.likes" :liked="this.have_i_liked_this"></LikeCounter>
+                <LikeCounter class="v-center" :likes_count="this.likes" :liked="this.have_i_liked_this" @like="Like"
+                    @unlike="Unlike"></LikeCounter>
             </div>
             <div class="col-auto d-flex align-items-center pb-2">
                 <button class="btn bt-sm comment-button btn-outline-primary v-center">
@@ -150,14 +198,15 @@ export default {
         <!-- Comments -->
 
         <div class="row">
-
-            <div class="col-12">
-
-                <span class="h5 mx-1 font-weight-bold align-middle text-muted text-start">Comments: </span>
-
+            <div v-if="comments.length == 0" class="col-12 align-content-center w-100"><!-- Center the text -->
+                <span class="h5 mx-1 font-weight-bold align-middle text-muted text-center">No comments yet.</span>
             </div>
-
-
+            <div v-else class="col-12">
+                <span class="h5 mx-1 font-weight-bold align-middle text-muted text-start">Comments: </span>
+            </div>
+            <div class="col-12">
+                <Comment v-for="comment in comments" :comment="comment"></Comment>
+            </div>
 
         </div>
     </div>

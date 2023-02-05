@@ -101,9 +101,9 @@ type AppDatabase interface {
 
 	UnbanUser(bannedID string, bannerID string) (errstring string, err error)
 
-	LikePhoto(likeeID string, likerID string) (errstring string, err error)
+	LikePhoto(likerID string, photoID string) (errstring string, err error)
 
-	UnlikePhoto(likeeID string, likerID string) (errstring string, err error)
+	UnlikePhoto(likerID string, photoID string) (errstring string, err error)
 
 	CommentPhoto(username string, photoID string, comment components.Comment) (errstring string, err error)
 
@@ -882,15 +882,13 @@ func (db *appdbimpl) UnbanUser(banisher, banished string) (errstring string, err
 	return "", nil
 }
 
-func (db *appdbimpl) LikePhoto(username, photoID string) (errstring string, err error) {
-
-	userID, err := db.GetUserID(username)
+func (db *appdbimpl) LikePhoto(likerID, photoID string) (errstring string, err error) {
 
 	if err != nil {
 		return components.InternalServerError, fmt.Errorf("error getting user ID: %w", err)
 	}
 
-	_, err = db.c.Exec(`INSERT OR REPLACE INTO likes (post_ID, liker) VALUES (?, ?)`, photoID, userID)
+	_, err = db.c.Exec(`INSERT OR REPLACE INTO likes (post_ID, liker) VALUES (?, ?)`, photoID, likerID)
 
 	if err != nil {
 		return components.InternalServerError, fmt.Errorf("error inserting like: %w", err)
@@ -899,15 +897,13 @@ func (db *appdbimpl) LikePhoto(username, photoID string) (errstring string, err 
 	return "", nil
 }
 
-func (db *appdbimpl) UnlikePhoto(username, photoID string) (errstring string, err error) {
-
-	userID, err := db.GetUserID(username)
+func (db *appdbimpl) UnlikePhoto(likerID, photoID string) (errstring string, err error) {
 
 	if err != nil {
 		return components.InternalServerError, fmt.Errorf("error getting user ID: %w", err)
 	}
 
-	_, err = db.c.Exec(`DELETE FROM likes WHERE post_ID = ? AND liker = ?`, photoID, userID)
+	_, err = db.c.Exec(`DELETE FROM likes WHERE post_ID = ? AND liker = ?`, photoID, likerID)
 
 	if err != nil {
 		return components.InternalServerError, fmt.Errorf("error deleting like: %w", err)

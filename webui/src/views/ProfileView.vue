@@ -209,7 +209,7 @@ export default {
         <div class="align-items-center text-center h-100">
             <div class="container text-center pt-3 pb-2 border-bottom">
                 <div class="row w-100 my-3">
-                    <h2 class="col-3">
+                    <h2 class="col-3 text-break d-inline-block" style="vertical-align: middle;">
                         <i class="bi-person-circle mx-1"></i>{{ username }}'s profile.
                     </h2>
                     <div class="col-9" style="align-items: center; vertical-align: middle;">

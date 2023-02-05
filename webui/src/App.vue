@@ -137,9 +137,9 @@ export default {
 					</li>
 				</ul>
 
-				<div class="col-md-4 col-sm-0 text-light">
+				<div class="col-md-4 col-sm-0 text-light text-truncate d-inline-block">
 
-					<h5>
+					<h5 class="">
 						{{
 							$user_state.username == null ? "Not Logged In" : "Logged in as " + $user_state.username
 						}}

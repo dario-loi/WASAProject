@@ -144,15 +144,6 @@ components:
         parent_post:
           $ref: "#/components/schemas/SHA256hash"
 
-    CommentID:
-      title: CommentID
-      type: object
-      description: |-
-        An ID identifying a comment, we use our SHA256 hash.
-      properties:
-        token:
-          $ref: "#/components/schemas/SHA256hash"
-
     CommentList:
       title: CommentList
       type: object
@@ -703,7 +694,7 @@ paths:
         description: The comment's ID.
         required: true
         schema:
-          $ref: "#/components/schemas/CommentID"
+          $ref: "#/components/schemas/SHA256hash"
     put:
       operationId: commentPhoto
       summary: Comment a photo.

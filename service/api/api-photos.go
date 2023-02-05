@@ -77,11 +77,17 @@ func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprout
 
 	// get the user ID
 
-	token := r.Header.Get("user_id")
+	token := r.Header.Get("Authorization")
+	liker_id := ps.ByName("liker_id")
+	liker_name, err := rt.db.GetUsername(liker_id)
 
-	userName := ps.ByName("user_name")
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		ctx.Logger.WithError(err).Error("error getting username")
+		return
+	}
 
-	is_valid, err := rt.db.Validate(userName, token)
+	is_valid, err := rt.db.Validate(liker_name, token)
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -94,7 +100,7 @@ func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprout
 		return
 	}
 
-	ret, err := rt.db.LikePhoto(userName, photoID)
+	ret, err := rt.db.LikePhoto(liker_id, photoID)
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -122,9 +128,16 @@ func (rt *_router) unlikePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 
 	token := r.Header.Get("Authorization")
 
-	userName := ps.ByName("user_name")
+	liker_id := ps.ByName("liker_id")
+	liker_name, err := rt.db.GetUsername(liker_id)
 
-	is_valid, err := rt.db.Validate(userName, token)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		ctx.Logger.WithError(err).Error("error getting username")
+		return
+	}
+
+	is_valid, err := rt.db.Validate(liker_name, token)
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -137,7 +150,7 @@ func (rt *_router) unlikePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
-	ret, err := rt.db.UnlikePhoto(userName, photoID)
+	ret, err := rt.db.UnlikePhoto(liker_id, photoID)
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)

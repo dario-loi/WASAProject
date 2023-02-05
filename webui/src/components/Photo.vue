@@ -57,7 +57,7 @@ export default {
 <template>
 
     <div v-if="!is_loading">
-        <img :src="src_" :alt="(alt != null ? alt : 'Wasaphoto Image')" class="img-fluid opacity-100"
+        <img :src="src_" :alt="(alt != null ? alt : 'Wasaphoto Image')" class="shadow-sm rounded img-fluid opacity-100"
             :style="(style_ != null ? style_ : '')" />
     </div>
     <div v-else>
