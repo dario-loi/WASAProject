@@ -34,6 +34,7 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"database/sql"
+	_ "embed"
 	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
@@ -46,6 +47,9 @@ import (
 	"git.sapienzaapps.it/fantasticcoffee/fantastic-coffee-decaffeinated/service/components"
 	"github.com/sirupsen/logrus"
 )
+
+//go:embed migration.sql
+var migration string
 
 // AppDatabase is the high level interface for the DB
 type AppDatabase interface {
@@ -145,10 +149,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 		}
 	}
 
-	// go:embed migration.sql
-	var migration_strings string
-
-	_, err = db.Exec(migration_strings)
+	_, err = db.Exec(migration)
 
 	if err != nil {
 		return nil, fmt.Errorf("error executing migration: %w", err)
@@ -176,9 +177,8 @@ func (db *appdbimpl) GetUsername(ID string) (username string, err error) {
 	return username, nil
 }
 
-// PostUserID returns the ID of the user with the given name
-// Create the user if it doesn't exist
-
+// PostUserID returns the ID of the user with the given name,
+// Creates the user if it doesn't exist
 func (db *appdbimpl) PostUserID(userName string) (json string, err error) {
 
 	// check if the user already exists
@@ -188,6 +188,7 @@ func (db *appdbimpl) PostUserID(userName string) (json string, err error) {
 	err = db.c.QueryRow(`SELECT COUNT(id) FROM users WHERE name = ?`, userName).Scan(&count)
 
 	if err != nil {
+
 		data, e := components.Error{Code: 500, Message: "Internal Server Error"}.ToJSON()
 
 		if e != nil {
@@ -212,6 +213,7 @@ func (db *appdbimpl) PostUserID(userName string) (json string, err error) {
 		_, err = db.c.Exec(`INSERT OR REPLACE INTO users (id, name) VALUES (?, ?)`, userID, userName)
 
 		if err != nil {
+
 			data, e := components.Error{Code: 500, Message: "Internal Server Error"}.ToJSON()
 
 			if e != nil {
@@ -224,7 +226,6 @@ func (db *appdbimpl) PostUserID(userName string) (json string, err error) {
 	} else {
 
 		// get the user ID
-
 		err = db.c.QueryRow(`SELECT id FROM users WHERE name = ?`, userName).Scan(&userID)
 
 		if err != nil {
