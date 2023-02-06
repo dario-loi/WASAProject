@@ -21,6 +21,8 @@ export default {
         }
     },
 
+    emits: ["delete-post"],
+
     methods: {
 
         async initialize() {
@@ -60,6 +62,26 @@ export default {
         },
 
         async DeletePost() {
+
+            // Update the state on the server
+
+            console.log("Request Path: " + "/users/" + this.post_data.author_name["username-string"] + "/profile/photos/" + this.photo_id);
+
+            let response = await this.$axios.delete("/users/" + this.post_data.author_name["username-string"] + "/profile/photos/" + this.photo_id, {
+                headers: {
+                    "Authorization": this.$user_state.headers.Authorization
+                }
+            });
+
+            if (response.statusText != "No Content") {
+                alert("Error: " + response.statusText);
+                return;
+            }
+
+            // Remove the post from the stream
+
+
+            this.$emit("delete-post", this.post_data);
 
         },
 

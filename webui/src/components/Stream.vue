@@ -21,10 +21,20 @@ export default {
         }
     },
 
+    emits: ["delete-post"],
+
     methods: {
 
         async initialize() {
 
+        },
+
+        async RemovePost(post_data) {
+
+            // Bubble up the event, let the parent handle it
+            // Not optimal design but its what we are stuck with
+
+            this.$emit("delete-post", post_data);
         }
 
     },
@@ -39,7 +49,7 @@ export default {
 <template>
 
     <div v-for="post in posts_" :key="post.id" class="m-1">
-        <PhotoPost :post_data="post" />
+        <PhotoPost :post_data="post" @delete-post="RemovePost" />
     </div>
 
 </template>

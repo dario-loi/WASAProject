@@ -1006,7 +1006,7 @@ func (db *appdbimpl) DeletePhoto(username string, photoID string) (errstring str
 		return components.InternalServerError, fmt.Errorf("error getting user ID: %w", err)
 	}
 
-	_, err = db.c.Exec(`DELETE FROM posts WHERE post_ID = ? AND user_code = ?`, photoID, userID)
+	_, err = db.c.Exec(`DELETE FROM posts WHERE post_ID = ? AND poster_ID = ?`, photoID, userID)
 
 	if err != nil {
 		return components.InternalServerError, fmt.Errorf("error deleting photo: %w", err)
@@ -1014,7 +1014,7 @@ func (db *appdbimpl) DeletePhoto(username string, photoID string) (errstring str
 
 	// erase from ./photos
 
-	err = os.Remove("./photos/" + photoID + ".jpg")
+	err = os.Remove("./photos/" + photoID + ".png")
 
 	if err != nil {
 		return components.InternalServerError, fmt.Errorf("error deleting photo: %w", err)

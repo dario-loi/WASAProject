@@ -88,6 +88,11 @@ export default {
 
         },
 
+        async DeletePost(post_data) {
+
+            this.refresh();
+        },
+
         async ChangeName() {
 
             const new_name = prompt("Change name", "New name");
@@ -320,7 +325,7 @@ export default {
         </div>
     </div>
     <div v-else class="container">
-        <Stream :posts="photos" />
+        <Stream :posts="photos" @delete-post="DeletePost" />
     </div>
 </template>
 
