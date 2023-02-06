@@ -11,7 +11,7 @@ export default {
 
     watch: {
         posts: function (new_posts) {
-            this.posts = new_posts;
+            this.posts_ = new_posts;
         }
     },
 
