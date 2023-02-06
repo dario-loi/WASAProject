@@ -8,6 +8,4 @@ EXPOSE 3000 4000
 WORKDIR /app/
 COPY --from=builder /tmp/webapi /bin/webapi
 
-COPY ./cmd/webapi/migration.sql /bin/migration.sql
-
 CMD [ "/bin/webapi"]

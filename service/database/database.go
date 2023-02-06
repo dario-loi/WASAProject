@@ -145,25 +145,10 @@ func New(db *sql.DB) (AppDatabase, error) {
 		}
 	}
 
-	// Load migration queries from file and execute them
+	// go:embed migration.sql
+	var migration_strings string
 
-	// get current directory
-
-	cwd, err := os.Getwd()
-
-	if err != nil {
-		return nil, fmt.Errorf("error getting current directory: %w", err)
-	}
-
-	// read migration file
-
-	migration_data, err := os.ReadFile(cwd + "/migration.sql")
-
-	if err != nil {
-		return nil, fmt.Errorf("error reading migration file: %w", err)
-	}
-
-	_, err = db.Exec(string(migration_data))
+	_, err = db.Exec(migration_strings)
 
 	if err != nil {
 		return nil, fmt.Errorf("error executing migration: %w", err)
