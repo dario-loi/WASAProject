@@ -163,15 +163,12 @@ export default {
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-
                     <!-- Image Input -->
                     <div class="mb-3">
                         <div class="row g-3 align-items-center">
-
                             <form id="formFile">
-
                                 <label for="formFile" class="form-label">Upload Image</label>
-                                <input class="form-control" type="file" id="fileInput">
+                                <input class="form-control" type="file" id="fileInput" accept="image/png">
 
                                 <label for="formFile" class="form-label">Caption</label>
                                 <textarea class="form-control" type="text" id="captionInput" rows="6"></textarea>

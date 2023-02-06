@@ -96,6 +96,12 @@ export default {
                 return
             }
 
+
+            if (!new_name.match("^[a-zA-Z][a-zA-Z0-9_]{2,32}$")) {
+                alert("Invalid username, must respect RegEx: ^[a-zA-Z][a-zA-Z0-9_]{2,32}$ (3 - 32 characters, first character must be a letter, only letters, numbers and underscores allowed)");
+                return;
+            }
+
             const req_body = {
                 "username-string": new_name
             }
@@ -104,7 +110,7 @@ export default {
                 headers: this.$user_state.headers
             });
 
-            if (res.statusText != "No Content") {
+            if (res.statusText != "No Content" && res.statusText != "OK") {
 
                 alert("Error: " + res.statusText);
                 console.table(res);
@@ -114,6 +120,8 @@ export default {
             this.$user_state.username = new_name;
             this.username = new_name;
             this.$user_state.headers["Authorization"] = res.data.token.hash;
+
+            this.refresh();
         },
 
         async Follow() {

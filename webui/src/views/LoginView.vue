@@ -18,6 +18,14 @@ export default {
 
             let username = document.getElementById("login-form").value;
 
+            // check username regex
+
+            if (!username.match("^[a-zA-Z][a-zA-Z0-9_]{2,32}$")) {
+                alert("Invalid username, must respect RegEx: ^[a-zA-Z][a-zA-Z0-9_]{2,32}$ (3 - 32 characters, first character must be a letter, only letters, numbers and underscores allowed)");
+                return;
+            }
+
+
             let response = await this.$axios.put("/session", {
                 "username-string": username
             });
