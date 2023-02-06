@@ -1,0 +1,13 @@
+FROM golang:1.19.4 as builder
+WORKDIR /src
+COPY  . .
+RUN go build -o /tmp/webapi ./cmd/webapi
+
+FROM debian:bullseye
+EXPOSE 3000 4000
+WORKDIR /app/
+COPY --from=builder /tmp/webapi /bin/webapi
+
+COPY ./cmd/webapi/migration.sql /bin/migration.sql
+
+CMD [ "/bin/webapi"]

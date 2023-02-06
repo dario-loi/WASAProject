@@ -1,0 +1,7 @@
+FROM node:lts as builder
+WORKDIR /src/
+COPY webui webui
+WORKDIR /src/webui
+RUN npm install && npm run build-prod
+FROM nginx:1.21.3
+COPY --from=builder /src/webui/dist /usr/share/nginx/html
