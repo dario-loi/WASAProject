@@ -99,20 +99,6 @@ components:
         follow-list:
           $ref: "#/components/schemas/UserList"
 
-    IDList:
-      title: IDList
-      type: object
-      description: |-
-        A list of SHA256 hashes, used to represent a list of photos, posts or users.
-      properties:
-        ids:
-          type: array
-          description: The list of SHA256 hashes
-          minItems: 0
-          maxItems: 4294967295
-          items:
-            $ref: "#/components/schemas/SHA256hash"
-
     Comment:
       title: Comment
       type: object
@@ -352,8 +338,8 @@ paths:
         schema:
           $ref: "#/components/schemas/Username"
     get:
-      operationId: getUserPhotos
-      summary: Get a user's photos
+      operationId: getUserProfile
+      summary: Get a user's profile photos
       tags:
         - "photos"
       description: |-

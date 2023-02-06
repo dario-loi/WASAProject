@@ -114,7 +114,11 @@ func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httproute
 
 	bin := buf.Bytes()
 
-	w.Write([]byte("data:image/png;base64,"))
+	_, err = w.Write([]byte("data:image/png;base64,"))
+
+	if err != nil {
+		ctx.Logger.WithError(err).Error("error writing response (propending base64 header)")
+	}
 
 	// Send the photo to the client
 	_, err = w.Write([]byte(toBase64(bin)))

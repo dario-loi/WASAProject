@@ -446,9 +446,11 @@ func (rt *_router) getStream(w http.ResponseWriter, r *http.Request, ps httprout
 	is_valid, err := rt.db.Validate(userName, token)
 
 	if err != nil {
+
+		ctx.Logger.WithError(err).Error("error validating user")
+
 		w.WriteHeader(http.StatusInternalServerError)
 		_, err := w.Write([]byte(components.InternalServerError))
-		ctx.Logger.WithError(err).Error("error validating user")
 
 		if err != nil {
 			ctx.Logger.WithError(err).Error("error writing response")
@@ -481,9 +483,10 @@ func (rt *_router) getStream(w http.ResponseWriter, r *http.Request, ps httprout
 
 	if err != nil {
 
+		ctx.Logger.WithError(err).Error("bad getstream request query")
+
 		w.WriteHeader(http.StatusBadRequest)
 		_, err := w.Write([]byte(components.BadRequestError))
-		ctx.Logger.WithError(err).Error("bad getstream request query")
 
 		if err != nil {
 			ctx.Logger.WithError(err).Error("error writing response")
@@ -503,9 +506,10 @@ func (rt *_router) getStream(w http.ResponseWriter, r *http.Request, ps httprout
 
 	if err != nil {
 
+		ctx.Logger.WithError(err).Error("bad getstream request query")
+
 		w.WriteHeader(http.StatusBadRequest)
 		_, err := w.Write([]byte(components.BadRequestError))
-		ctx.Logger.WithError(err).Error("bad getstream request query")
 
 		if err != nil {
 			ctx.Logger.WithError(err).Error("error writing response")
@@ -517,9 +521,10 @@ func (rt *_router) getStream(w http.ResponseWriter, r *http.Request, ps httprout
 
 	if lower_bound < 0 || offset < 1 || offset > 255 {
 
+		ctx.Logger.WithError(err).Error("bad getstream request")
+
 		w.WriteHeader(http.StatusBadRequest)
 		_, err := w.Write([]byte(components.BadRequestError))
-		ctx.Logger.WithError(err).Error("bad getstream request")
 
 		if err != nil {
 			ctx.Logger.WithError(err).Error("error writing response")
