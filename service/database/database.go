@@ -1037,16 +1037,16 @@ func (db *appdbimpl) UploadPhoto(username string, photo components.Photo, photo_
 		return components.InternalServerError, fmt.Errorf("error decoding PNG: %w", err)
 	}
 
-	_, err = os.Stat("./photos")
+	_, err = os.Stat("/tmp/photos")
 
 	if os.IsNotExist(err) {
-		err = os.Mkdir("./photos", 0755)
+		err = os.Mkdir("/tmp/photos", 0755)
 		if err != nil {
-			return components.InternalServerError, fmt.Errorf("error creating ./photos: %w", err)
+			return components.InternalServerError, fmt.Errorf("error creating /tmp/photos: %w", err)
 		}
 	}
 
-	f, err := os.OpenFile("./photos/"+photo_ID+".png", os.O_WRONLY|os.O_CREATE, 0777)
+	f, err := os.OpenFile("/tmp/photos/"+photo_ID+".png", os.O_WRONLY|os.O_CREATE, 0777)
 
 	if err != nil {
 		return components.InternalServerError, fmt.Errorf("error creating file: %w", err)
@@ -1077,9 +1077,9 @@ func (db *appdbimpl) DeletePhoto(username string, photoID string) (errstring str
 		return components.InternalServerError, fmt.Errorf("error deleting photo: %w", err)
 	}
 
-	// erase from ./photos
+	// erase from /tmp/photos
 
-	err = os.Remove("./photos/" + photoID + ".png")
+	err = os.Remove("/tmp/photos/" + photoID + ".png")
 
 	if err != nil {
 		return components.InternalServerError, fmt.Errorf("error deleting photo: %w", err)
@@ -1112,6 +1112,11 @@ func (db *appdbimpl) ChangeUsername(user_name string, new_username string) (errs
 	}()
 
 	if rows.Next() {
+
+		if rows.Err() != nil {
+			return components.InternalServerError, fmt.Errorf("error checking if username is taken: %w", err)
+		}
+
 		return components.ConflictError, fmt.Errorf("username is taken")
 	}
 

@@ -62,7 +62,7 @@ func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httproute
 
 	// Get the photo from the filesystem
 
-	img_file, err := os.Open("photos/" + uuid + ".png")
+	img_file, err := os.Open("/tmp/photos/" + uuid + ".png")
 
 	if err != nil {
 
