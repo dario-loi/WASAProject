@@ -111,22 +111,53 @@ export default {
                 "username-string": new_name
             }
 
+            // How do I catch errors here? 400 crashes
+
+            // 
+
             const res = await this.$axios.put("/users/" + this.$user_state.username + "/profile", req_body, {
                 headers: this.$user_state.headers
+            }).catch(err => {
+
+                if (err.response.status == 400) {
+                    alert("Error: " + err.response.data["error-string"]);
+                    return
+                } else if (err.response.status == 401) {
+                    alert("Error: " + err.response.data["error-string"]);
+                    this.$router.push("/");
+                    return
+                } else if (err.response.status == 409) {
+                    alert("Username already taken");
+                    return
+                }
+
+                console.table(err.response);
+                return
+            }).then(res => {
+
+                if (res == undefined) {
+                    console.log("Error: undefined response");
+                    return
+                }
+
+                if (res.statusText != "OK") {
+                    alert("Error: " + res.statusText);
+                    console.table(res);
+                    return
+                }
+
+                this.$user_state.username = new_name;
+                this.username = new_name;
+
+                this.$user_state.headers["Authorization"] = res.data.hash;
+
+                console.log("Name Changed, dumping user state")
+                console.table(this.$user_state);
+
+
+                this.$router.push("/profile/" + new_name);
             });
 
-            if (res.statusText != "No Content" && res.statusText != "OK") {
-
-                alert("Error: " + res.statusText);
-                console.table(res);
-                return
-            }
-
-            this.$user_state.username = new_name;
-            this.username = new_name;
-            this.$user_state.headers["Authorization"] = res.data.token.hash;
-
-            this.refresh();
         },
 
         async Follow() {

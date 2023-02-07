@@ -1,4 +1,5 @@
 import {createApp, reactive} from 'vue'
+import sha256 from 'js-sha256'
 import App from './App.vue'
 import router from './router'
 import axios from './services/axios.js';
@@ -39,6 +40,10 @@ app.config.globalProperties.$views = views;
 app.config.globalProperties.$axios = axios;
 app.config.globalProperties.$user_state = reactive(state);
 app.config.globalProperties.$months = months;
+
+app.config.globalProperties.$hasher = (password) => {
+    return sha256(password);
+}
 
 app.component("ErrorMsg", ErrorMsg);
 app.component("LoadingSpinner", LoadingSpinner);

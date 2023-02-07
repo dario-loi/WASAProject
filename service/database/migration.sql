@@ -1,6 +1,9 @@
+
+PRAGMA foreign_keys = ON;
+
 CREATE TABLE IF NOT EXISTS users (
-	ID string PRIMARY KEY, 
-	name string NOT NULL
+	ID string PRIMARY KEY NOT NULL, 
+	name string UNIQUE NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS bans (
@@ -23,8 +26,7 @@ CREATE TABLE IF NOT EXISTS posts (
 	poster_ID string NOT NULL,
 	description string,
 	creation_date datetime,
-	FOREIGN KEY (poster_ID) REFERENCES users(ID) ON DELETE CASCADE ON UPDATE CASCADE,
-	FOREIGN KEY (post_ID) REFERENCES likes(post_ID) ON DELETE CASCADE ON UPDATE CASCADE
+	FOREIGN KEY (poster_ID) REFERENCES users(ID) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS likes (

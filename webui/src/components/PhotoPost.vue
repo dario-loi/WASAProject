@@ -83,10 +83,7 @@ export default {
 
             // SHA256 hash the comment ID
 
-            const textAsBuffer = new TextEncoder().encode(to_hash);
-            const hashBuffer = await window.crypto.subtle.digest('SHA-256', textAsBuffer);
-            const hashArray = Array.from(new Uint8Array(hashBuffer))
-            const comment_id = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            const comment_id = this.$hasher(to_hash);
 
             let comm_obj = {
                 comment_id: {

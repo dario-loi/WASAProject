@@ -162,51 +162,52 @@ func New(db *sql.DB) (AppDatabase, error) {
 
 		logrus.Error("migration.sql not found, migrating from an ugly hardcoded string (gotta get this exam)")
 
-		_, err = db.Exec(`CREATE TABLE IF NOT EXISTS users (
-				ID string PRIMARY KEY, 
-				name string NOT NULL
-			);
+		_, err = db.Exec(`PRAGMA foreign_keys = ON;
 
-			CREATE TABLE IF NOT EXISTS bans (
-				banisher string NOT NULL,
-				banished string NOT NULL,
-				FOREIGN KEY (banisher) REFERENCES users(ID) ON DELETE CASCADE ON UPDATE CASCADE,
-				FOREIGN KEY (banished) REFERENCES users(ID) ON DELETE CASCADE ON UPDATE CASCADE
+CREATE TABLE IF NOT EXISTS users (
+	ID string PRIMARY KEY NOT NULL, 
+	name string UNIQUE NOT NULL
+);
 
-			);
+CREATE TABLE IF NOT EXISTS bans (
+	banisher string NOT NULL,
+	banished string NOT NULL,
+	FOREIGN KEY (banisher) REFERENCES users(ID) ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY (banished) REFERENCES users(ID) ON DELETE CASCADE ON UPDATE CASCADE
 
-			CREATE TABLE IF NOT EXISTS followers (
-				follower string NOT NULL,
-				followed string NOT NULL,
-				FOREIGN KEY (follower) REFERENCES users(ID) ON DELETE CASCADE ON UPDATE CASCADE,
-				FOREIGN KEY (followed) REFERENCES users(ID) ON DELETE CASCADE ON UPDATE CASCADE
-			);
+);
 
-			CREATE TABLE IF NOT EXISTS posts (
-				post_ID string PRIMARY KEY,
-				poster_ID string NOT NULL,
-				description string,
-				creation_date datetime,
-				FOREIGN KEY (poster_ID) REFERENCES users(ID) ON DELETE CASCADE ON UPDATE CASCADE,
-				FOREIGN KEY (post_ID) REFERENCES likes(post_ID) ON DELETE CASCADE ON UPDATE CASCADE
-			);
+CREATE TABLE IF NOT EXISTS followers (
+	follower string NOT NULL,
+	followed string NOT NULL,
+	FOREIGN KEY (follower) REFERENCES users(ID) ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY (followed) REFERENCES users(ID) ON DELETE CASCADE ON UPDATE CASCADE
+);
 
-			CREATE TABLE IF NOT EXISTS likes (
-				post_ID string NOT NULL,
-				liker string NOT NULL,
-				FOREIGN KEY (post_ID) REFERENCES posts(post_ID) ON DELETE CASCADE ON UPDATE CASCADE,
-				FOREIGN KEY (liker) REFERENCES users(ID) ON DELETE CASCADE ON UPDATE CASCADE
-			);
+CREATE TABLE IF NOT EXISTS posts (
+	post_ID string PRIMARY KEY,
+	poster_ID string NOT NULL,
+	description string,
+	creation_date datetime,
+	FOREIGN KEY (poster_ID) REFERENCES users(ID) ON DELETE CASCADE ON UPDATE CASCADE
+);
 
-			CREATE TABLE IF NOT EXISTS comments (
-				comment_ID string PRIMARY KEY,
-				post_code string NOT NULL,
-				user_code string NOT NULL,
-				content string,
-				creation_date datetime,
-				FOREIGN KEY (post_code) REFERENCES posts(post_ID) ON DELETE CASCADE ON UPDATE CASCADE,
-				FOREIGN KEY (user_code) REFERENCES users(ID) ON DELETE CASCADE ON UPDATE CASCADE
-			);`)
+CREATE TABLE IF NOT EXISTS likes (
+	post_ID string NOT NULL,
+	liker string NOT NULL,
+	FOREIGN KEY (post_ID) REFERENCES posts(post_ID) ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY (liker) REFERENCES users(ID) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS comments (
+	comment_ID string PRIMARY KEY,
+	post_code string NOT NULL,
+	user_code string NOT NULL,
+	content string,
+	creation_date datetime,
+	FOREIGN KEY (post_code) REFERENCES posts(post_ID) ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY (user_code) REFERENCES users(ID) ON DELETE CASCADE ON UPDATE CASCADE
+);`)
 
 		if err != nil {
 			return nil, fmt.Errorf("error executing migration: %w", err)
@@ -612,6 +613,7 @@ func (db *appdbimpl) GetUserFollowing(username string) (following string, err er
 	userID, err := db.GetUserID(username)
 
 	if err != nil {
+		logrus.Error(err)
 		return components.InternalServerError,
 			fmt.Errorf("error getting user ID: %w", err)
 	}
@@ -619,6 +621,7 @@ func (db *appdbimpl) GetUserFollowing(username string) (following string, err er
 	res, err := db.c.Query(`SELECT followed FROM followers WHERE follower = ?`, userID)
 
 	if err != nil {
+		logrus.Error(err)
 		return components.InternalServerError,
 			fmt.Errorf("error getting user's following: %w", err)
 	}
@@ -634,6 +637,7 @@ func (db *appdbimpl) GetUserFollowing(username string) (following string, err er
 	for res.Next() {
 
 		if res.Err() != nil {
+			logrus.Error(err)
 			return components.InternalServerError, fmt.Errorf("error getting next user: %w", res.Err())
 		}
 
@@ -642,6 +646,7 @@ func (db *appdbimpl) GetUserFollowing(username string) (following string, err er
 		err = res.Scan(&followingID)
 
 		if err != nil {
+			logrus.Error(err)
 			return components.InternalServerError,
 				fmt.Errorf("error scanning following: %w", err)
 		}
@@ -653,6 +658,7 @@ func (db *appdbimpl) GetUserFollowing(username string) (following string, err er
 		}
 
 		if err != nil {
+			logrus.Error(err)
 			return components.InternalServerError, fmt.Errorf("error getting following name: %w", err)
 		}
 
@@ -663,6 +669,7 @@ func (db *appdbimpl) GetUserFollowing(username string) (following string, err er
 	data, err := json.MarshalIndent(followingNames, "", "	")
 
 	if err != nil {
+		logrus.Error(err)
 		return components.InternalServerError,
 			fmt.Errorf("error converting following to JSON: %w", err)
 	}
@@ -1089,13 +1096,54 @@ func (db *appdbimpl) ChangeUsername(user_name string, new_username string) (errs
 		return components.InternalServerError, fmt.Errorf("error getting user ID: %w", err)
 	}
 
+	// Check if username is taken
+
+	rows, err := db.c.Query(`SELECT ID FROM users WHERE name = ?`, new_username)
+
+	if err != nil {
+		return components.InternalServerError, fmt.Errorf("error checking if username is taken: %w", err)
+	}
+
+	defer func() {
+		err := rows.Close()
+		if err != nil {
+			logrus.Error(err)
+		}
+	}()
+
+	if rows.Next() {
+		return components.ConflictError, fmt.Errorf("username is taken")
+	}
+
 	_, err = db.c.Exec(`UPDATE users SET name = ? WHERE ID = ?`, new_username, userID)
+
+	// Generate new ID for user
 
 	if err != nil {
 		return components.InternalServerError, fmt.Errorf("error changing username: %w", err)
 	}
 
-	return "", nil
+	h := sha256.New()
+	h.Write([]byte(new_username))
+	newID := hex.EncodeToString(h.Sum(nil))
+
+	_, err = db.c.Exec(`UPDATE users SET ID = ? WHERE ID = ?`, newID, userID)
+
+	if err != nil {
+		return components.InternalServerError, fmt.Errorf("error changing username: %w", err)
+	}
+
+	ret := components.SHA256hash{
+		Hash: newID,
+	}
+
+	ret_str, err := json.MarshalIndent(ret, "", "	")
+
+	if err != nil {
+		return components.InternalServerError, fmt.Errorf("error marshalling JSON: %w", err)
+	}
+
+	return string(ret_str), nil
 }
 
 func (db *appdbimpl) GetStream(user_name string, from, offset int) (stream string, err error) {

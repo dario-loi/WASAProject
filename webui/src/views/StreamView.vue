@@ -25,6 +25,9 @@ export default {
             document.getElementById("submit-button").innerHTML = "Uploading...";
             document.getElementById("submit-button").classList.add("disabled");
 
+            console.log(this.$user_state.headers.Authorization)
+            console.log(this.$user_state.username)
+
 
             const image = document.getElementById("fileInput").files[0];
 
@@ -57,11 +60,7 @@ export default {
             // the law of large numbers)
             const to_hash = filename + this.$user_state.username + Date.now().toString();
 
-            const textAsBuffer = new TextEncoder().encode(to_hash);
-            const hashBuffer = await window.crypto.subtle.digest('SHA-256', textAsBuffer);
-            const hashArray = Array.from(new Uint8Array(hashBuffer))
-            const img_id = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-
+            const img_id = this.$hasher(to_hash);
             const author = this.$user_state.username;
 
             const caption = document.getElementById("captionInput").value;
@@ -101,6 +100,11 @@ export default {
                     submit_button.classList.add("btn-primary");
                     submit_button.innerHTML = "Submit";
                 }, 3000);
+
+                // Clear the form
+
+                document.getElementById("fileInput").value = "";
+                document.getElementById("captionInput").value = "";
 
             }
             else {

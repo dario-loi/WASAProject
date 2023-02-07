@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"git.sapienzaapps.it/fantasticcoffee/fantastic-coffee-decaffeinated/service/api/reqcontext"
 	"git.sapienzaapps.it/fantasticcoffee/fantastic-coffee-decaffeinated/service/components"
@@ -199,6 +200,27 @@ func (rt *_router) changeUsername(w http.ResponseWriter, r *http.Request, ps htt
 	ret_data, err := rt.db.ChangeUsername(user_name, new_username.Uname)
 
 	if err != nil {
+
+		// Check if error is conflict
+
+		if strings.Contains(err.Error(), "taken") {
+
+			w.WriteHeader(http.StatusConflict)
+
+			_, err := w.Write([]byte(components.ConflictError))
+
+			if err != nil {
+
+				ctx.Logger.WithError(err).Error("error writing response")
+
+			}
+
+			ctx.Logger.Info("User tried to change username to one that is already taken")
+
+			return
+
+		}
+
 		w.WriteHeader(http.StatusInternalServerError)
 		_, err := w.Write([]byte(ret_data))
 
