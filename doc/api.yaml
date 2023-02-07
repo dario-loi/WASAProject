@@ -681,6 +681,12 @@ paths:
         required: true
         schema:
           $ref: "#/components/schemas/SHA256hash"
+      - name: commenter_name
+        in: header
+        description: The commenter's username.
+        required: true
+        schema:
+          $ref: "#/components/schemas/Username"
     put:
       operationId: commentPhoto
       summary: Comment a photo.
@@ -699,6 +705,7 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/Comment"
+
       responses:
         "204":
           description: |-

@@ -54,10 +54,72 @@ export default {
 
             response = await this.$axios.get("/users/" + this.post_data.author_name["username-string"] + "/profile/photos/" + this.photo_id + "/comments");
 
-            console.log(this.likes)
+            this.comments = response.data.comments;
         },
 
-        async WriteComment() {
+        async ToCommentWriter() {
+
+            // Jump to the comment writer
+
+            let comment_writer = document.getElementById("comment-writer");
+
+            comment_writer.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+
+
+        },
+
+        async AddComment(text) {
+
+            // Update the frontend, then update the state on the server
+
+            const creation_time = new Date().toISOString();
+
+            console.log("Creation time: " + creation_time);
+
+            const to_hash = creation_time + this.$user_state.username + this.photo_id;
+
+            // SHA256 hash the comment ID
+
+            const textAsBuffer = new TextEncoder().encode(to_hash);
+            const hashBuffer = await window.crypto.subtle.digest('SHA-256', textAsBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer))
+            const comment_id = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+            let comm_obj = {
+                comment_id: {
+                    "hash": comment_id
+                },
+                author: {
+                    "username-string": this.$user_state.username
+                },
+                body: text,
+                "creation-time": creation_time,
+                parent_post: {
+                    "hash": this.photo_id
+                }
+            }
+
+            console.log(comm_obj)
+
+            // Add to the comments array, triggering a re-render
+            this.comments.push(comm_obj);
+
+            // Update the state on the server
+
+            console.log("Request Path: " + "/users/" + this.post_data.author_name["username-string"] + "/profile/photos/" + this.photo_id + "/comments");
+
+            let response = await this.$axios.put("/users/" + this.post_data.author_name["username-string"] + "/profile/photos/" + this.photo_id + "/comments/" + comment_id,
+                comm_obj,
+                {
+                    headers: {
+                        "Authorization": this.$user_state.headers.Authorization,
+                        "commenter_name": this.$user_state.username
+                    }
+                });
+
 
         },
 
@@ -79,8 +141,6 @@ export default {
             }
 
             // Remove the post from the stream
-
-
             this.$emit("delete-post", this.post_data);
 
         },
@@ -190,7 +250,7 @@ export default {
             </div>
             <div class="col-auto d-flex align-items-center pb-2">
                 <button class="btn bt-sm comment-button btn-outline-primary v-center">
-                    <i class="bi-chat" @click="WriteComment()">Comment</i>
+                    <i class="bi-chat" @click="ToCommentWriter">Comment</i>
                 </button>
             </div>
 
@@ -224,13 +284,24 @@ export default {
                 <span class="h5 mx-1 font-weight-bold align-middle text-muted text-center">No comments yet.</span>
             </div>
             <div v-else class="col-12">
-                <span class="h5 mx-1 font-weight-bold align-middle text-muted text-start">Comments: </span>
+                <span class="h4 mx-1 font-weight-bold align-middle mb-2 text-start">Comments: </span>
             </div>
-            <div class="col-12">
-                <Comment v-for="comment in comments" :comment="comment"></Comment>
+            <div class="col-12 my-3">
+                <Comment v-for="comment in comments" :comment="comment" :key="comment.comment_id.hash"></Comment>
             </div>
 
         </div>
+
+        <!-- CommentWriter -->
+
+        <div class="row my-0">
+            <div class="col-12">
+                <CommentWriter id="comment-writer" :photo_id="photo_id" :author_name="username" @comment="AddComment">
+                </CommentWriter>
+            </div>
+        </div>
+
+
     </div>
 
 

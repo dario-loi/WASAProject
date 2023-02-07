@@ -5,25 +5,42 @@ export default {
 
     data: function () {
         return {
-            author: this.comment.author,
-            date: null,
-            text: this.comment.text
+            author: this.comment.author["username-string"],
+            created_at: null,
+            text: this.comment.body
         }
     },
 
-    methods: {
-        async initialize() {
-            this.date = this.comment.creation_time;
+    emits: ['delete-comment'],
+
+    /*
+                // Get date in RFC3339 format
+            let now = new Date().toISOString();
 
             // format to dd month yyyy at hh:mm
 
-            this.date = this.date.split("T");
-            let date = this.date[0].split("-");
-            let time = this.date[1].split(":");
+            let date_split = now.split("T");
+            let date = date_split[0].split("-");
+            let time = date_split[1].split(":");
+            time = time[0] + ":" + time[1];
+            date = date[2] + " " + this.$months[parseInt(date[1]) - 1] + " " + date[0] + " at " + time;
+*/
+
+    methods: {
+        async initialize() {
+
+            // format to dd month yyyy at hh:mm
+
+            console.log(this.comment)
+
+            let creation_time = this.comment["creation-time"];
+            let date_split = creation_time.split("T");
+            let date = date_split[0].split("-");
+            let time = date_split[1].split(":");
             time = time[0] + ":" + time[1];
             date = date[2] + " " + this.$months[parseInt(date[1]) - 1] + " " + date[0] + " at " + time;
 
-            this.date = date;
+            this.created_at = date;
         }
     },
 
@@ -36,15 +53,35 @@ export default {
 <template>
     <div class="card WasaPhotoComment shadow-lg">
         <div class="card-body">
-            <div class="row justify-content-between">
-                <h5 class="card-title col-3">{{ author }}</h5>
-                <!-- Align the text to the top right of the card -->
+            <div class="row justify-content-between" style="vertical-align: middle;">
+                <h5 class="card-title col-5" style="font-size: 1.2em;">
+                    <i class="bi bi-person-circle mx-1" style="font-size: 1.5em;"></i>{{ author }}
+                </h5>
+
+                <!-- Delete button-->
+
                 <div class="col-3 text-end align-middle">
-                    <h6 class="card-subtitle mb-text-muted w-auto">{{ date }}</h6>
+                    <button type="button" class="btn btn-danger btn-sm" v-on:click="$emit('delete-comment', comment)">
+                        <i class="bi bi-trash mx-1"></i>
+                    </button>
+
                 </div>
+
             </div>
 
-            <p class="card-text">{{ text }}</p>
+            <hr class="my-2">
+
+            <p class="card-text p-3">{{ text }}</p>
+
+            <div class="row justify-content-end">
+                <!-- Align the text to the top right of the card -->
+                <div class="col-3 text-end align-middle">
+                    <span class="card-subtitle v-center text-muted w-auto"
+                        style="font-size: 0.8em, font-style: italic;">
+                        {{ created_at }}</span>
+                </div>
+
+            </div>
         </div>
     </div>
 </template>

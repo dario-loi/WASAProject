@@ -70,9 +70,29 @@ func (t JSONTime) MarshalJSON() ([]byte, error) {
 	return []byte(stamp), nil
 }
 
+// UnmarshalJSON implements the json.Unmarshaler interface.
+
+func (t *JSONTime) UnmarshalJSON(b []byte) (err error) {
+
+	if b[0] != '"' || b[len(b)-1] != '"' {
+		return fmt.Errorf("invalid timestamp: %s", b)
+	}
+
+	ts, err := time.Parse(time.RFC3339, string(b[1:len(b)-1]))
+
+	if err != nil {
+		return err
+	}
+
+	*t = JSONTime(ts)
+
+	return nil
+
+}
+
 type Comment struct {
 	Comment_ID   SHA256hash `json:"comment_id"`
-	Username     string     `json:"author"`
+	Username     User       `json:"author"`
 	Body         string     `json:"body"`
 	CreationTime JSONTime   `json:"creation-time"`
 	Parent       SHA256hash `json:"parent_post"`

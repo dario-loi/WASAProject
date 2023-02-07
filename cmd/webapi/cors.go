@@ -10,6 +10,7 @@ import (
 // feature present in web browsers that blocks JavaScript requests going across different domains if not specified in a
 // policy. This function sends the policy of this API server.
 func applyCORSHandler(h http.Handler) http.Handler {
+	// Some of the allowed headers are legacy.
 	return handlers.CORS(
 		handlers.AllowedHeaders([]string{
 			"x-example-header",
@@ -18,5 +19,5 @@ func applyCORSHandler(h http.Handler) http.Handler {
 		handlers.AllowedOrigins([]string{"*"}),
 		handlers.ExposedHeaders([]string{"Authorization"}),
 		handlers.AllowedHeaders([]string{"Authorization", "Content-Type", "searcher_id",
-			"identifier", "requester_ID", "user_id", "user_name"}))(h)
+			"identifier", "requester_ID", "user_id", "user_name", "commenter_name"}))(h)
 }

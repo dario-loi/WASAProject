@@ -9,6 +9,7 @@ import LikeCounter from './components/LikeCounter.vue'
 import Photo from './components/Photo.vue'
 import PhotoPost from './components/PhotoPost.vue'
 import Stream from './components/Stream.vue'
+import CommentWriter from './components/CommentWriter.vue'
 
 import './assets/dashboard.css'
 import './assets/main.css'
@@ -46,6 +47,7 @@ app.component("LikeCounter", LikeCounter);
 app.component("Photo", Photo);
 app.component("PhotoPost", PhotoPost);
 app.component("Stream", Stream);
+app.component("CommentWriter", CommentWriter);
 
 app.use(router)
 app.mount('#app')

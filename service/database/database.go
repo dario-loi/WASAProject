@@ -690,7 +690,7 @@ func (db *appdbimpl) GetPhotoComments(photoID string) (comments string, err erro
 
 		var comment components.Comment
 
-		err = res.Scan(&comment.Comment_ID, &comment.Username, &comment.Body, &comment.CreationTime, &comment.Parent)
+		err = res.Scan(&comment.Comment_ID.Hash, &comment.Username.Uname, &comment.Body, &comment.CreationTime, &comment.Parent.Hash)
 
 		if err != nil {
 			return components.InternalServerError,
@@ -908,7 +908,7 @@ func (db *appdbimpl) CommentPhoto(username string, photoID string, comment compo
 
 	comment_id := comment.Comment_ID.Hash
 
-	_, err = db.c.Exec(`INSERT OR REPLACE INTO comments (comment_ID, post_code, user_code, content, creation_date ) VALUES (?, ?, ?)`, comment_id, comment.Parent, userID, comment.Body, comment.CreationTime)
+	_, err = db.c.Exec(`INSERT OR REPLACE INTO comments (comment_ID, post_code, user_code, content, creation_date ) VALUES (?, ?, ?, ?, ?)`, comment_id, comment.Parent.Hash, userID, comment.Body, time.Time(comment.CreationTime))
 
 	if err != nil {
 		return components.InternalServerError, fmt.Errorf("error inserting comment: %w", err)

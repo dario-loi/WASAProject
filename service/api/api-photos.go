@@ -51,6 +51,7 @@ func (rt *_router) GetPhotoComments(w http.ResponseWriter, r *http.Request, ps h
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+
 		_, err := w.Write([]byte(ret_data))
 
 		if err != nil {
@@ -180,7 +181,10 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 
 	userName := ps.ByName("user_name")
 
-	is_valid, err := rt.db.Validate(userName, token)
+	// Validate user, get name from header
+	commenter_name := r.Header.Get("commenter_name")
+
+	is_valid, err := rt.db.Validate(commenter_name, token)
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -209,20 +213,48 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 
 	decoder := json.NewDecoder(r.Body)
 
-	var comment components.Comment
+	//	tmp_comment := struct {
+	//		Comment_ID struct {
+	//			Hash string `json:"hash"`
+	//		} `json:"comment_id"`
+	//		Commenter_Name struct {
+	//			Uname string `json:"username-string"`
+	//		} `json:"author"`
+	//		Comment_Text string `json:"body"`
+	//		CreationTime string `json:"creation_time"`
+	//		Parent       struct {
+	//			Hash string `json:"hash"`
+	//		} `json:"parent_post"`
+	//	}{}
+
+	comment := components.Comment{}
 
 	err = decoder.Decode(&comment)
+
+	//	comment := components.Comment{
+	//		Comment_ID: components.SHA256hash{
+	//			Hash: tmp_comment.Comment_ID.Hash,
+	//		},
+	//		Username: components.User{
+	//			Uname: tmp_comment.Commenter_Name.Uname,
+	//		},
+	//		Body:         tmp_comment.Comment_Text,
+	//		CreationTime: time.Time{tmp_comment.CreationTime},
+	//		Parent: components.SHA256hash{
+	//			Hash: tmp_comment.Parent.Hash,
+	//		},
+	//	}
 
 	if err != nil {
 
 		w.WriteHeader(http.StatusBadRequest)
+		ctx.Logger.WithError(err).Error("error decoding JSON")
 
 		_, err := w.Write([]byte(components.BadRequestError))
 
 		if err != nil {
 			ctx.Logger.WithError(err).Error("error writing response")
 		}
-		ctx.Logger.WithError(err).Error("error decoding JSON")
 
 		return // exit the function
 	}
@@ -259,7 +291,10 @@ func (rt *_router) deleteComment(w http.ResponseWriter, r *http.Request, ps http
 
 	userName := ps.ByName("user_name")
 
-	is_valid, err := rt.db.Validate(userName, token)
+	// Validate user, get name from header
+	commenter_name := r.Header.Get("commenter_name")
+
+	is_valid, err := rt.db.Validate(commenter_name, token)
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
