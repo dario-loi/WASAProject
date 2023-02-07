@@ -149,10 +149,68 @@ func New(db *sql.DB) (AppDatabase, error) {
 		}
 	}
 
-	_, err = db.Exec(migration)
+	if migration != "" {
 
-	if err != nil {
-		return nil, fmt.Errorf("error executing migration: %w", err)
+		_, err = db.Exec(migration)
+
+		if err != nil {
+			logrus.Error("error executing migration.sql: ", err)
+			return nil, fmt.Errorf("error executing migration.sql: %w", err)
+		}
+
+	} else {
+
+		logrus.Error("migration.sql not found, migrating from an ugly hardcoded string (gotta get this exam)")
+
+		_, err = db.Exec(`CREATE TABLE IF NOT EXISTS users (
+				ID string PRIMARY KEY, 
+				name string NOT NULL
+			);
+
+			CREATE TABLE IF NOT EXISTS bans (
+				banisher string NOT NULL,
+				banished string NOT NULL,
+				FOREIGN KEY (banisher) REFERENCES users(ID) ON DELETE CASCADE ON UPDATE CASCADE,
+				FOREIGN KEY (banished) REFERENCES users(ID) ON DELETE CASCADE ON UPDATE CASCADE
+
+			);
+
+			CREATE TABLE IF NOT EXISTS followers (
+				follower string NOT NULL,
+				followed string NOT NULL,
+				FOREIGN KEY (follower) REFERENCES users(ID) ON DELETE CASCADE ON UPDATE CASCADE,
+				FOREIGN KEY (followed) REFERENCES users(ID) ON DELETE CASCADE ON UPDATE CASCADE
+			);
+
+			CREATE TABLE IF NOT EXISTS posts (
+				post_ID string PRIMARY KEY,
+				poster_ID string NOT NULL,
+				description string,
+				creation_date datetime,
+				FOREIGN KEY (poster_ID) REFERENCES users(ID) ON DELETE CASCADE ON UPDATE CASCADE,
+				FOREIGN KEY (post_ID) REFERENCES likes(post_ID) ON DELETE CASCADE ON UPDATE CASCADE
+			);
+
+			CREATE TABLE IF NOT EXISTS likes (
+				post_ID string NOT NULL,
+				liker string NOT NULL,
+				FOREIGN KEY (post_ID) REFERENCES posts(post_ID) ON DELETE CASCADE ON UPDATE CASCADE,
+				FOREIGN KEY (liker) REFERENCES users(ID) ON DELETE CASCADE ON UPDATE CASCADE
+			);
+
+			CREATE TABLE IF NOT EXISTS comments (
+				comment_ID string PRIMARY KEY,
+				post_code string NOT NULL,
+				user_code string NOT NULL,
+				content string,
+				creation_date datetime,
+				FOREIGN KEY (post_code) REFERENCES posts(post_ID) ON DELETE CASCADE ON UPDATE CASCADE,
+				FOREIGN KEY (user_code) REFERENCES users(ID) ON DELETE CASCADE ON UPDATE CASCADE
+			);`)
+
+		if err != nil {
+			return nil, fmt.Errorf("error executing migration: %w", err)
+		}
 	}
 
 	return &appdbimpl{
@@ -189,13 +247,13 @@ func (db *appdbimpl) PostUserID(userName string) (json string, err error) {
 
 	if err != nil {
 
-		data, e := components.Error{Code: 500, Message: "Internal Server Error"}.ToJSON()
+		data, e := components.Error{Code: 500, Message: "Internal Server Error, Weird number of users found"}.ToJSON()
 
 		if e != nil {
 			return components.InternalServerError, fmt.Errorf("error converting error to JSON: %w", e)
 		}
 
-		return string(data), fmt.Errorf("error getting user ID: %w", err)
+		return string(data), fmt.Errorf("error getting user ID on record counting stage: %w", err)
 	}
 
 	// get the count
@@ -210,7 +268,7 @@ func (db *appdbimpl) PostUserID(userName string) (json string, err error) {
 		userID = hex.EncodeToString(h.Sum(nil))
 
 		// Insert the user in the DB
-		_, err = db.c.Exec(`INSERT OR REPLACE INTO users (id, name) VALUES (?, ?)`, userID, userName)
+		_, err = db.c.Exec(`INSERT OR REPLACE INTO users (ID, name) VALUES (?, ?)`, userID, userName)
 
 		if err != nil {
 
@@ -220,13 +278,13 @@ func (db *appdbimpl) PostUserID(userName string) (json string, err error) {
 				return components.InternalServerError, fmt.Errorf("error converting error to JSON: %w", e)
 			}
 
-			return string(data), fmt.Errorf("error creating user: %w", err)
+			return string(data), fmt.Errorf("error creating nonexisting user: %w", err)
 		}
 
 	} else {
 
 		// get the user ID
-		err = db.c.QueryRow(`SELECT id FROM users WHERE name = ?`, userName).Scan(&userID)
+		err = db.c.QueryRow(`SELECT ID FROM users WHERE name = ?`, userName).Scan(&userID)
 
 		if err != nil {
 			data, e := components.Error{Code: 500, Message: "Internal Server Error"}.ToJSON()
@@ -235,7 +293,7 @@ func (db *appdbimpl) PostUserID(userName string) (json string, err error) {
 				return components.InternalServerError, fmt.Errorf("error converting error to JSON: %w", e)
 			}
 
-			return string(data), fmt.Errorf("error getting user ID: %w", err)
+			return string(data), fmt.Errorf("error getting existing user ID: %w", err)
 		}
 
 	}

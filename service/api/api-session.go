@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"git.sapienzaapps.it/fantasticcoffee/fantastic-coffee-decaffeinated/service/api/reqcontext"
@@ -21,10 +22,13 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 		_, err := w.Write([]byte(components.BadRequestError))
 
 		if err != nil {
-			ctx.Logger.WithError(err).Error("error writing response")
+			ctx.Logger.WithError(err).Error(
+				fmt.Errorf("error writing response, details: %s", err).Error())
 		}
 
-		ctx.Logger.WithError(err).Error("error decoding JSON")
+		ctx.Logger.WithError(err).Error(
+			fmt.Errorf("error parsing request body, details: %s", err).Error())
+
 		return
 	}
 
@@ -39,7 +43,8 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 			ctx.Logger.WithError(err).Error("error writing response")
 		}
 
-		ctx.Logger.WithError(err).Error("error getting user ID")
+		ctx.Logger.WithError(err).Error(
+			fmt.Errorf("error getting user ID (username: %s), details: %s", uname.Uname, err).Error())
 		return
 	}
 
@@ -47,7 +52,8 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 	_, err = w.Write([]byte(ret_data))
 
 	if err != nil {
-		ctx.Logger.WithError(err).Error("error writing response")
+		ctx.Logger.WithError(err).Error(
+			fmt.Errorf("error writing response, details: %s", err).Error())
 	}
 
 }
