@@ -30,10 +30,6 @@ export default {
                 "username-string": username
             });
 
-            console.log({
-                "username-string": username
-            })
-
             //check if the response is 201
 
             if (response.status == 201) {
@@ -42,7 +38,6 @@ export default {
                 this.$user_state.headers.Authorization = response.data["token"]["hash"]
                 this.$router.push("/stream/" + username);
             } else {
-                console.table(response);
                 this.error = true;
             }
         }

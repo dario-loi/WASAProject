@@ -1151,15 +1151,21 @@ func (db *appdbimpl) GetStream(user_name string, from, offset int) (stream strin
 	userID, err := db.GetUserID(user_name)
 
 	if err != nil {
-		return "", fmt.Errorf("error getting user ID: %w", err)
+		logrus.Errorf("error getting user ID: %v", err)
+		return components.InternalServerError, fmt.Errorf("error getting user ID: %w", err)
 	}
 
-	rows, err := db.c.Query(`SELECT post_ID, poster_ID, description, creation_date FROM posts AS p, followers AS f WHERE f.follower = ? AND f.followed = p.poster_ID AND ? NOT IN (
-		SELECT banned FROM bans WHERE banisher = p.poster_ID AND banished = ?
-	)  ORDER BY p.creation_date DESC LIMIT ?, ?`, userID, userID, userID, from, offset)
+	rows, err := db.c.Query(`SELECT post_ID, poster_ID, description, creation_date 
+	FROM posts AS p, followers AS f 
+	WHERE ((f.follower = ? 
+	AND f.followed = p.poster_ID) OR (p.poster_ID = ?))
+	AND ? NOT IN (
+		SELECT banished FROM bans WHERE banisher = p.poster_ID AND banished = ?
+	)  ORDER BY p.creation_date DESC LIMIT ?, ?`, userID, userID, userID, userID, from, offset)
 
 	if err != nil {
-		return "", fmt.Errorf("error getting stream: %w", err)
+		logrus.Errorf("error getting stream: %v", err)
+		return components.InternalServerError, fmt.Errorf("error getting stream: %w", err)
 	}
 
 	defer func() {
@@ -1180,21 +1186,24 @@ func (db *appdbimpl) GetStream(user_name string, from, offset int) (stream strin
 		// for each retrieved post, get the comments and likes
 
 		if rows.Err() != nil {
-			return "", fmt.Errorf("error getting post in the stream: %w", err)
+			logrus.Errorf("error getting post in the stream: %v", err)
+			return components.InternalServerError, fmt.Errorf("error getting post in the stream: %w", err)
 		}
 
 		var post components.Post
 
-		err := rows.Scan(&post.Photo_ID, &post.Author_Name.Uname, &post.Description, &post.CreationTime)
+		err := rows.Scan(&post.Photo_ID.Hash, &post.Author_Name.Uname, &post.Description, &post.CreationTime)
 
 		if err != nil {
-			return "", fmt.Errorf("error scanning row: %w", err)
+			logrus.Errorf("error scanning row: %v", err)
+			return components.InternalServerError, fmt.Errorf("error scanning row: %w", err)
 		}
 
 		auth_name, err := db.GetUsername(post.Author_Name.Uname)
 
 		if err != nil {
-			return "", fmt.Errorf("error getting author name: %w", err)
+			logrus.Errorf("error getting author name: %v", err)
+			return components.InternalServerError, fmt.Errorf("error getting author name: %w", err)
 		}
 
 		post.Author_Name.Uname = auth_name
@@ -1205,7 +1214,8 @@ func (db *appdbimpl) GetStream(user_name string, from, offset int) (stream strin
 	stream_data, err := json.MarshalIndent(posts, "", "  ")
 
 	if err != nil {
-		return "", fmt.Errorf("error marshaling stream: %w", err)
+		logrus.Errorf("error marshaling stream: %v", err)
+		return components.InternalServerError, fmt.Errorf("error marshaling stream: %w", err)
 	}
 
 	return string(stream_data), nil

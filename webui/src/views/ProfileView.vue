@@ -79,11 +79,7 @@ export default {
                 });
 
                 this.photos = response.data["posts"];
-
                 this.posts = this.photos.length;
-
-                console.log(this.has_banned_you)
-
             }
 
         },
@@ -131,7 +127,6 @@ export default {
                     return
                 }
 
-                console.table(err.response);
                 return
             }).then(res => {
 
@@ -142,7 +137,6 @@ export default {
 
                 if (res.statusText != "OK") {
                     alert("Error: " + res.statusText);
-                    console.table(res);
                     return
                 }
 
@@ -150,9 +144,6 @@ export default {
                 this.username = new_name;
 
                 this.$user_state.headers["Authorization"] = res.data.hash;
-
-                console.log("Name Changed, dumping user state")
-                console.table(this.$user_state);
 
 
                 this.$router.push("/profile/" + new_name);
@@ -173,7 +164,6 @@ export default {
             if (res.statusText != "No Content") {
 
                 alert("Error: " + res.statusText);
-                console.table(res);
                 return
             }
 
@@ -199,7 +189,6 @@ export default {
             if (res.statusText != "No Content") {
 
                 alert("Error: " + res.statusText);
-                console.table(res);
                 return
             }
 
@@ -216,7 +205,6 @@ export default {
             if (res.statusText != "No Content") {
 
                 alert("Error: " + res.statusText);
-                console.table(res);
                 return
             }
 
@@ -232,7 +220,6 @@ export default {
             if (res.statusText != "No Content") {
 
                 alert("Error: " + res.statusText);
-                console.table(res);
                 return
             }
 
@@ -356,7 +343,7 @@ export default {
         </div>
     </div>
     <div v-else class="container">
-        <Stream :posts="photos" @delete-post="DeletePost" />
+        <Stream :posts="photos" @delete-post="DeletePost" :key="photos.length"></Stream>
     </div>
 </template>
 

@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -540,7 +541,7 @@ func (rt *_router) getStream(w http.ResponseWriter, r *http.Request, ps httprout
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		ctx.Logger.WithError(err).Error("error getting stream")
+		ctx.Logger.WithError(err).Error(fmt.Errorf("error getting stream for user %s details %w", userName, err))
 		_, err := w.Write([]byte(ret_json_string))
 
 		if err != nil {

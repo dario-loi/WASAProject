@@ -5,6 +5,9 @@ export default {
     data: function () {
         return {
             modal: null,
+            stream_posts: [],
+            stream_top: 0,
+            there_are_more_posts: true,
         }
     },
     methods: {
@@ -16,7 +19,65 @@ export default {
             document.body.appendChild(mod._element)
             this.modal = mod
 
+            // Load stream from user's 
+
+            const loading_factor = 8;
+
+            let batch = await this.LoadStream(this.stream_top, this.stream_top + loading_factor)
+
+            if (batch.length == 0) {
+                this.there_are_more_posts = false;
+            }
+
+            this.stream_posts.push(...batch);
+            this.stream_top += batch.length;
+
+            // listen when the user scrolls to the bottom of the page
+
+            window.onscroll = async () => {
+                if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
+
+                    let batch = await this.LoadStream(this.stream_top, this.stream_top + loading_factor)
+
+                    if (this.there_are_more_posts == false) {
+                        return;
+                    }
+
+                    if (batch.length == 0) {
+                        this.there_are_more_posts = false;
+                    }
+
+                    this.stream_posts.push(...batch);
+                    this.stream_top += batch.length;
+
+                }
+            };
+
         },
+
+        async DeletePost(post_data) {
+
+            this.refresh();
+        },
+
+        async LoadStream(start, end) {
+            let ret = await this.$axios.get("/users/" + this.$user_state.username + "/stream?from=" + start + "&offset=" + end, {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": this.$user_state.headers.Authorization
+                }
+            }
+            ).catch((error) => {
+                console.log(error);
+                alert("Error loading stream");
+                return [];
+            }).then((response) => {
+                return response;
+            });
+
+            return ret.data["posts"];
+        },
+
 
         async UploadPhoto() {
 
@@ -24,10 +85,6 @@ export default {
 
             document.getElementById("submit-button").innerHTML = "Uploading...";
             document.getElementById("submit-button").classList.add("disabled");
-
-            console.log(this.$user_state.headers.Authorization)
-            console.log(this.$user_state.username)
-
 
             const image = document.getElementById("fileInput").files[0];
 
@@ -147,7 +204,13 @@ export default {
                     Post Photo
                 </button>
             </div>
+
+            <!-- Stream -->
+
         </div>
+
+
+        <Stream :posts="stream_posts" :key="stream_posts.length" @delete-post="DeletePost"></Stream>
     </div>
 
     <!-- Modal -->
