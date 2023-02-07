@@ -190,7 +190,30 @@ export default {
 
             this.have_i_liked_this = false;
             this.likes--;
-        }
+        },
+
+        async DeleteComment(comment) {
+
+            // Update the state on the server
+
+            console.log("Request Path: " + "/users/" + this.post_data.author_name["username-string"] + "/profile/photos/" + this.photo_id + "/comments/" + comment.comment_id["hash"]);
+
+            let response = await this.$axios.delete("/users/" + this.post_data.author_name["username-string"] + "/profile/photos/" + this.photo_id + "/comments/" + comment.comment_id["hash"], {
+                headers: {
+                    "Authorization": this.$user_state.headers.Authorization
+                }
+            });
+
+            if (response.statusText != "No Content") {
+                alert("Error: " + response.statusText);
+                return;
+            }
+
+            // Remove the comment from the array
+            this.comments = this.comments.filter((c) => c.comment_id["hash"] != comment.comment_id["hash"]);
+
+        },
+
 
     },
 
@@ -287,7 +310,9 @@ export default {
                 <span class="h4 mx-1 font-weight-bold align-middle mb-2 text-start">Comments: </span>
             </div>
             <div class="col-12 my-3">
-                <Comment v-for="comment in comments" :comment="comment" :key="comment.comment_id.hash"></Comment>
+                <Comment v-for="comment in comments" :comment="comment" :key="comment.comment_id.hash"
+                    @delete="DeleteComment">
+                </Comment>
             </div>
 
         </div>

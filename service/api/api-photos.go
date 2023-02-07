@@ -291,10 +291,7 @@ func (rt *_router) deleteComment(w http.ResponseWriter, r *http.Request, ps http
 
 	userName := ps.ByName("user_name")
 
-	// Validate user, get name from header
-	commenter_name := r.Header.Get("commenter_name")
-
-	is_valid, err := rt.db.Validate(commenter_name, token)
+	is_valid, err := rt.db.Validate(userName, token)
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)

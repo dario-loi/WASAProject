@@ -11,20 +11,7 @@ export default {
         }
     },
 
-    emits: ['delete-comment'],
-
-    /*
-                // Get date in RFC3339 format
-            let now = new Date().toISOString();
-
-            // format to dd month yyyy at hh:mm
-
-            let date_split = now.split("T");
-            let date = date_split[0].split("-");
-            let time = date_split[1].split(":");
-            time = time[0] + ":" + time[1];
-            date = date[2] + " " + this.$months[parseInt(date[1]) - 1] + " " + date[0] + " at " + time;
-*/
+    emits: ['delete'],
 
     methods: {
         async initialize() {
@@ -61,7 +48,7 @@ export default {
                 <!-- Delete button-->
 
                 <div class="col-3 text-end align-middle">
-                    <button type="button" class="btn btn-danger btn-sm" v-on:click="$emit('delete-comment', comment)">
+                    <button type="button" class="btn btn-danger btn-sm" v-on:click="$emit('delete', comment)">
                         <i class="bi bi-trash mx-1"></i>
                     </button>
 

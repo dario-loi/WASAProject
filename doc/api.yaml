@@ -681,12 +681,7 @@ paths:
         required: true
         schema:
           $ref: "#/components/schemas/SHA256hash"
-      - name: commenter_name
-        in: header
-        description: The commenter's username.
-        required: true
-        schema:
-          $ref: "#/components/schemas/Username"
+
     put:
       operationId: commentPhoto
       summary: Comment a photo.
@@ -694,6 +689,13 @@ paths:
         Lets the user comment one of `user_name`'s photos, authentication is required in order 
         to perform the comment, the user might post multiple comments, even identical ones
         (but that would be annoying!).
+      parameters:
+        - name: commenter_name
+          in: header
+          description: The commenter's username.
+          required: true
+          schema:
+            $ref: "#/components/schemas/Username"
       security:
         - bearerAuth: []
       tags:
