@@ -212,38 +212,8 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 	// Retrieve comment from request body
 
 	decoder := json.NewDecoder(r.Body)
-
-	//	tmp_comment := struct {
-	//		Comment_ID struct {
-	//			Hash string `json:"hash"`
-	//		} `json:"comment_id"`
-	//		Commenter_Name struct {
-	//			Uname string `json:"username-string"`
-	//		} `json:"author"`
-	//		Comment_Text string `json:"body"`
-	//		CreationTime string `json:"creation_time"`
-	//		Parent       struct {
-	//			Hash string `json:"hash"`
-	//		} `json:"parent_post"`
-	//	}{}
-
 	comment := components.Comment{}
-
 	err = decoder.Decode(&comment)
-
-	//	comment := components.Comment{
-	//		Comment_ID: components.SHA256hash{
-	//			Hash: tmp_comment.Comment_ID.Hash,
-	//		},
-	//		Username: components.User{
-	//			Uname: tmp_comment.Commenter_Name.Uname,
-	//		},
-	//		Body:         tmp_comment.Comment_Text,
-	//		CreationTime: time.Time{tmp_comment.CreationTime},
-	//		Parent: components.SHA256hash{
-	//			Hash: tmp_comment.Parent.Hash,
-	//		},
-	//	}
 
 	if err != nil {
 

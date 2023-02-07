@@ -5,7 +5,6 @@ export default {
     data: function () {
         return {
             modal: null,
-            uploaded_image: null,
         }
     },
     methods: {
@@ -17,13 +16,6 @@ export default {
             document.body.appendChild(mod._element)
             this.modal = mod
 
-            // Get the default image's base64 data from ./assets/default.png
-
-            const default_image = await this.$axios.get("/resources/photos/default", {
-                responseType: "image/jpeg"
-            });
-
-            this.uploaded_image = default_image.data;
         },
 
         async UploadPhoto() {
